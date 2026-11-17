@@ -1,1503 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <!-- PLACEHOLDER COPY: title, description, logo, imagery and links below come from the
-       design reference (mcu-timelines.vercel.app). Replace with this project's own brand
-       before publishing. -->
-  <title>MCU Timeline — The Complete Marvel Universe</title>
-  <meta name="description" content="Track your MCU journey, unlock secret achievements, and discover hidden Easter eggs.">
-  <meta name="theme-color" content="#06080d">
-  <link rel="icon" type="image/webp" href="https://mcu-timelines.vercel.app/red.webp">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap">
-  <style>
-    /* ═══════════════════════════════════════════
-       DESIGN TOKENS (measured from reference)
-    ═══════════════════════════════════════════ */
-    :root {
-      --bg-void: #06080d;
-      --bg-deep: #0d1018;
-      --bg-card: #0f1320;
-      --bg-card-hover: #141826;
-      --accent-color: #ff2a2a;
-      --glow-color: #FF2A2A26;
-      --button-color: #e8392b;
-      --highlight-color: #c0392b;
-      --accent-red: #c0392b;
-      --accent-red-bright: #e8392b;
-      --accent-red-dim: #FF2A2A26;
-      --accent-blue: #2980b9;
-      --accent-blue-dim: #2980B91F;
-      --text-primary: #e8eaf0;
-      --text-secondary: #7f8fa6;
-      --text-muted: #3d4a5c;
-      --border: #FFFFFF0E;
-      --border-hover: #FFFFFF21;
-      --watched-overlay: #06080DC7;
-      --font-display: 'Bebas Neue', sans-serif;
-      --font-body: 'Outfit', sans-serif;
-      --card-radius: 12px;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MCU Timeline — The Multiverse Experience</title>
+  <meta name="description" content="An interactive, cinematic Marvel Universe exploration experience tracking 79 titles, 44 audited characters, 6 Infinity Stones, and network relationship science." />
+  <meta name="theme-color" content="#05070C" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%2305070c' stroke='%23e23636' stroke-width='6'/><text x='50' y='64' font-size='42' font-family='sans-serif' font-weight='900' fill='%23e23636' text-anchor='middle'>M</text></svg>" />
 
-      /* extra measured values */
-      --surface-poster: #0a0d14;
-      --watch-dot: #1e90ff;
-      --type-movie-bg: #c0392b2e;
-      --type-series-bg: #2980b92e;
-      --green: #00E676;
-      --shadow-deep: #000000B3 0px 8px 24px 0px;
-      --shadow-modal: #00000099 0px 8px 25px 0px;
-      --glow-pink-sm: #FF004D66 0px 0px 8px 0px;
-      --glow-pink-md: #FF004D66 0px 0px 15px 0px;
-      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-    }
+  <!-- Fonts: Bebas Neue (Titles), Outfit (Body/UI), Playfair Display (Editorial/Quotes) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400;1,600&display=swap" />
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    html { scroll-behavior: smooth; background: var(--bg-void); scrollbar-width: none; }
-    html::-webkit-scrollbar { display: none; }
-
-    body {
-      font-family: var(--font-body), Arial, sans-serif;
-      font-size: 16px;
-      line-height: normal;
-      font-weight: 400;
-      background: var(--bg-void);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: clip;
-    }
-
-    a { color: var(--text-muted); text-decoration: none; transition: color 0.2s ease; }
-    button { font-family: inherit; }
-    img { display: block; }
-    :focus-visible { outline: 2px solid var(--accent-red-bright); outline-offset: 2px; }
-
-    /* ═══════════════════════════════════════════
-       STUDIO INTRO
-    ═══════════════════════════════════════════ */
-    #studio-intro {
-      position: fixed; inset: 0; z-index: 3000000;
-      background: #000; display: grid; place-items: center;
-      overflow: hidden; cursor: pointer;
-      opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0s linear 0.5s;
-    }
-    #studio-intro.play { opacity: 1; visibility: visible; transition: opacity 0.2s ease; }
-    .intro-flip {
-      position: absolute; inset: -6%;
-      background-size: cover; background-position: center top;
-      filter: saturate(0.5) contrast(1.15);
-      transform: scale(1.12);
-    }
-    #studio-intro.play .intro-flip { animation: introPush 3.2s linear forwards; }
-    .intro-red {
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, #e8392b8c 0%, #6e0a06eb 58%, #1a0202 100%);
-    }
-    .intro-logo {
-      position: relative; display: flex; align-items: stretch;
-      font-family: var(--font-display); line-height: 1;
-      font-size: clamp(3.2rem, 12vw, 9rem); letter-spacing: 0.04em;
-      opacity: 0; transform: scale(1.25);
-      transition: opacity 0.6s ease, transform 1.6s var(--ease-out);
-    }
-    .intro-logo .box { background: var(--accent-red-bright); color: #fff; padding: 0.06em 0.18em 0; }
-    .intro-logo .word { color: #fff; padding: 0.06em 0.12em 0; border: 0.04em solid #fff; border-left: 0; }
-    #studio-intro.logo-in .intro-logo { opacity: 1; transform: scale(1); }
-    .intro-blackout { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity 0.6s ease; pointer-events: none; }
-    #studio-intro.blackout .intro-blackout { opacity: 1; }
-    .intro-skip {
-      position: absolute; bottom: 1.5rem; right: 1.5rem;
-      font-size: 0.6rem; letter-spacing: 0.24em; text-transform: uppercase; color: #ffffff2e;
-    }
-    @keyframes introPush { from { transform: scale(1.12); } to { transform: scale(1); } }
-
-    /* ═══════════════════════════════════════════
-       1. HERO
-    ═══════════════════════════════════════════ */
-    #hero {
-      position: relative;
-      min-height: 100vh; min-height: 100dvh;
-      padding: 4rem 1.5rem 3.5rem;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      overflow: hidden; text-align: center;
-      background: #010407 url('https://mcu-timelines.vercel.app/tree.webp') center center / cover no-repeat;
-    }
-    /* soft red glow breathing over the backdrop */
-    #hero::before {
-      content: ''; position: absolute; inset: -5%;
-      background: radial-gradient(circle at center, var(--glow-color) 0%, transparent 50%);
-      z-index: 1; animation: heroZoom 10s ease-in-out infinite alternate;
-    }
-    /* film-grain noise */
-    #hero::after {
-      content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    }
-    .hero-vignette {
-      position: absolute; inset: 0; z-index: 2; pointer-events: none;
-      background:
-        radial-gradient(circle at center, #01040733 0%, #010407a6 70%, #010407f2 100%),
-        linear-gradient(180deg, transparent 70%, var(--bg-void) 100%);
-    }
-    #hero-canvas { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
-
-    .hero-overlay {
-      position: relative; z-index: 10;
-      width: 90%; max-width: 680px;
-      display: flex; flex-direction: column; align-items: center;
-    }
-    .hero-badge {
-      font-size: clamp(0.72rem, 1.4vw, 0.85rem); font-weight: 800;
-      letter-spacing: 0.42em; text-transform: uppercase; color: var(--green);
-      margin-bottom: 0.65rem;
-      animation: heroBadgeEntrance 0.45s var(--ease-out) 0.05s both;
-    }
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 4.4vw, 3.4rem); /* → 54.4px at desktop */
-      font-weight: 700; line-height: 1.02; letter-spacing: 0.08em;
-      color: #ffffff; margin: 0.35rem 0 0.65rem;
-      text-shadow: 0 0 40px #00e67659, 0 0 80px #00d4ff33;
-      animation: heroTitleEntrance 0.55s var(--ease-out) 0.1s both;
-    }
-    .hero-subtitle {
-      font-size: clamp(0.72rem, 1.3vw, 0.88rem); font-weight: 700;
-      letter-spacing: 0.36em; text-transform: uppercase; color: #ffffff;
-      opacity: 0.95; line-height: 1.45; margin-top: 0.4rem;
-      animation: heroSubtitleEntrance 0.45s var(--ease-out) 0.18s both;
-    }
-    .hero-stats-row {
-      display: flex; align-items: center; justify-content: center; gap: 2.2rem;
-      margin-top: 1.7rem;
-      animation: heroStatsEntrance 0.45s var(--ease-out) 0.25s both;
-    }
-    .hero-stat-item { display: flex; flex-direction: column; align-items: center; }
-    .hero-stat-num {
-      font-family: var(--font-display); font-size: clamp(1.35rem, 2.5vw, 1.8rem);
-      color: #ffffff; line-height: 1; letter-spacing: 0.05em;
-      text-shadow: 0 0 12px var(--glow-color);
-    }
-    .hero-stat-label {
-      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.24em;
-      text-transform: uppercase; color: #ffffff; margin-top: 0.35rem;
-    }
-    .hero-stat-divider { width: 1px; height: 28px; background: #ffffff66; }
-
-    .scroll-hint {
-      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); z-index: 10;
-      display: flex; flex-direction: column; align-items: center; gap: 7px;
-      font-size: 0.58rem; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase;
-      color: var(--text-secondary); background: none; border: 0; cursor: pointer;
-    }
-    .scroll-hint span { animation: hintPulse 1.6s ease-in-out infinite alternate; }
-    .scroll-hint svg { width: 14px; height: 14px; animation: hintPulse 1.6s ease-in-out 0.2s infinite alternate; }
-
-    /* Primary CTA — DOOMSDAY FAST-TRACK (exact measured values) */
-    .button-primary {
-      position: absolute; bottom: 2.5rem; right: 3rem; z-index: 100;
-      display: inline-flex; align-items: center; gap: 8.8px;
-      background: #00E6761F;
-      color: #00E676;
-      border: 1px solid #00E67673;
-      border-radius: 30px;
-      padding: 8.8px 18.4px;
-      font-family: var(--font-body);
-      font-size: 10.88px;
-      font-weight: 700;
-      letter-spacing: 1.7408px;
-      text-transform: uppercase;
-      box-shadow: #00000099 0px 8px 24px 0px, #00E67640 0px 0px 15px 0px;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      cursor: pointer;
-      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-    }
-    .button-primary:hover {
-      background: #00E67647; border-color: #00E676; color: #ffffff;
-      box-shadow: 0 0 25px #00e67699, 0 8px 28px #000000d9;
-      transform: translateY(-2px);
-    }
-    .button-primary:active { transform: translateY(0) scale(0.96); }
-    .button-primary .pulse-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: #00E676;
-      animation: surprisePulse 1.2s ease-in-out infinite alternate;
-    }
-
-    /* ═══════════════════════════════════════════
-       2. STICKY HEADER
-    ═══════════════════════════════════════════ */
-    header#timeline-anchor {
-      position: sticky; top: 0; z-index: 100;
-      background: #06080DF5;
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow-deep);
-      scroll-margin-top: 0;
-    }
-    header#timeline-anchor.slide-in .timeline-header { animation: navSlideDown 0.35s var(--ease-out) both; }
-
-    .timeline-header {
-      position: relative;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 13.6px 16px 7.2px;
-      background: linear-gradient(to bottom, #0f132066, transparent);
-      border-bottom: 1px solid #ffffff0d;
-    }
-    .timeline-header::before {
-      content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 350px; height: 120px; pointer-events: none;
-      background: radial-gradient(circle, #ffffff08 0%, transparent 70%);
-    }
-    .logo-wrapper { position: relative; z-index: 1; display: flex; align-items: center; gap: 13.6px; }
-    .logo {
-      font-family: var(--font-display); font-size: 1.45rem; letter-spacing: 0.09em;
-      color: var(--text-primary); white-space: nowrap; line-height: 1;
-    }
-    .logo span { color: var(--accent-red); }
-    .infinity-stones-row { display: flex; align-items: center; gap: 8px; height: 24px; }
-    .infinity-stone {
-      height: 20px; width: auto; object-fit: contain;
-      opacity: 0.16; filter: grayscale(1);
-      transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
-    }
-    .infinity-stone.placed {
-      opacity: 1; filter: grayscale(0) drop-shadow(0 0 6px var(--stone-color));
-      animation: stoneIdlePulse 4s ease-in-out infinite alternate;
-    }
-    .infinity-stone.placed:nth-child(2) { animation-delay: 0.6s; }
-    .infinity-stone.placed:nth-child(3) { animation-delay: 1.2s; }
-    .infinity-stone.placed:nth-child(4) { animation-delay: 1.8s; }
-    .infinity-stone.placed:nth-child(5) { animation-delay: 2.4s; }
-    .infinity-stone.placed:nth-child(6) { animation-delay: 3s; }
-    .nav-badge {
-      position: relative; z-index: 1;
-      font-size: 9.28px; opacity: 0.7; margin-top: 7px;
-      letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-color); line-height: 1;
-    }
-
-    .header-inner {
-      max-width: 1140px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      min-height: 52px; padding: 5px 16px; gap: 1.5rem;
-    }
-    .header-actions { display: flex; gap: 8px; }
-
-    /* base button */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 4.8px 13.6px;
-      border: 1px solid var(--border-hover); border-radius: 6px;
-      background: transparent; color: var(--text-secondary);
-      font-family: var(--font-body); font-size: 11.52px; font-weight: 500; letter-spacing: 0.04em;
-      cursor: pointer; white-space: nowrap;
-      transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    }
-    .btn:hover { color: var(--text-primary); background: #ffffff0a; }
-    /* Button style 3 — "Share" (exact measured values) */
-    .btn-share {
-      background: transparent; color: #C0392B; border: 1px solid #C0392B;
-      border-radius: 6px; padding: 4.8px 13.6px; font-size: 11.52px; font-weight: 500;
-    }
-    .btn-share:hover { background: var(--accent-red-dim); color: #e74c3c; box-shadow: 0 0 14px #c0392b33; }
-    /* Button style 2 — "SNAP" (exact measured values) */
-    .btn-snap {
-      background: #E8392B1A; color: #C0392B; border: 1px solid #E8392B66;
-      border-radius: 6px; padding: 6.72px 16px; font-size: 12.16px; font-weight: 600; letter-spacing: 0.1em;
-    }
-    .btn-snap:hover {
-      background: #e8392b33; border-color: var(--accent-red); color: #fff;
-      text-shadow: 0 0 10px #e8392bcc; box-shadow: 0 0 20px #e8392b4d;
-    }
-    .btn-snap:active { transform: scale(0.95); }
-    .btn-lg { padding: 6.72px 16px; font-size: 12.16px; }
-
-    .progress-section { flex: 1; max-width: 400px; }
-    .progress-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 5px; }
-    .progress-count { font-size: 10.4px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.06em; text-transform: uppercase; }
-    .progress-percent { font-family: var(--font-display); font-size: 19.2px; color: var(--accent-red); letter-spacing: 0.05em; line-height: 1; }
-    .progress-bar-track { height: 3px; background: #ffffff12; border-radius: 3px; overflow: hidden; }
-    .progress-bar-fill {
-      height: 100%; width: 0%; border-radius: 3px;
-      background: linear-gradient(90deg, #8b1a10, var(--accent-red), #e8392b);
-      transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-    .nav-filters {
-      display: flex; justify-content: center; align-items: center; gap: 7px; margin-top: 7px;
-      font-size: 10.4px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
-      overflow-x: auto; scrollbar-width: none;
-    }
-    .nav-filters::-webkit-scrollbar { display: none; }
-    .nav-filter-btn {
-      background: none; border: 0; color: var(--text-primary); font: inherit; letter-spacing: inherit; text-transform: inherit;
-      opacity: 0.6; cursor: pointer; transition: opacity 0.2s ease, text-shadow 0.2s ease, color 0.2s ease;
-    }
-    .nav-filter-btn:hover { opacity: 0.85; }
-    .nav-filter-btn.active { opacity: 1; text-shadow: 0 0 8px #ffffff66; }
-    .nav-filter-btn[data-filter="doomsday"].active { color: var(--green); text-shadow: 0 0 8px #00e67680; }
-    .nav-filter-sep { opacity: 0.3; }
-
-    /* Up-next / fast-track banner */
-    .next-banner {
-      background: var(--accent-blue-dim); border-bottom: 1px solid #2980b92e;
-      padding: 10.4px 32px; display: flex; align-items: center; gap: 12px;
-      font-size: 12.8px; color: #5ba4d0;
-    }
-    .next-banner[hidden] { display: none; }
-    .next-banner .next-label { font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-blue); font-size: 10.88px; }
-    .next-banner .next-title-text { color: var(--text-primary); font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .next-banner.dd { background: #00E6760F; border-bottom-color: #00e67626; }
-    .next-banner.dd .next-label { color: var(--green); }
-    .link-btn { background: none; border: 0; cursor: pointer; font: inherit; font-size: 10.4px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); transition: color 0.2s ease; }
-    .link-btn:hover { color: var(--text-primary); }
-
-    /* ═══════════════════════════════════════════
-       3. MAIN — STATS + TIMELINE GRID
-    ═══════════════════════════════════════════ */
-    main { max-width: 1140px; margin: 0 auto; padding: 8px 16px 24px; position: relative; z-index: 1; background: transparent; }
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 12.8px 0 19.2px; }
-    .stat-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 13.6px 16px; text-align: center; transition: border-color 0.2s ease, background 0.2s ease;
-    }
-    .stat-card:hover { border-color: var(--border-hover); background: var(--bg-card-hover); }
-    .stat-value { font-family: var(--font-display); font-size: 1.85rem; color: var(--text-primary); letter-spacing: 0.04em; line-height: 1; margin-bottom: 3px; }
-    .stat-label { font-size: 10.08px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); font-weight: 600; }
-
-    .phase-block { position: relative; margin-bottom: 24px; }
-    .phase-block[hidden] { display: none; }
-    .phase-block::before {
-      content: attr(data-watermark); position: absolute; right: -8px; top: -16px; z-index: 0;
-      font-family: var(--font-display); font-size: 9rem; line-height: 1; letter-spacing: -0.02em;
-      color: var(--accent-red); opacity: 0.025; pointer-events: none;
-    }
-    .phase-header { position: relative; z-index: 1; display: flex; align-items: center; gap: 12.8px; margin-bottom: 5.6px; padding: 16px 0; }
-    .phase-header::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, var(--accent-red) 0%, #c0392b40 40%, transparent 100%);
-    }
-    .phase-number { font-family: var(--font-display); font-size: 3rem; color: var(--accent-red); line-height: 1; opacity: 0.32; letter-spacing: 0.02em; }
-    .phase-info { flex: 1; min-width: 0; }
-    .phase-label { font-size: 10.08px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
-    .phase-name { font-family: var(--font-display); font-size: 1.55rem; letter-spacing: 0.06em; color: var(--text-primary); }
-    .phase-count {
-      font-size: 10.88px; font-weight: 500; letter-spacing: 0.06em; color: var(--text-muted); white-space: nowrap;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 3.5px 11.2px;
-    }
-
-    .timeline-grid {
-      position: relative; z-index: 1;
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 17.6px;
-      padding-top: 12px;
-    }
-
-    /* Card (measured base) */
-    .card {
-      background: #0F1320; color: #E8EAF0;
-      border: 1px solid #FFFFFF0E; border-radius: 12px; font-size: 16px;
-      position: relative; overflow: hidden; cursor: pointer;
-      display: flex; flex-direction: column;
-      transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, opacity 0.3s ease;
-    }
-    .card[hidden] { display: none; }
-    .card::before {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2.5px; z-index: 5;
-      background: linear-gradient(180deg, var(--accent-red), #c0392b4d);
-      border-radius: 3px 0 0 3px; opacity: 0; transition: opacity 0.22s ease;
-    }
-    .card::after {
-      content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none; border-radius: var(--card-radius);
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.035'/%3E%3C/svg%3E");
-    }
-    .card:hover, .card:focus-visible {
-      border-color: #ffffff24; transform: translateY(-3px);
-      box-shadow: 0 12px 36px #0000008c, 0 0 0 1px #c0392b1f;
-    }
-    .card:hover::before, .card:focus-visible::before { opacity: 1; }
-    .card:active { transform: translateY(-1px) scale(0.992); transition: transform 0.08s; }
-
-    .card-poster { position: relative; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; background: var(--surface-poster); flex-shrink: 0; }
-    .card-poster img {
-      position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2;
-      object-fit: cover; object-position: center top;
-      opacity: 0; filter: blur(10px);
-      transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease, filter 0.45s ease;
-    }
-    .card-poster img.loaded { opacity: 1; filter: none; }
-    .card:hover .card-poster img { transform: scale(1.07); }
-    .card-poster::after {
-      content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-      background:
-        linear-gradient(180deg, transparent 35%, #06080d99 65%, #06080df2 100%),
-        radial-gradient(ellipse at center, transparent 50%, #00000059 100%);
-    }
-    .poster-placeholder {
-      position: absolute; inset: 0; z-index: 1;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-      background: linear-gradient(160deg, #0f1420 0%, #0a0d18 100%);
-    }
-    .poster-placeholder-icon { font-family: var(--font-display); font-size: 2.5rem; color: var(--accent-red); opacity: 0.25; letter-spacing: 0.05em; }
-    .poster-placeholder-label { font-size: 9.6px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); }
-    .poster-seq {
-      position: absolute; top: 8px; right: 10px; z-index: 3;
-      font-family: var(--font-display); font-size: 19.2px; line-height: 1; letter-spacing: 0.04em; color: #ffffff2e;
-    }
-    .card.up-next .poster-seq { color: #fff; text-shadow: 0 0 8px #FF004D66; }
-    .dd-flag {
-      position: absolute; left: 8px; top: 8px; z-index: 3;
-      font-size: 8.8px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--green); background: #00E6761F; border: 1px solid #00E67659; border-radius: 20px; padding: 2px 7px;
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    }
-
-    .card-body { padding: 13.6px 16px 14.4px; display: flex; flex-direction: column; gap: 7.2px; flex: 1; }
-    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .card-meta { display: flex; align-items: center; gap: 7.2px; flex-wrap: wrap; }
-    .card-type { font-size: 9.28px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
-    .type-movie { background: var(--type-movie-bg); color: #d4574a; border: 1px solid #c0392b47; }
-    .type-series { background: var(--type-series-bg); color: #4a9fd4; border: 1px solid #2980b947; }
-    .type-special { background: #8e44ad2e; color: #a86ccc; border: 1px solid #8e44ad47; }
-    .card-meta-year { font-size: 10.72px; color: var(--text-muted); font-weight: 500; transition: opacity 0.3s ease; }
-    .check-icon {
-      position: relative; z-index: 6; flex-shrink: 0; margin-top: 1px;
-      width: 22px; height: 22px; border-radius: 50%; background: var(--accent-red);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; transform: scale(0.6);
-      transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .check-icon svg { width: 11px; height: 11px; }
-    .card-title { font-size: 14.08px; font-weight: 600; line-height: 1.35; color: var(--text-primary); transition: opacity 0.3s ease; }
-    .card-summary { font-size: 12.16px; line-height: 1.55; color: var(--text-secondary); flex: 1; transition: opacity 0.3s ease; }
-    .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 3.2px; }
-    .card-watch-on {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 10.4px; letter-spacing: 0.03em; color: var(--text-muted);
-      background: none; border: 0; cursor: pointer; font-family: inherit;
-      transition: color 0.2s ease, opacity 0.2s ease;
-    }
-    .card-watch-on:hover { color: var(--accent-red); opacity: 1; }
-    .watch-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--watch-dot); flex-shrink: 0; }
-
-    .card.watched { border-color: #ffffff08; }
-    .card.watched .check-icon { opacity: 1; transform: scale(1); box-shadow: 0 0 10px #c0392b99; }
-    .card.watched .card-poster img { filter: brightness(0.45) saturate(0.5); }
-    .card.watched .card-title,
-    .card.watched .card-summary,
-    .card.watched .card-meta-year,
-    .card.watched .card-watch-on { opacity: 0.38; }
-
-    /* Snap disintegration */
-    .card.dusting { animation: dust 1.1s ease-in forwards; animation-delay: var(--d, 0s); }
-    @keyframes dust {
-      0% { opacity: 1; filter: none; transform: none; }
-      100% { opacity: 0; filter: blur(6px) sepia(1); transform: translate(18px, -14px) rotate(2deg) scale(0.96); }
-    }
-
-    .empty-state { display: none; text-align: center; padding: 48px 16px; color: var(--text-secondary); font-size: 14.08px; }
-    .empty-state.show { display: block; }
-    .empty-state strong { display: block; font-family: var(--font-display); font-weight: 400; font-size: 40px; letter-spacing: 0.06em; color: var(--text-primary); margin-bottom: 8px; }
-
-    /* ═══════════════════════════════════════════
-       4. FOOTER
-    ═══════════════════════════════════════════ */
-    footer.agency-footer {
-      position: relative; z-index: 10;
-      background: linear-gradient(180deg, #06080d66 0%, #030406f2 100%);
-      border-top: 1px solid #ffffff12;
-      padding: 72px 32px 40px; color: #f3f4f6;
-    }
-    .agency-footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 64px; }
-    .agency-promo { display: flex; flex-direction: column; align-items: flex-start; gap: 19.2px; }
-    .agency-branding-wrapper { display: flex; align-items: center; gap: 12.8px; }
-    .agency-logo-img { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; border-radius: 50%; }
-    .agency-logo-text-group { display: flex; flex-direction: column; gap: 2px; }
-    .agency-logo { font-family: 'Playfair Display', Georgia, serif; font-size: 1.85rem; font-weight: 800; letter-spacing: -0.01em; color: #fff; text-transform: uppercase; line-height: 0.95; }
-    .agency-logo span { color: #e53935; text-shadow: 0 0 15px #e5393559; }
-    .agency-tagline { font-size: 9.28px; font-weight: 700; letter-spacing: 0.28em; color: #ffffff73; text-transform: uppercase; line-height: 1; }
-    .agency-description { font-size: 14.72px; line-height: 1.6; color: var(--text-secondary); max-width: 600px; }
-    .agency-whatsapp-btn {
-      display: inline-flex; align-items: center; gap: 12.8px; margin-top: 8px;
-      background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-      color: #ffffff; font-weight: 700; font-size: 13.12px; letter-spacing: 0.08em; text-transform: uppercase;
-      padding: 12px 24px; border-radius: 50px; border: 1px solid #ffffff26;
-      box-shadow: 0 4px 15px #25d36640;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease;
-    }
-    .agency-whatsapp-btn:hover { color: #fff; transform: translateY(-3px); box-shadow: #00000099 0px 8px 25px 0px, 0 0 15px #25d36633; filter: brightness(1.08); }
-    .agency-whatsapp-btn svg { width: 18px; height: 18px; fill: currentColor; }
-    .agency-disclaimer { display: flex; flex-direction: column; gap: 16px; }
-    .agency-section-title {
-      position: relative; font-size: 12.8px; font-weight: 700; letter-spacing: 0.15em;
-      color: #ffffff; text-transform: uppercase; padding-bottom: 8px; margin-bottom: 3.2px;
-    }
-    .agency-section-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 30px; height: 2px; background: #e8392b; }
-    .agency-disclaimer-text { font-size: 12.8px; line-height: 1.6; color: var(--text-muted); }
-    .agency-disclaimer-text strong { color: var(--text-secondary); font-weight: 600; }
-    .agency-footer-bottom {
-      max-width: 1200px; margin: 56px auto 0; padding-top: 24px;
-      border-top: 1px solid #ffffff0d;
-      display: flex; justify-content: space-between; align-items: center; gap: 16px;
-      font-size: 12px; color: var(--text-muted);
-    }
-    .agency-footer-bottom a { color: var(--text-secondary); }
-    .agency-footer-bottom a:hover { color: #ffffff; }
-    .replay-btn {
-      margin-left: 10px; padding: 3px 10px; border-radius: 12px; cursor: pointer;
-      background: #e8392b26; border: 1px solid #e8392b59; color: #ff6b6b;
-      font-size: 11.52px; transition: background 0.2s ease, color 0.2s ease;
-    }
-    .replay-btn:hover { background: #e8392b4d; color: #fff; }
-
-    /* ═══════════════════════════════════════════
-       OVERLAYS: scroll-top, toast, badge, modals, snap, Miles
-    ═══════════════════════════════════════════ */
-    .scroll-top {
-      position: fixed; bottom: 32px; right: 32px; z-index: 50;
-      width: 42px; height: 42px; border-radius: 50%;
-      background: var(--bg-card); border: 1px solid var(--border-hover); color: var(--text-secondary);
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-      opacity: 0; transform: translateY(12px); pointer-events: none;
-      transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
-    }
-    .scroll-top.visible { opacity: 1; transform: none; pointer-events: auto; }
-    .scroll-top:hover { background: var(--bg-card-hover); color: var(--text-primary); box-shadow: 0 0 20px #c0392b33; }
-    .scroll-top svg { width: 16px; height: 16px; }
-
-    .toast {
-      position: fixed; bottom: 80px; left: 50%; z-index: 200;
-      transform: translateX(-50%) translateY(10px);
-      background: #0f1320fa; border: 1px solid var(--border-hover); color: var(--text-primary);
-      padding: 8.8px 19.2px; border-radius: 20px; font-size: 12.16px; font-weight: 500;
-      box-shadow: var(--shadow-deep); opacity: 0; pointer-events: none; white-space: nowrap;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    .badge-popup {
-      position: fixed; bottom: 35px; left: 50%; z-index: 9999;
-      transform: translateX(-50%) translateY(20px) scale(0.9);
-      background: #0f1320f5; border: 1.5px solid var(--accent-color);
-      padding: 14.4px 28.8px; border-radius: 14px; text-align: center;
-      box-shadow: 0 12px 35px #000000d9, 0 0 25px var(--glow-color);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .badge-popup.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-    .badge-popup-name { font-size: 17.6px; font-weight: 600; color: var(--accent-color); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4.8px; text-shadow: 0 0 10px var(--glow-color); }
-    .badge-popup-desc { font-size: 11.2px; color: var(--text-secondary); letter-spacing: 0.1em; text-transform: uppercase; }
-
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 2000000;
-      background: #000000e0; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-      display: flex; align-items: center; justify-content: center; padding: 32px;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal {
-      width: 100%; max-width: 500px; overflow: hidden;
-      background: var(--bg-card); border: 1px solid #ffffff1a; border-radius: 20px;
-      box-shadow: var(--shadow-modal);
-      transform: translateY(14px) scale(0.98); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .modal-overlay.open .modal { transform: none; }
-    .modal-header { padding: 20.8px 24px 14.4px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .modal-title { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: 0.06em; color: var(--text-primary); }
-    .modal-close { background: none; border: 0; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 19.2px; line-height: 1; transition: color 0.2s ease; }
-    .modal-close:hover { color: var(--text-primary); }
-    .modal-body { padding: 22.4px; }
-    .modal-actions { display: flex; gap: 11.2px; }
-    .modal-actions .btn { flex: 1; padding: 9.9px 16px; font-size: 12.8px; }
-
-    .snap-modal { max-width: 400px; text-align: center; }
-    .snap-modal .modal-header { justify-content: center; padding-top: 32px; border-bottom: 0; }
-    .snap-modal .modal-title { color: var(--accent-red); text-shadow: 0 0 15px #e8392b66; font-size: 1.8rem; }
-    .snap-modal .modal-body { padding: 0 32px 40px; }
-    .snap-modal p { color: var(--text-secondary); margin-bottom: 32px; font-size: 15.2px; }
-    .snap-modal .row { display: flex; gap: 16px; justify-content: center; }
-
-    #share-preview {
-      position: relative; overflow: hidden; text-align: center;
-      background: #080a0f; border-radius: 12px; padding: 40px 32px; margin-bottom: 19.2px;
-      border: 1px solid #ffffff14; box-shadow: inset 0 0 40px #00000099;
-      transition: background 0.4s ease;
-    }
-    #share-preview.t-low { background: radial-gradient(circle at center, #1e0a0a 0%, #080a0f 80%); }
-    #share-preview.t-mid { background: radial-gradient(circle at center, #500f0f 0%, #080a0f 80%); }
-    #share-preview.t-high { background: radial-gradient(circle at top left, #5a0f1e99 0%, transparent 60%), radial-gradient(circle at bottom right, #0f285a99 0%, transparent 60%), #080a0f; }
-    #share-preview.t-max { background: radial-gradient(circle at center, #781428 0%, #080a0f 80%); }
-    .share-logo { font-family: var(--font-display); font-size: 1.3rem; letter-spacing: 0.1em; color: var(--text-primary); margin-bottom: 24px; }
-    .share-logo span { color: var(--accent-color); }
-    .share-big-num { font-family: var(--font-display); font-size: 5.5rem; line-height: 1; color: #fff; letter-spacing: 0.02em; text-shadow: 0 0 20px #ffffff4d; }
-    .share-of { font-size: 11.68px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6.4px; }
-    .share-subtitle { font-size: 13.28px; color: var(--text-secondary); margin-bottom: 8px; }
-    .share-badge { font-size: 14.4px; font-weight: 700; color: var(--accent-color); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px; text-shadow: 0 0 12px var(--glow-color); }
-    .share-bar-track { height: 4px; background: #ffffff14; border-radius: 3px; }
-    .share-bar-fill { height: 100%; width: 0; background: var(--accent-red); border-radius: 3px; transition: width 0.6s ease; }
-    .social-share-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
-    .btn-social {
-      padding: 6.4px 12.8px; border-radius: 6px; cursor: pointer;
-      background: transparent; border: 1px solid var(--border-hover); color: var(--text-secondary);
-      font-size: 10.4px; font-weight: 600; letter-spacing: 0.12em;
-      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-    }
-    .btn-social:hover { color: var(--accent-color); border-color: var(--accent-color); background: #ffffff08; }
-
-    #snap-flash { position: fixed; inset: 0; z-index: 2400000; background: #fff; opacity: 0; pointer-events: none; }
-    #snap-flash.go { animation: snapFlash 0.7s ease-out; }
-    @keyframes snapFlash { 0% { opacity: 0; } 15% { opacity: 0.85; } 100% { opacity: 0; } }
-    #gauntlet {
-      position: fixed; bottom: -20px; left: 50%; z-index: 2500000;
-      width: 400px; height: 400px; margin-left: -200px; pointer-events: none;
-      display: flex; justify-content: center; align-items: flex-end;
-      opacity: 0; transform: translateY(120%) scale(0.9) rotate(-6deg);
-      transition: transform 0.6s var(--ease-out), opacity 0.3s ease;
-    }
-    #gauntlet.active { opacity: 1; transform: none; }
-    #gauntlet.snap img { animation: snapShake 0.35s ease-in-out; }
-    #gauntlet .glow { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 300px; height: 300px; background: radial-gradient(circle, #e8b42b66 0%, transparent 70%); }
-    #gauntlet img { position: relative; z-index: 2; max-width: 100%; max-height: 100%; object-fit: contain; }
-    @keyframes snapShake { 0%, 100% { transform: none; } 30% { transform: rotate(-4deg) scale(1.03); } 60% { transform: rotate(3deg); } }
-
-    #miles-popup {
-      position: fixed; left: 16px; bottom: 0; z-index: 9000; pointer-events: none;
-      display: flex; align-items: flex-end; gap: 5px;
-      transform: translateX(-120%); transition: transform 0.5s var(--ease-out);
-    }
-    #miles-popup.show { transform: none; }
-    #miles-popup img { max-width: 200px; height: auto; filter: drop-shadow(0 8px 24px #000000b3); }
-    .miles-speech {
-      align-self: center; margin-bottom: 64px; max-width: 200px;
-      background: #0f1320f2; border: 1px solid #FF004D66; color: #fff;
-      padding: 12.8px 16px; border-radius: 20px 20px 20px 3px;
-      font-family: var(--font-display); font-size: 19.2px; letter-spacing: 0.06em; line-height: 1.1;
-      box-shadow: #FF004D66 0px 0px 15px 0px, var(--shadow-deep);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    }
-
-    /* ═══════════════════════════════════════════
-       KEYFRAMES (names from reference)
-    ═══════════════════════════════════════════ */
-    @keyframes hintPulse { 0% { opacity: 0.4; transform: translateY(0); } 100% { opacity: 0.85; transform: translateY(-3px); } }
-    @keyframes heroBadgeEntrance { 0% { opacity: 0; transform: translateY(-12px); filter: blur(2px); } 100% { opacity: 0.95; transform: translateY(0); filter: blur(0); } }
-    @keyframes heroTitleEntrance { 0% { opacity: 0; transform: translateY(18px) scale(0.95); filter: blur(3px); letter-spacing: 0.14em; } 60% { filter: blur(0); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); letter-spacing: 0.08em; } }
-    @keyframes heroSubtitleEntrance { 0% { opacity: 0; transform: translateY(12px); filter: blur(2px); } 100% { opacity: 0.95; transform: translateY(0); filter: blur(0); } }
-    @keyframes heroStatsEntrance { 0% { opacity: 0; transform: translateY(15px) scale(0.97); filter: blur(2px); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
-    @keyframes surprisePulse { 0% { transform: scale(1); box-shadow: 0 0 15px #00e67666; } 100% { transform: scale(1.08); box-shadow: 0 0 30px #00e676e6; } }
-    @keyframes navSlideDown { from { transform: translateY(-100%); opacity: 0.4; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes heroZoom { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.02); opacity: 1; } }
-    @keyframes stoneIdlePulse { 0% { filter: grayscale(0) drop-shadow(0 0 3px var(--stone-color)); } 100% { filter: grayscale(0) drop-shadow(0 0 9px var(--stone-color)); } }
-
-    /* ═══════════════════════════════════════════
-       RESPONSIVE
-    ═══════════════════════════════════════════ */
-    @media (max-width: 900px) {
-      #hero { background-image: url('https://mcu-timelines.vercel.app/tree%20mob.webp'); }
-      .agency-footer-container { grid-template-columns: 1fr; gap: 40px; }
-    }
-    @media (max-width: 720px) {
-      #hero { padding: 56px 19.2px 40px; }
-      .scroll-hint { display: none; }
-      .button-primary { right: auto; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 9.6px 20.8px; font-size: 11.52px; }
-      .button-primary:hover { transform: translateX(-50%) translateY(-2px); }
-      .hero-stats-row { gap: 1.4rem; }
-
-      .header-inner { flex-wrap: wrap; padding: 8px 12.8px; gap: 7.2px; min-height: unset; }
-      .header-actions { width: 100%; justify-content: center; }
-      .progress-section { flex: 0 0 100%; max-width: 100%; }
-      .next-banner { padding: 8px 16px; }
-
-      main { padding: 8px 0 24px; }
-      .stats-row { grid-template-columns: repeat(2, 1fr); gap: 7px; margin: 12px; }
-      .phase-header { padding: 16px 14px; }
-      .phase-number { font-size: 2.2rem; }
-      .phase-name { font-size: 1.15rem; }
-      .timeline-grid {
-        display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
-        gap: 12px; padding: 12px 14px; 
-      }
-      .timeline-grid::-webkit-scrollbar { display: none; }
-      .timeline-grid .card { flex: 0 0 158px; scroll-snap-align: start; }
-      .nav-filters { justify-content: flex-start; }
-      .card-body { padding: 10.4px 12px 11.2px; gap: 5.6px; }
-      .card-title { font-size: 13.6px; line-height: 1.25; }
-      .card-summary { display: none; }
-
-      footer.agency-footer { padding: 48px 24px 32px; }
-      .agency-logo { font-size: 1.6rem; }
-      .agency-whatsapp-btn { width: 100%; justify-content: center; }
-      .agency-footer-bottom { flex-direction: column; text-align: center; margin-top: 40px; }
-      #miles-popup img { max-width: 140px; }
-      #gauntlet { width: 300px; height: 300px; margin-left: -150px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-    }
-  </style>
+  <!-- Master Multiverse Stylesheet -->
+  <link rel="stylesheet" href="/src/styles/multiverse.css" />
 </head>
 <body>
+  <!-- Scroll Progress Indicator -->
+  <div id="scroll-progress-line" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
 
-  <!-- ══ STUDIO INTRO (click to skip) ══ -->
-  <div id="studio-intro" aria-hidden="true">
-    <div class="intro-flip" id="intro-flip"></div>
-    <div class="intro-red"></div>
-    <div class="intro-logo"><span class="box">MCU</span><span class="word">TIMELINE</span></div>
-    <div class="intro-blackout"></div>
-    <div class="intro-skip">Click to skip</div>
-  </div>
+  <!-- SECTION 2: STICKY MULTIVERSE NAV -->
+  <nav id="multiverse-nav" aria-label="Multiverse Navigation">
+    <div class="nav-brand">
+      <a href="#hero" class="nav-logo-badge">
+        <span>MARVEL</span> MULTIVERSE
+      </a>
+      
+      <!-- Infinity Stone Discovery Tracker in Nav -->
+      <div class="nav-infinity-cluster" title="Infinity Stones Attunement Tracker">
+        <span class="nav-stone-dot" data-stone="space" style="color: #3C8DFF;" title="Space Stone"></span>
+        <span class="nav-stone-dot" data-stone="mind" style="color: #FACC15;" title="Mind Stone"></span>
+        <span class="nav-stone-dot" data-stone="reality" style="color: #E84B4B;" title="Reality Stone"></span>
+        <span class="nav-stone-dot" data-stone="power" style="color: #8257FF;" title="Power Stone"></span>
+        <span class="nav-stone-dot" data-stone="time" style="color: #00E676;" title="Time Stone"></span>
+        <span class="nav-stone-dot" data-stone="soul" style="color: #FF8A00;" title="Soul Stone"></span>
+      </div>
+    </div>
 
-  <!-- ══ 1. HERO ══ -->
-  <section id="hero" aria-label="Introduction">
-    <div class="hero-vignette"></div>
+    <div class="nav-links">
+      <a href="#multiverse-nexus" class="nav-link">Continuum</a>
+      <a href="#infinity-saga-section" class="nav-link">Infinity Saga</a>
+      <a href="#multiverse-saga-section" class="nav-link">Multiverse Saga</a>
+      <a href="#characters-section" class="nav-link">Dossiers</a>
+      <a href="#marvel-network-section" class="nav-link">Relationship Graph</a>
+      <a href="#stones-altar-section" class="nav-link">Infinity Stones</a>
+      <a href="#archive-section" class="nav-link">Archive & Tracker</a>
+    </div>
+
+    <div class="nav-actions">
+      <button id="audio-toggle-btn" class="nav-btn-track" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 0.72rem; border-color: rgba(255,255,255,0.15);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+        <span>Cosmic Audio</span>
+      </button>
+
+      <button id="nav-snap-trigger" class="nav-btn-track" style="border-color: #8257FF; color: #8257FF;" title="Thanos Snap Easter Egg">
+        🤌 The Snap
+      </button>
+
+      <a href="#archive-section" class="nav-btn-track">
+        Catalog
+      </a>
+    </div>
+  </nav>
+
+  <!-- SECTION 1: CINEMATIC HERO -->
+  <header id="hero">
     <canvas id="hero-canvas"></canvas>
-
-    <div class="hero-overlay">
-      <div class="hero-badge">&mdash;&mdash; The Complete Saga &mdash;&mdash;</div>
-      <h1 class="hero-title">MARVEL CINEMATIC<br>TIMELINES</h1>
-      <p class="hero-subtitle">TRACK &middot; WATCH &middot; EXPERIENCE</p>
-      <div class="hero-stats-row">
-        <div class="hero-stat-item"><span class="hero-stat-num" id="hero-titles" data-target="0">0</span><span class="hero-stat-label">Titles</span></div>
-        <div class="hero-stat-divider"></div>
-        <div class="hero-stat-item"><span class="hero-stat-num" id="hero-phases" data-target="0">0</span><span class="hero-stat-label">Phases</span></div>
-        <div class="hero-stat-divider"></div>
-        <div class="hero-stat-item"><span class="hero-stat-num" data-target="331" data-suffix="h+">0</span><span class="hero-stat-label">Watch Hours</span></div>
-      </div>
-    </div>
-
-    <button class="scroll-hint" type="button" data-scroll-to-timeline>
-      <span>Scroll to explore</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-    </button>
-
-    <button class="button-primary" type="button" id="doomsday-btn" title="Fast-track to the Doomsday essentials">
-      <span class="pulse-dot" aria-hidden="true"></span>
-      <span>DOOMSDAY FAST-TRACK</span>
-    </button>
-  </section>
-
-  <!-- ══ 2. STICKY HEADER ══ -->
-  <header id="timeline-anchor">
-    <div class="timeline-header">
-      <div class="logo-wrapper">
-        <div class="logo">MCU<span>.</span>TIMELINE</div>
-        <div class="infinity-stones-row" id="stones" aria-hidden="true">
-          <img class="infinity-stone" src="https://mcu-timelines.vercel.app/red.webp" alt="" style="--stone-color:#ff3c3c">
-          <img class="infinity-stone" src="https://mcu-timelines.vercel.app/blue.webp" alt="" style="--stone-color:#3c78ff">
-          <img class="infinity-stone" src="https://mcu-timelines.vercel.app/green.webp" alt="" style="--stone-color:#3cdc50">
-          <img class="infinity-stone" src="https://mcu-timelines.vercel.app/yellow.webp" alt="" style="--stone-color:#ffdc3c">
-          <img class="infinity-stone" src="https://mcu-timelines.vercel.app/purple.webp" alt="" style="--stone-color:#a03cff">
-          <img class="infinity-stone" src="https://mcu-timelines.vercel.app/orange.webp" alt="" style="--stone-color:#ffa028">
+    <div class="hero-content">
+      <div class="hero-badge">Official Multiverse Continuum • Earth-616 & Divergent Realities</div>
+      <h1 class="hero-title">THE MARVEL<br/><span style="background: linear-gradient(135deg, #FF2A2A, #FF8A00, #3C8DFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">MULTIVERSE</span></h1>
+      <p class="hero-subtitle">An interactive cosmic continuum mapping 79 canonical titles, 44 audited characters, 6 cosmic singularities, and mathematically modeled relationship network science.</p>
+      
+      <div class="hero-stats-strip">
+        <div class="hero-stat-box">
+          <span class="hero-stat-val" id="stat-total-titles">79</span>
+          <span class="hero-stat-lbl">Canonical Titles</span>
+        </div>
+        <div class="hero-stat-sep">/</div>
+        <div class="hero-stat-box">
+          <span class="hero-stat-val" id="stat-total-hours">172h</span>
+          <span class="hero-stat-lbl">Universe Runtime</span>
+        </div>
+        <div class="hero-stat-sep">/</div>
+        <div class="hero-stat-box">
+          <span class="hero-stat-val" id="stat-total-characters">44</span>
+          <span class="hero-stat-lbl">Nexus Beings</span>
+        </div>
+        <div class="hero-stat-sep">/</div>
+        <div class="hero-stat-box">
+          <span class="hero-stat-val" id="stat-total-phases">7</span>
+          <span class="hero-stat-lbl">Multiverse Phases</span>
         </div>
       </div>
-      <div class="nav-badge" id="nav-badge">🧬 Multiverse Newbie</div>
-    </div>
 
-    <div class="header-inner">
-      <div class="header-actions">
-        <button class="btn" type="button" id="reset-btn">Reset</button>
-        <button class="btn btn-share" type="button" id="share-btn">Share</button>
+      <div class="hero-actions">
+        <a href="#multiverse-nexus" class="btn-cosmic-primary">
+          Enter The Multiverse Continuum
+        </a>
+        <a href="#archive-section" class="btn-cosmic-ghost">
+          Explore Archive & Tracker
+        </a>
       </div>
-      <div class="progress-section">
-        <div class="progress-meta">
-          <span class="progress-count" id="prog-count">0 / 0 watched</span>
-          <span class="progress-percent" id="prog-pct">0%</span>
-        </div>
-        <div class="progress-bar-track" role="progressbar" aria-label="Watch progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="prog-track">
-          <div class="progress-bar-fill" id="prog-fill"></div>
-        </div>
-        <div class="nav-filters" role="toolbar" aria-label="Filter titles">
-          <button class="nav-filter-btn active" data-filter="all" type="button">All</button>
-          <span class="nav-filter-sep">|</span>
-          <button class="nav-filter-btn" data-filter="Movie" type="button">Movies</button>
-          <span class="nav-filter-sep">|</span>
-          <button class="nav-filter-btn" data-filter="Series" type="button">Series</button>
-          <span class="nav-filter-sep">|</span>
-          <button class="nav-filter-btn" data-filter="watched" type="button">Watched</button>
-          <span class="nav-filter-sep">|</span>
-          <button class="nav-filter-btn" data-filter="unwatched" type="button">Unwatched</button>
-          <span class="nav-filter-sep">|</span>
-          <button class="nav-filter-btn" data-filter="doomsday" type="button">Doomsday</button>
-        </div>
+
+      <div class="hero-scroll-cue">
+        <span>Scroll to Explore Realities</span>
+        <div class="scroll-arrow">↓</div>
       </div>
     </div>
   </header>
 
-  <div class="next-banner" id="next-banner" hidden>
-    <span class="next-label" id="next-label">Up next</span>
-    <span class="next-title-text" id="next-title">—</span>
-    <button class="link-btn" type="button" id="next-action">Jump</button>
-  </div>
-
-  <!-- ══ 3. MAIN — STATS + TIMELINE ══ -->
-  <main>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-value" id="stat-watched">0</div><div class="stat-label">Watched</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-movies">0</div><div class="stat-label">Movies</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-series">0</div><div class="stat-label">Series</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total</div></div>
+  <!-- SECTION 3: ENTER THE MULTIVERSE (BRANCH REALITIES MATRIX) -->
+  <section id="multiverse-nexus">
+    <div class="section-editorial-header">
+      <span class="section-tag">Dimensional Convergence</span>
+      <h2 class="section-heading">EVERY STORY IS CONNECTED</h2>
+      <p class="section-lead">Across the Sacred Timeline and branching realities, six distinct phases weave together the grand tapestry of gods, super-soldiers, cosmic conquerors, and imminent multiverse incursions.</p>
     </div>
-    <div id="timeline-container"></div>
-    <div class="empty-state" id="empty-state"><strong>No titles in this reality</strong>Try another filter.</div>
-  </main>
 
-  <!-- ══ 4. FOOTER ══ -->
+    <div class="branch-realities-container" id="branch-realities-grid">
+      <!-- Dynamically populated via renderBranchRealities() -->
+    </div>
+  </section>
+
+  <!-- SECTION 4: THE INFINITY SAGA (HORIZONTAL PINNED TIMELINE) -->
+  <section id="infinity-saga-section">
+    <div class="pinned-saga-header">
+      <div>
+        <span class="section-tag">Phases 1 — 3 • 2008 – 2019</span>
+        <h2 class="section-heading">THE INFINITY SAGA</h2>
+        <p class="section-lead">From Tony Stark declaring "I am Iron Man" to the cataclysmic snap on Titan and Earth's final stand.</p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button id="infinity-track-prev" class="nav-btn-track" aria-label="Scroll left" style="padding: 10px 18px;">←</button>
+        <button id="infinity-track-next" class="nav-btn-track" aria-label="Scroll right" style="padding: 10px 18px;">→</button>
+      </div>
+    </div>
+
+    <div id="infinity-saga-track" class="horizontal-timeline-track">
+      <!-- Populated via renderInfinitySaga() -->
+    </div>
+  </section>
+
+  <!-- SECTION 5: THE MULTIVERSE SAGA (PHASES 4, 5, 6 & INCURSIONS) -->
+  <section id="multiverse-saga-section">
+    <div class="section-editorial-header">
+      <span class="section-tag">Phases 4 — 6 • 2021 – 2027+</span>
+      <h2 class="section-heading">THE MULTIVERSE SAGA</h2>
+      <p class="section-lead">The boundaries of reality shatter. Variants, the Quantum Realm, dark dimensions, and universal incursions lead inexorably to Secret Wars.</p>
+    </div>
+
+    <div class="saga-phase-tabs">
+      <button class="phase-tab-btn active" data-phase="all">All Multiverse</button>
+      <button class="phase-tab-btn" data-phase="4">Phase 4 (Fracturing Realities)</button>
+      <button class="phase-tab-btn" data-phase="5">Phase 5 (The Kang Dynasty)</button>
+      <button class="phase-tab-btn" data-phase="6">Phase 6 (Secret Wars & Reset)</button>
+    </div>
+
+    <div class="multiverse-cards-grid" id="multiverse-saga-cards">
+      <!-- Populated via renderMultiverseSaga() -->
+    </div>
+  </section>
+
+  <!-- SECTION 6: CHARACTER UNIVERSE -->
+  <section id="characters-section">
+    <div class="section-editorial-header">
+      <span class="section-tag">Classified S.H.I.E.L.D. & TVA Database</span>
+      <h2 class="section-heading">CHARACTER UNIVERSE</h2>
+      <p class="section-lead">44 audited characters across MCU Canon, Fox Mutants, Sony Spider-Verse, and Marvel Comics. Every entry audited for canonical accuracy with full transparency.</p>
+    </div>
+
+    <div class="char-controls-bar">
+      <div class="char-search-box">
+        <svg class="char-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="char-search-input" placeholder="Search by hero moniker or civilian identity (e.g. Iron Man, Peter Parker)..." aria-label="Search characters" />
+      </div>
+
+      <div class="char-filter-pills">
+        <button class="char-pill active" data-category="all">All Beings (44)</button>
+        <button class="char-pill" data-category="Avengers">Avengers</button>
+        <button class="char-pill" data-category="Cosmic">Cosmic</button>
+        <button class="char-pill" data-category="Mystic">Mystic</button>
+        <button class="char-pill" data-category="Mutants">Mutants</button>
+        <button class="char-pill" data-category="Villains">Villains</button>
+        <button class="char-pill" data-category="Street Level">Street Level</button>
+      </div>
+    </div>
+
+    <div class="characters-grid" id="characters-grid">
+      <!-- Populated via renderCharacterGallery() -->
+    </div>
+  </section>
+
+  <!-- SECTION 7: THE MARVEL NETWORK (INTERACTIVE GRAPH & CENTRALITY) -->
+  <section id="marvel-network-section">
+    <div class="section-editorial-header">
+      <span class="section-tag">Social Network Science & Centrality Analysis</span>
+      <h2 class="section-heading">THE MARVEL NETWORK</h2>
+      <p class="section-lead">Inter-character alliances, rivalries, and multiverse bridges mathematically analyzed using genuine Graph Centrality algorithms derived directly from our universe relationship dataset.</p>
+    </div>
+
+    <div class="network-explorer-layout">
+      <div class="network-canvas-container">
+        <div class="network-floating-controls">
+          <label style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Alliance:</label>
+          <select id="network-faction-select" class="network-filter-select">
+            <option value="all">All Alliances (Entire Network)</option>
+            <option value="avengers">Avengers Core</option>
+            <option value="spider-verse">Spider-Verse</option>
+            <option value="mystic">Mystic / Cosmic</option>
+            <option value="mutants">Mutants / X-Men</option>
+            <option value="villains">Villains & Incurrence Forces</option>
+          </select>
+        </div>
+
+        <svg id="network-svg" aria-label="Interactive Marvel Social Network Graph"></svg>
+      </div>
+
+      <div class="network-metrics-panel">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="network-metric-btn active" data-metric="degree" style="font-size: 0.72rem; padding: 6px 12px; border-radius: 20px; background: rgba(60,141,255,0.2); border: 1px solid #3C8DFF; color: #fff;">
+            Degree Centrality
+          </button>
+          <button class="network-metric-btn" data-metric="eigenvector" style="font-size: 0.72rem; padding: 6px 12px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary);">
+            Eigenvector
+          </button>
+          <button class="network-metric-btn" data-metric="betweenness" style="font-size: 0.72rem; padding: 6px 12px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary);">
+            Betweenness
+          </button>
+        </div>
+
+        <div id="network-metrics-display">
+          <!-- Populated via updateNetworkMetricsPanel() -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: THE SIX INFINITY STONES -->
+  <section id="stones-altar-section">
+    <div class="section-editorial-header">
+      <span class="section-tag">Cosmic Singularities</span>
+      <h2 class="section-heading">THE SIX INFINITY STONES</h2>
+      <p class="section-lead">Before creation itself, there were six singularities. Then the universe exploded into existence, and the remnants of these systems were forged into concentrated ingots: The Infinity Stones.</p>
+    </div>
+
+    <div class="stones-altar-grid" id="stones-pedestals-grid">
+      <!-- Populated via renderStonesAltars() -->
+    </div>
+
+    <div class="stone-feature-display" id="stone-feature-panel">
+      <!-- Populated via updateStoneFeaturePanel() -->
+    </div>
+  </section>
+
+  <!-- SECTION 9: MOVIE ARCHIVE & TRACKER -->
+  <section id="archive-section">
+    <div class="section-editorial-header">
+      <span class="section-tag">Comprehensive Catalog & Progress Tracker</span>
+      <h2 class="section-heading">CHRONOLOGICAL ARCHIVE</h2>
+      <p class="section-lead">Switch between theatrical release order and in-universe chronological story sequence. Track your watched progress across 79 canonical Marvel Studios projects.</p>
+    </div>
+
+    <!-- Watch Progress Overview Strip -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: var(--card-radius); padding: 1.5rem 2rem; margin-bottom: 2.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem;">
+      <div style="display: flex; gap: 2rem; align-items: center;">
+        <div>
+          <span style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted);">Watched Status</span>
+          <div style="font-family: var(--font-display); font-size: 1.8rem; color: var(--stone-time);" id="archive-watched-count">0 / 79</div>
+        </div>
+        <div>
+          <span style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted);">Completion</span>
+          <div style="font-family: var(--font-display); font-size: 1.8rem; color: #fff;" id="archive-watched-pct">0%</div>
+        </div>
+        <div>
+          <span style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted);">Agent Clearance Rank</span>
+          <div style="font-size: 0.95rem; font-weight: 700; color: var(--stone-space); margin-top: 4px;" id="archive-agent-rank">Cadet</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button id="btn-mark-all-watched" class="nav-btn-track" style="font-size: 0.72rem; padding: 8px 16px;">Mark All Watched</button>
+        <button id="btn-reset-watched" class="nav-btn-track" style="font-size: 0.72rem; padding: 8px 16px; border-color: rgba(232,57,43,0.4); color: var(--accent-red);">Reset Progress</button>
+      </div>
+    </div>
+
+    <!-- Mode Selector: Release Order vs Chronological Story Sequence -->
+    <div class="archive-mode-toggle">
+      <button class="archive-mode-btn active" data-order="chronological">
+        ✦ In-Universe Story Chronology
+      </button>
+      <button class="archive-mode-btn" data-order="release">
+        Theatrical Release Order
+      </button>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="archive-filter-bar">
+      <input type="text" id="archive-search-input" class="archive-search-input" placeholder="Search archive by title, year, or phase..." aria-label="Search archive" />
+
+      <div class="archive-type-tabs">
+        <button class="archive-type-btn active" data-type="all">All Releases</button>
+        <button class="archive-type-btn" data-type="movie">Feature Films</button>
+        <button class="archive-type-btn" data-type="series">Disney+ Series</button>
+        <button class="archive-type-btn" data-type="special">Special Presentations</button>
+      </div>
+    </div>
+
+    <div class="archive-grid" id="archive-grid">
+      <!-- Populated via renderMovieArchive() -->
+    </div>
+  </section>
+
+  <!-- SECTION 10: CINEMATIC FINALE & TREE CONVERGENCE -->
+  <section id="finale-section">
+    <div class="finale-tree-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+      </svg>
+    </div>
+    <h2 class="finale-headline">WHERE TIME ENDS,<br/>THE MULTIVERSE BEGINS</h2>
+    <p class="finale-sub">79 TITLES • 44 NEXUS HEROES • 6 PHASES • 1 UNIFIED DESTINY</p>
+    
+    <button id="btn-replay-universe" class="btn-replay-universe">
+      <span>✦ Replay The Multiverse Continuum</span>
+    </button>
+  </section>
+
+  <!-- MASTER AGENCY FOOTER -->
   <footer class="agency-footer">
     <div class="agency-footer-container">
-      <div class="agency-promo">
-        <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" class="agency-logo-link">
-          <div class="agency-branding-wrapper">
-            <img src="https://mcu-timelines.vercel.app/ox.png" alt="Origin Max logo" class="agency-logo-img" onerror="this.style.display='none'">
-            <div class="agency-logo-text-group">
-              <div class="agency-logo">ORIGIN<span>MAX</span></div>
-              <div class="agency-tagline">Creative Marketing Agency</div>
-            </div>
-          </div>
-        </a>
+      <div>
+        <div class="agency-logo">ORIGIN<span>MAX</span></div>
+        <div class="agency-tagline">Multiverse Experience Architecture • Web Studio</div>
         <p class="agency-description">
-          We build Trendy, Cool digital experiences that captivate and convert. Ready to launch your own custom
-          interactive campaign, build a high-performance web app, or elevate your brand's digital presence?
-          Let's create something extraordinary together.
+          Engineered with cinematic precision, high-performance WebGL aesthetics, and verified data modeling. Built for Marvel enthusiasts, digital scholars, and multiverse navigators worldwide.
         </p>
-        <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" class="agency-whatsapp-btn">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35M12.05 21.5h-.01a9.4 9.4 0 0 1-4.8-1.32l-.34-.2-3.57.94.95-3.48-.22-.36a9.4 9.4 0 0 1-1.44-5.02c0-5.2 4.23-9.43 9.44-9.43a9.4 9.4 0 0 1 9.43 9.44c0 5.2-4.23 9.43-9.44 9.43M20.08 3.9A11.3 11.3 0 0 0 12.05.58C5.79.58.7 5.67.7 11.93c0 2 .52 3.95 1.52 5.67L.6 23.42l5.95-1.56a11.3 11.3 0 0 0 5.5 1.4h.01c6.26 0 11.35-5.09 11.35-11.35 0-3.03-1.18-5.88-3.33-8.02"/></svg>
-          <span>Connect on WhatsApp</span>
+        <a href="https://wa.me/?text=Exploring%20the%20MCU%20Multiverse%20Experience" target="_blank" rel="noopener" class="agency-whatsapp-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+          Share on WhatsApp
         </a>
       </div>
-      <div class="agency-disclaimer">
-        <h3 class="agency-section-title">Disclaimer &amp; Terms</h3>
+
+      <div>
+        <div class="agency-disclaimer-title">Legal & Canonical Notice</div>
         <p class="agency-disclaimer-text">
-          This interactive timeline is a non-commercial, fan-made tribute to the Marvel Cinematic Universe.
-          <strong>We don't own any of this. This is made for fans to experience the cinematic timeline.</strong>
-        </p>
-        <p class="agency-disclaimer-text">
-          All Marvel assets, poster art, character names, imagery, and intellectual properties belong solely to
-          Marvel Studios, Walt Disney Pictures, and their respective copyright holders. No infringement is intended.
+          Marvel, Avengers, Iron Man, Spider-Man, and all related character names, properties, and imagery are trademarks and copyright of Marvel Characters, Inc., Marvel Studios, LLC, and The Walt Disney Company. This experience is an educational, non-commercial portfolio and fan exploration interface created under fair use doctrine.
         </p>
       </div>
     </div>
+
     <div class="agency-footer-bottom">
-      <div>&copy; 2026 Origin Max. Built for the Marvel Fan Community.
-        <button class="replay-btn" type="button" id="replay-intro">🎬 Replay Studio Intro</button>
-      </div>
-      <div><a href="https://wa.me/" target="_blank" rel="noopener noreferrer">Contact Agency</a></div>
+      <span>© 2026 Origin Max Studio • All Multiverse Continuums Active</span>
+      <span>Engineered with Vite + GSAP + SVG Graph Network</span>
     </div>
   </footer>
 
-  <!-- ══ OVERLAYS ══ -->
-  <button class="scroll-top" id="scroll-top" type="button" aria-label="Back to top">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>
-  </button>
-
-  <div class="badge-popup" id="badge-popup" role="status">
-    <div class="badge-popup-name" id="badge-popup-name">🔥 Infinity Survivor</div>
-    <div class="badge-popup-desc">Achievement Unlocked</div>
-  </div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <div class="modal-overlay" id="snap-modal" role="dialog" aria-modal="true" aria-labelledby="snap-title">
-    <div class="modal snap-modal">
-      <div class="modal-header"><span class="modal-title" id="snap-title">Erase the Timeline?</span></div>
-      <div class="modal-body">
-        <p>All progress will be wiped from this reality.</p>
-        <div class="row">
-          <button class="btn btn-lg" type="button" data-close>Cancel</button>
-          <button class="btn btn-snap" type="button" id="snap-confirm">SNAP</button>
-        </div>
-      </div>
+  <!-- CINEMATIC MODAL: CHARACTER DOSSIER -->
+  <div id="character-dossier-modal" class="cinematic-modal-overlay" role="dialog" aria-modal="true">
+    <div class="cinematic-modal-dialog">
+      <button class="modal-close-cross" aria-label="Close dossier">✕</button>
+      <div class="modal-dynamic-body"></div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="share-modal" role="dialog" aria-modal="true" aria-labelledby="share-title">
-    <div class="modal">
-      <div class="modal-header">
-        <span class="modal-title" id="share-title">Share Progress</span>
-        <button class="modal-close" type="button" data-close aria-label="Close">✕</button>
-      </div>
-      <div class="modal-body">
-        <div id="share-preview">
-          <div class="share-logo">MCU<span>.</span>TIMELINE</div>
-          <div class="share-big-num" id="share-num">0</div>
-          <div class="share-of" id="share-of">titles watched</div>
-          <div class="share-subtitle" id="share-sub">Beginning the journey</div>
-          <div class="share-badge" id="share-badge">🧬 Multiverse Newbie</div>
-          <div class="share-bar-track"><div class="share-bar-fill" id="share-bar"></div></div>
-        </div>
-        <div class="modal-actions">
-          <button class="btn" type="button" data-close>Cancel</button>
-          <button class="btn btn-share" type="button" id="share-native">Copy / Share</button>
-        </div>
-        <div class="social-share-actions">
-          <button class="btn-social" type="button" data-social="whatsapp">WHATSAPP</button>
-          <button class="btn-social" type="button" data-social="telegram">TELEGRAM</button>
-          <button class="btn-social" type="button" data-social="facebook">FACEBOOK</button>
-        </div>
-      </div>
+  <!-- CINEMATIC MODAL: MOVIE DETAILS -->
+  <div id="movie-detail-modal" class="cinematic-modal-overlay" role="dialog" aria-modal="true">
+    <div class="cinematic-modal-dialog">
+      <button class="modal-close-cross" aria-label="Close movie details">✕</button>
+      <div class="modal-dynamic-body"></div>
     </div>
   </div>
 
-  <div id="snap-flash"></div>
-  <div id="gauntlet" aria-hidden="true">
-    <div class="glow"></div>
-    <img src="https://mcu-timelines.vercel.app/thanos-removebg-preview.webp" alt="" loading="lazy" decoding="async">
-  </div>
-
-  <div id="miles-popup" aria-hidden="true">
-    <img src="https://mcu-timelines.vercel.app/miles.webp" alt="" loading="lazy" decoding="async">
-    <div class="miles-speech">Don't break the timeline, bro!</div>
-  </div>
-
-  <script>
-    /* ═══════════════════════════════════════════
-       DATA (placeholder content from reference)
-    ═══════════════════════════════════════════ */
-    const ASSET_BASE = 'https://mcu-timelines.vercel.app';
-    const MCU_DATA = [{"phase":"Phase 0 — Multiverse Origins & Mutants","phaseNum":"00","items":[{"id":101,"title":"X-Men","year":"Jul 14, 2000","type":"Movie","summary":"The landmark film introducing Wolverine, Professor X, and Magneto — establishing the Fox Mutant reality anchored in Secret Wars.","watch":"Disney+"},
-      {"id":102,"title":"X2: X-Men United","year":"May 2, 2003","type":"Movie","summary":"The acclaimed mutant sequel deepening Charles Xavier's school, Weapon X origins, and the mutant-human cold war.","watch":"Disney+"},
-      {"id":1,"title":"Captain America: The First Avenger","year":"Jul 22, 2011","type":"Movie","summary":"Steve Rogers becomes a super-soldier and battles HYDRA's Red Skull during World War II to stop the Tesseract.","watch":"Disney+"},
-      {"id":2,"title":"Agent Carter (Season 1)","year":"Jan 6, 2015","type":"Series","summary":"Peggy Carter fights Soviet threats and sexism while working to clear Howard Stark's name in postwar New York.","watch":"Disney+"},
-      {"id":3,"title":"Agent Carter (Season 2)","year":"Jan 19, 2016","type":"Series","summary":"Peggy investigates a mysterious substance and a secret organization in 1940s Hollywood.","watch":"Disney+"},
-      {"id":4,"title":"Captain Marvel","year":"Mar 8, 2019","type":"Movie","summary":"Carol Danvers discovers her alien heritage and becomes Earth's most powerful hero amid an intergalactic war.","watch":"Disney+"}]},
-    {"phase":"Phase 1 — The Infinity Saga Begins","phaseNum":"01","items":[{"id":5,"title":"Iron Man","year":"May 2, 2008","type":"Movie","summary":"Genius billionaire Tony Stark builds a powered suit to escape captivity and becomes the armored hero Iron Man.","watch":"Disney+","dd":1},
-      {"id":7,"title":"The Incredible Hulk","year":"Jun 13, 2008","type":"Movie","summary":"Bruce Banner hunts for a cure to his gamma affliction while being pursued by General Ross and the Abomination.","watch":"Disney+"},
-      {"id":6,"title":"Iron Man 2","year":"May 7, 2010","type":"Movie","summary":"Tony Stark faces a vengeful Russian physicist and government pressure while battling palladium poisoning.","watch":"Disney+"},
-      {"id":8,"title":"Thor","year":"May 6, 2011","type":"Movie","summary":"The arrogant Asgardian prince Thor is exiled to Earth and must prove himself worthy to reclaim his powers.","watch":"Disney+"},
-      {"id":9,"title":"Marvel's The Avengers","year":"May 4, 2012","type":"Movie","summary":"Earth's mightiest heroes assemble for the first time to stop Loki and his Chitauri army from conquering the world.","watch":"Disney+"}]},
-    {"phase":"Phase 2 — The Expansion","phaseNum":"02","items":[{"id":10,"title":"Thor: The Dark World","year":"Nov 8, 2013","type":"Movie","summary":"Thor battles the ancient Dark Elves to protect Jane Foster and the Nine Realms from the Aether's power.","watch":"Disney+"},
-      {"id":11,"title":"Iron Man 3","year":"May 3, 2013","type":"Movie","summary":"Tony Stark faces the mysterious Mandarin and the deadly Extremis virus after his world is torn apart.","watch":"Disney+"},
-      {"id":12,"title":"Captain America: The Winter Soldier","year":"Apr 4, 2014","type":"Movie","summary":"Steve Rogers uncovers a massive conspiracy within S.H.I.E.L.D. and battles a deadly ghost from his past.","watch":"Disney+"},
-      {"id":13,"title":"Guardians of the Galaxy","year":"Aug 1, 2014","type":"Movie","summary":"A ragtag crew of space misfits bands together to stop a fanatical Kree warrior from destroying a planet.","watch":"Disney+"},
-      {"id":14,"title":"Guardians of the Galaxy Vol. 2","year":"May 5, 2017","type":"Movie","summary":"The Guardians explore Peter Quill's parentage and face a god-like villain with devastating intentions.","watch":"Disney+"},
-      {"id":15,"title":"Daredevil (Season 1)","year":"Apr 10, 2015","type":"Series","summary":"Blind lawyer Matt Murdock fights crime as Daredevil on Hell's Kitchen's streets against the criminal Kingpin.","watch":"Disney+"},
-      {"id":16,"title":"Daredevil (Season 2)","year":"Mar 18, 2016","type":"Series","summary":"Daredevil clashes with the brutal Punisher and reunites with the deadly Elektra amid a ninja conspiracy.","watch":"Disney+"},
-      {"id":17,"title":"Jessica Jones (Season 1)","year":"Nov 20, 2015","type":"Series","summary":"A hard-drinking private investigator with super-strength hunts the mind-controlling psychopath Kilgrave.","watch":"Disney+"},
-      {"id":18,"title":"Avengers: Age of Ultron","year":"May 1, 2015","type":"Movie","summary":"Tony Stark's peacekeeping AI goes rogue, forcing the Avengers to stop Ultron from human extinction.","watch":"Disney+"},
-      {"id":19,"title":"Ant-Man","year":"Jul 17, 2015","type":"Movie","summary":"A master thief dons a suit that shrinks him to ant size and must pull off a heist to save the world.","watch":"Disney+"},
-      {"id":20,"title":"Luke Cage (Season 1)","year":"Sep 30, 2016","type":"Series","summary":"A bulletproof street hero protects Harlem from corrupt politics and a powerful crime lord.","watch":"Disney+"},
-      {"id":21,"title":"Iron Fist (Season 1)","year":"Mar 17, 2017","type":"Series","summary":"Danny Rand returns from K'un-Lun to reclaim his family's company and fight the Hand's influence.","watch":"Disney+"}]},
-    {"phase":"Phase 3 — Civil War Arc & Infinity War","phaseNum":"03","items":[{"id":22,"title":"Captain America: Civil War","year":"May 6, 2016","type":"Movie","summary":"Political pressure splits the Avengers into two factions when the government demands superhero oversight.","watch":"Disney+","dd":1},
-      {"id":23,"title":"Black Widow","year":"Jul 9, 2021","type":"Movie","summary":"Natasha Romanoff confronts her past and dismantles the Red Room's Widow program with her found family.","watch":"Disney+"},
-      {"id":24,"title":"Spider-Man: Homecoming","year":"Jul 7, 2017","type":"Movie","summary":"Teenage Peter Parker balances high school life and his Spider-Man identity while facing the Vulture.","watch":"Disney+"},
-      {"id":25,"title":"The Punisher (Season 1)","year":"Nov 17, 2017","type":"Series","summary":"Frank Castle wages a brutal war on those responsible for his family's murder in a conspiracy thriller.","watch":"Disney+"},
-      {"id":26,"title":"Doctor Strange","year":"Nov 4, 2016","type":"Movie","summary":"A brilliant surgeon discovers a hidden world of magic and becomes Earth's Sorcerer Supreme.","watch":"Disney+"},
-      {"id":27,"title":"The Defenders","year":"Aug 18, 2017","type":"Series","summary":"Daredevil, Jessica Jones, Luke Cage, and Iron Fist join forces against the Hand's secret endgame.","watch":"Disney+"},
-      {"id":28,"title":"Jessica Jones (Season 2)","year":"Mar 8, 2018","type":"Series","summary":"Jessica investigates IGH, the organization responsible for her powers, as she spirals into her darkest chapter.","watch":"Disney+"},
-      {"id":29,"title":"Black Panther","year":"Feb 16, 2018","type":"Movie","summary":"T'Challa returns home to rule Wakanda and faces a challenger who threatens the nation and the world.","watch":"Disney+"},
-      {"id":30,"title":"Thor: Ragnarok","year":"Nov 3, 2017","type":"Movie","summary":"Thor fights for Asgard's survival while trapped on a gladiator planet and confronting the goddess of death.","watch":"Disney+"},
-      {"id":31,"title":"Luke Cage (Season 2)","year":"Jun 22, 2018","type":"Series","summary":"Luke Cage protects Harlem from a Jamaican crime lord while grappling with becoming a true hero.","watch":"Disney+"},
-      {"id":32,"title":"Iron Fist (Season 2)","year":"Sep 7, 2018","type":"Series","summary":"Danny Rand faces a war over Chinatown's streets while Colleen Wing discovers her true destiny.","watch":"Disney+"},
-      {"id":33,"title":"Daredevil (Season 3)","year":"Oct 19, 2018","type":"Series","summary":"Matt Murdock returns to Hell's Kitchen as Daredevil while Fisk controls New York from inside prison.","watch":"Disney+"},
-      {"id":34,"title":"Ant-Man and the Wasp","year":"Jul 6, 2018","type":"Movie","summary":"Scott Lang partners with Hope van Dyne to rescue her mother Janet from the quantum realm.","watch":"Disney+"},
-      {"id":35,"title":"Avengers: Infinity War","year":"Apr 27, 2018","type":"Movie","summary":"Thanos collects all six Infinity Stones to reshape the universe, and the Avengers struggle to stop him.","watch":"Disney+","dd":1},
-      {"id":36,"title":"The Punisher (Season 2)","year":"Jan 18, 2019","type":"Series","summary":"Frank Castle protects a young girl from a mysterious assassin while Jigsaw returns for revenge.","watch":"Disney+"},
-      {"id":37,"title":"Jessica Jones (Season 3)","year":"Jun 14, 2019","type":"Series","summary":"Jessica Jones faces a manipulative serial killer while Trish Walker's vigilante obsession spirals dangerously.","watch":"Disney+"},
-      {"id":38,"title":"Avengers: Endgame","year":"Apr 26, 2019","type":"Movie","summary":"The surviving Avengers travel through time to undo Thanos's snap in an epic battle for the universe.","watch":"Disney+","dd":1}]},
-    {"phase":"Phase 4 — The Multiverse Saga Begins","phaseNum":"04","items":[{"id":39,"title":"WandaVision","year":"Jan 15, 2021","type":"Series","summary":"Wanda Maximoff and Vision live in a sitcom-perfect town — but reality is far more dangerous beneath the surface.","watch":"Disney+"},
-      {"id":40,"title":"Falcon and the Winter Soldier","year":"Mar 19, 2021","type":"Series","summary":"Sam Wilson and Bucky Barnes team up to stop Flag Smashers while grappling with the Captain America legacy.","watch":"Disney+"},
-      {"id":41,"title":"Loki (Season 1)","year":"Jun 9, 2021","type":"Series","summary":"Variant Loki is captured by the Time Variance Authority and discovers a shocking conspiracy at the end of time.","watch":"Disney+","dd":1},
-      {"id":42,"title":"What If…? (Season 1)","year":"Aug 11, 2021","type":"Series","summary":"The Watcher explores alternate Marvel realities where pivotal moments went entirely differently.","watch":"Disney+"},
-      {"id":43,"title":"Shang-Chi and the Legend of the Ten Rings","year":"Sep 3, 2021","type":"Movie","summary":"A skilled martial artist is forced to confront his criminal father and a destiny tied to a mythic realm.","watch":"Disney+"},
-      {"id":44,"title":"Eternals","year":"Nov 5, 2021","type":"Movie","summary":"A group of immortal beings who secretly shaped human civilization must reunite to stop a world-ending emergence.","watch":"Disney+"},
-      {"id":45,"title":"Hawkeye","year":"Nov 24, 2021","type":"Series","summary":"Clint Barton teams with young archer Kate Bishop to deal with his dark Ronin past before Christmas.","watch":"Disney+"},
-      {"id":46,"title":"Spider-Man: Far From Home","year":"Jul 2, 2019","type":"Movie","summary":"Peter Parker's European trip becomes a battle against Mysterio and dangerous illusions threatening the world.","watch":"Disney+ / Rent"},
-      {"id":47,"title":"Spider-Man: No Way Home","year":"Dec 17, 2021","type":"Movie","summary":"Doctor Strange's spell opens the multiverse, unleashing villains from other realities as Peter faces his greatest loss.","watch":"Disney+","dd":1},
-      {"id":48,"title":"Moon Knight","year":"Mar 30, 2022","type":"Series","summary":"A mercenary with dissociative identity disorder becomes the avatar of an Egyptian moon god on a wild journey.","watch":"Disney+"},
-      {"id":49,"title":"Doctor Strange in the Multiverse of Madness","year":"May 6, 2022","type":"Movie","summary":"Strange ventures into the multiverse to protect America Chavez from the increasingly dangerous Scarlet Witch.","watch":"Disney+","dd":1},
-      {"id":50,"title":"Ms. Marvel","year":"Jun 8, 2022","type":"Series","summary":"Kamala Khan, a Pakistani-American teen and Marvel superfan, discovers she has cosmic crystalline powers.","watch":"Disney+"},
-      {"id":51,"title":"She-Hulk: Attorney at Law","year":"Aug 18, 2022","type":"Series","summary":"Lawyer Jennifer Walters navigates life as a seven-foot green Hulk while breaking the fourth wall constantly.","watch":"Disney+"},
-      {"id":52,"title":"Thor: Love and Thunder","year":"Jul 8, 2022","type":"Movie","summary":"Thor faces Gorr the God Butcher while his ex Jane Foster wields Mjolnir as the Mighty Thor.","watch":"Disney+"},
-      {"id":53,"title":"Black Panther: Wakanda Forever","year":"Nov 11, 2022","type":"Movie","summary":"Wakanda mourns T'Challa and faces war with the powerful underwater kingdom of Talokan.","watch":"Disney+"},
-      {"id":54,"title":"Werewolf by Night","year":"Oct 7, 2022","type":"Special","summary":"A black-and-white monster hunter special featuring Jack Russell and the creature Man-Thing in gothic style.","watch":"Disney+"},
-      {"id":55,"title":"The Guardians Holiday Special","year":"Nov 25, 2022","type":"Special","summary":"Drax and Mantis kidnap Kevin Bacon as a Christmas gift for Star-Lord in this festive seasonal special.","watch":"Disney+"}]},
-    {"phase":"Phase 5 — The Multiverse Expands","phaseNum":"05","items":[{"id":56,"title":"Ant-Man and the Wasp: Quantumania","year":"Feb 17, 2023","type":"Movie","summary":"Scott Lang and his family are pulled into the Quantum Realm where they face the time-traveling Kang the Conqueror.","watch":"Disney+","dd":1},
-      {"id":57,"title":"Guardians of the Galaxy Vol. 3","year":"May 5, 2023","type":"Movie","summary":"The Guardians embark on a mission to protect Rocket and discover his tragic origin as an evolutionary experiment.","watch":"Disney+"},
-      {"id":58,"title":"Secret Invasion","year":"Jun 21, 2023","type":"Series","summary":"Nick Fury discovers shape-shifting Skrulls have secretly infiltrated Earth's governments in a global conspiracy.","watch":"Disney+"},
-      {"id":59,"title":"Loki (Season 2)","year":"Oct 6, 2023","type":"Series","summary":"Loki faces time-slipping chaos as the TVA is threatened and he must confront destiny itself to save everything.","watch":"Disney+","dd":1},
-      {"id":60,"title":"Echo","year":"Jan 9, 2024","type":"Series","summary":"Maya Lopez returns home to Oklahoma, reconnects with her Indigenous heritage, and confronts Wilson Fisk's reach.","watch":"Disney+"},
-      {"id":61,"title":"Ironheart","year":"Jun 24, 2025","type":"Series","summary":"Riri Williams builds her own Iron Man suit and faces supernatural forces tied to a dark deal in Chicago.","watch":"Disney+"},
-      {"id":62,"title":"The Marvels","year":"Nov 10, 2023","type":"Movie","summary":"Captain Marvel, Ms. Marvel, and Monica Rambeau swap places every time they use their powers — and must work as one.","watch":"Disney+"},
-      {"id":63,"title":"What If…? (Season 2)","year":"Dec 22, 2023","type":"Series","summary":"The Watcher returns for more alternate universe tales, including a special Happy Hogan holiday episode.","watch":"Disney+"},
-      {"id":64,"title":"Deadpool & Wolverine","year":"Jul 26, 2024","type":"Movie","summary":"Wade Wilson is recruited by the TVA and drags an unwilling Wolverine into a multiverse-spanning adventure.","watch":"Disney+","dd":1},
-      {"id":65,"title":"Agatha All Along","year":"Sep 18, 2024","type":"Series","summary":"Agatha Harkness escapes a mind-wipe and assembles a coven to travel the Witches' Road for her powers back.","watch":"Disney+"},
-      {"id":66,"title":"What If…? (Season 3)","year":"Dec 2024","type":"Series","summary":"The final season of alternate universe storytelling as the Watcher faces his greatest challenges yet.","watch":"Disney+"},
-      {"id":68,"title":"Captain America: Brave New World","year":"Feb 14, 2025","type":"Movie","summary":"Sam Wilson's Captain America is drawn into an international conspiracy involving a newly emerging Red Hulk.","watch":"Disney+"},
-      {"id":69,"title":"Thunderbolts*","year":"May 2, 2025","type":"Movie","summary":"A team of morally grey antiheroes is assembled by Valentina de Fontaine and becomes the New Avengers.","watch":"Disney+","dd":1}]},
-    {"phase":"Phase 6 — The Multiverse Saga Endgame","phaseNum":"06","items":[{"id":72,"title":"The Fantastic Four: First Steps","year":"Jul 25, 2025","type":"Movie","summary":"Marvel's First Family faces the Silver Surfer and the world-devouring Galactus in a retro-futuristic 1964.","watch":"Disney+","dd":1},
-      {"id":67,"title":"Daredevil: Born Again (Season 1)","year":"Mar 4, 2025","type":"Series","summary":"Matt Murdock returns to Hell's Kitchen while Wilson Fisk rises to become Mayor of New York City.","watch":"Disney+"},
-      {"id":70,"title":"Wonder Man","year":"2025","type":"Series","summary":"Simon Williams, an actor and Avengers' PR specialist, grapples with superhero life in Hollywood.","watch":"Disney+"},
-      {"id":71,"title":"Daredevil: Born Again (Season 2)","year":"2027","type":"Series","summary":"The Man Without Fear faces even greater threats as his war with Fisk reaches a devastating new chapter.","watch":"Disney+"},
-      {"id":73,"title":"Eyes of Wakanda","year":"Aug 6, 2025","type":"Series","summary":"An animated anthology tracing elite Wakandan warriors across history protecting the nation's vibranium.","watch":"Disney+"},
-      {"id":74,"title":"Spider-Man: Brand New Day","year":"Jul 31, 2026","type":"Movie","summary":"Peter Parker starts a new chapter four years after the world forgot him — with new threats rising.","watch":"Coming Jul 31, 2026"},
-      {"id":77,"title":"VisionQuest","year":"Oct 13, 2026","type":"Series","summary":"White Vision embarks on a journey to reclaim his humanity and memories, reconnecting with Tommy Maximoff while evading a resurrected Ultron.","watch":"Disney+","dd":1},
-      {"id":75,"title":"Avengers: Doomsday","year":"May 1, 2026","type":"Movie","summary":"Earth's heroes face Doctor Doom in a cataclysmic showdown that threatens the entire Marvel multiverse.","watch":"Coming May 1, 2026"},
-      {"id":76,"title":"Avengers: Secret Wars","year":"May 7, 2027","type":"Movie","summary":"The ultimate battle across the multiverse — the culmination of the entire Multiverse Saga.","watch":"Coming May 7, 2027"}]}];
-
-    const STORAGE_KEY = 'mcu-timeline-watched-v1';
-    const ALL_ITEMS = MCU_DATA.flatMap(p => p.items);
-    const TOTAL = ALL_ITEMS.length;
-    const watched = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
-    let currentFilter = 'all';
-    let lastRank = null;
-
-    const RANKS = [
-      { min: 0,   name: '🧬 Multiverse Newbie',        sub: 'Beginning the journey' },
-      { min: 10,  name: '🛡️ S.H.I.E.L.D. Recruit',      sub: 'Clearance granted' },
-      { min: 25,  name: '⚡ Avenger in Training',       sub: 'Assembling nicely' },
-      { min: 50,  name: '🔥 Infinity Survivor',         sub: 'Half the universe, conquered' },
-      { min: 75,  name: '🌌 Multiverse Guardian',       sub: 'Defender of every reality' },
-      { min: 100, name: '♾️ Sacred Timeline Keeper',    sub: 'Every reality watched' },
-    ];
-
-    const $ = (s, el = document) => el.querySelector(s);
-    const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-    const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify([...watched]));
-    const pct = () => TOTAL ? Math.round((watched.size / TOTAL) * 100) : 0;
-    const rankFor = p => [...RANKS].reverse().find(r => p >= r.min);
-    const posterSrc = item => (item.customPoster ? (item.customPoster.startsWith('http') ? item.customPoster : ASSET_BASE + '/' + item.customPoster.replace(/^\.?\//, '')) : `${ASSET_BASE}/photos/${item.id}.jpg`) + '?v=2';
-    const watchUrl = item => `https://www.hotstar.com/in/explore?search_query=${encodeURIComponent(item.title)}`;
-    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-    /* ═══════════════════════════════════════════
-       RENDER
-    ═══════════════════════════════════════════ */
-    function renderAll() {
-      const container = $('#timeline-container');
-      const frag = document.createDocumentFragment();
-      let seq = 0;
-      MCU_DATA.forEach(phase => {
-        const block = document.createElement('section');
-        block.className = 'phase-block';
-        block.dataset.phase = phase.phaseNum;
-        block.dataset.watermark = phase.phaseNum;
-        const name = (phase.phase.split('—')[1] || phase.phase).trim();
-        block.setAttribute('aria-label', phase.phase);
-        block.innerHTML = `
-          <div class="phase-header">
-            <div class="phase-number">${phase.phaseNum}</div>
-            <div class="phase-info">
-              <div class="phase-label">Phase</div>
-              <div class="phase-name">${esc(name)}</div>
-            </div>
-            <div class="phase-count" data-phase-count></div>
-          </div>
-          <div class="timeline-grid"></div>`;
-        const grid = $('.timeline-grid', block);
-        phase.items.forEach(item => { item._seq = ++seq; grid.appendChild(buildCard(item)); });
-        frag.appendChild(block);
-      });
-      container.appendChild(frag);
-    }
-
-    function buildCard(item) {
-      const typeClass = item.type === 'Movie' ? 'type-movie' : item.type === 'Series' ? 'type-series' : 'type-special';
-      const card = document.createElement('article');
-      card.className = 'card' + (watched.has(item.id) ? ' watched' : '');
-      card.id = 'card-' + item.id;
-      card.dataset.id = item.id;
-      card.dataset.type = item.type;
-      if (item.dd) card.dataset.dd = '1';
-      card.tabIndex = 0;
-      card.setAttribute('role', 'button');
-      card.setAttribute('aria-pressed', watched.has(item.id));
-      card.setAttribute('aria-label', `${item.title} (${item.year}) — toggle watched`);
-      card.innerHTML = `
-        <div class="card-poster">
-          <div class="poster-placeholder">
-            <div class="poster-placeholder-icon">MCU</div>
-            <div class="poster-placeholder-label">${esc(item.type)}</div>
-          </div>
-          <img src="${posterSrc(item)}" alt="" loading="lazy" decoding="async">
-          ${item.dd ? '<span class="dd-flag">Doomsday</span>' : ''}
-          <div class="poster-seq">${String(item._seq).padStart(2, '0')}</div>
-        </div>
-        <div class="card-body">
-          <div class="card-top">
-            <div class="card-meta">
-              <span class="card-type ${typeClass}">${esc(item.type)}</span>
-              <span class="card-meta-year">${esc(item.year)}</span>
-            </div>
-            <div class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>
-          </div>
-          <div class="card-title">${esc(item.title)}</div>
-          <div class="card-summary">${esc(item.summary)}</div>
-          <div class="card-footer">
-            <a href="${watchUrl(item)}" target="_blank" rel="noopener noreferrer" class="card-watch-on" data-watch><span class="watch-dot"></span>Watch on ${esc(item.watch)}</a>
-          </div>
-        </div>`;
-      const img = $('img', card);
-      img.addEventListener('load', () => { img.classList.add('loaded'); img.previousElementSibling.style.display = 'none'; }, { once: true });
-      img.addEventListener('error', () => { img.style.display = 'none'; }, { once: true });
-      return card;
-    }
-
-    /* ═══════════════════════════════════════════
-       STATE UPDATES
-    ═══════════════════════════════════════════ */
-    function toggleWatched(id) {
-      const adding = !watched.has(id);
-      if (adding) {
-        watched.add(id);
-        const idx = ALL_ITEMS.findIndex(i => i.id === id);
-        const skipped = ALL_ITEMS.slice(0, idx).some(i => !watched.has(i.id));
-        if (skipped) showMiles();
-      } else {
-        watched.delete(id);
-      }
-      save();
-      syncCard(id);
-      updateAll();
-    }
-
-    function syncCard(id) {
-      const card = document.getElementById('card-' + id);
-      if (!card) return;
-      card.classList.toggle('watched', watched.has(id));
-      card.setAttribute('aria-pressed', watched.has(id));
-    }
-
-    function updateAll() {
-      const p = pct();
-      const movies = ALL_ITEMS.filter(i => i.type === 'Movie' && watched.has(i.id)).length;
-      const series = ALL_ITEMS.filter(i => i.type === 'Series' && watched.has(i.id)).length;
-
-      $('#prog-count').textContent = `${watched.size} / ${TOTAL} watched`;
-      $('#prog-pct').textContent = p + '%';
-      $('#prog-fill').style.width = p + '%';
-      $('#prog-track').setAttribute('aria-valuenow', p);
-
-      $('#stat-watched').textContent = watched.size;
-      $('#stat-movies').textContent = movies;
-      $('#stat-series').textContent = series;
-      $('#stat-total').textContent = TOTAL;
-
-      // phase counters
-      $$('.phase-block').forEach(block => {
-        const phase = MCU_DATA.find(ph => ph.phaseNum === block.dataset.phase);
-        const n = phase.items.filter(i => watched.has(i.id)).length;
-        $('[data-phase-count]', block).textContent = `${n}/${phase.items.length} watched`;
-      });
-
-      // infinity stones: one per sixth of progress
-      const placed = Math.floor((watched.size / TOTAL) * 6 + 1e-9);
-      $$('.infinity-stone').forEach((s, i) => s.classList.toggle('placed', i < placed));
-
-      // rank badge
-      const rank = rankFor(p);
-      $('#nav-badge').textContent = rank.name;
-      if (lastRank && RANKS.indexOf(rank) > RANKS.indexOf(lastRank)) showBadge(rank.name);
-      lastRank = rank;
-
-      updateNextBanner();
-      applyFilter(currentFilter);
-    }
-
-    function nextUp() { return ALL_ITEMS.find(i => !watched.has(i.id)); }
-
-    function updateNextBanner() {
-      const banner = $('#next-banner');
-      $$('.card.up-next').forEach(c => c.classList.remove('up-next'));
-      if (currentFilter === 'doomsday') {
-        const dd = ALL_ITEMS.filter(i => i.dd);
-        const left = dd.filter(i => !watched.has(i.id)).length;
-        banner.classList.add('dd');
-        $('#next-label').textContent = 'Doomsday Fast-Track';
-        $('#next-title').textContent = `${dd.length} essential titles · ${left} left before Doomsday`;
-        $('#next-action').textContent = 'Clear';
-        banner.hidden = false;
-        return;
-      }
-      banner.classList.remove('dd');
-      const n = nextUp();
-      if (!n || watched.size === 0) { banner.hidden = true; return; }
-      document.getElementById('card-' + n.id)?.classList.add('up-next');
-      $('#next-label').textContent = 'Up next';
-      $('#next-title').textContent = n.title;
-      $('#next-action').textContent = 'Jump';
-      banner.hidden = false;
-    }
-
-    function applyFilter(filter) {
-      currentFilter = filter;
-      $$('.nav-filter-btn').forEach(b => {
-        const on = b.dataset.filter === filter;
-        b.classList.toggle('active', on);
-        b.setAttribute('aria-pressed', on);
-      });
-      let anyVisible = false;
-      $$('.phase-block').forEach(block => {
-        let visibleInPhase = 0;
-        $$('.card', block).forEach(card => {
-          const id = +card.dataset.id;
-          const show =
-            filter === 'all' ? true :
-            filter === 'watched' ? watched.has(id) :
-            filter === 'unwatched' ? !watched.has(id) :
-            filter === 'doomsday' ? card.dataset.dd === '1' :
-            card.dataset.type === filter;
-          card.hidden = !show;
-          if (show) visibleInPhase++;
-        });
-        block.hidden = visibleInPhase === 0;
-        if (visibleInPhase) anyVisible = true;
-      });
-      $('#empty-state').classList.toggle('show', !anyVisible);
-    }
-
-    /* ═══════════════════════════════════════════
-       UI HELPERS
-    ═══════════════════════════════════════════ */
-    let toastTimer;
-    function toast(msg) {
-      const t = $('#toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
-    }
-
-    let badgeTimer;
-    function showBadge(name) {
-      $('#badge-popup-name').textContent = name;
-      $('#badge-popup').classList.add('show');
-      clearTimeout(badgeTimer);
-      badgeTimer = setTimeout(() => $('#badge-popup').classList.remove('show'), 2800);
-    }
-
-    let milesTimer, milesCooldown = 0;
-    function showMiles() {
-      const now = Date.now();
-      if (now < milesCooldown) return;
-      milesCooldown = now + 20000;
-      const m = $('#miles-popup');
-      m.classList.add('show');
-      clearTimeout(milesTimer);
-      milesTimer = setTimeout(() => m.classList.remove('show'), 2600);
-    }
-
-    function scrollToTimeline() {
-      $('#timeline-anchor').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    let lastFocus = null;
-    function openModal(id) {
-      lastFocus = document.activeElement;
-      const m = document.getElementById(id);
-      m.classList.add('open');
-      setTimeout(() => $('button', m)?.focus(), 50);
-    }
-    function closeModal(m) {
-      m.classList.remove('open');
-      lastFocus?.focus?.();
-    }
-
-    function openShare() {
-      const p = pct();
-      const rank = rankFor(p);
-      $('#share-num').textContent = watched.size;
-      $('#share-of').textContent = `of ${TOTAL} titles watched`;
-      $('#share-sub').textContent = rank.sub;
-      $('#share-badge').textContent = rank.name;
-      $('#share-bar').style.width = p + '%';
-      const pv = $('#share-preview');
-      pv.className = p >= 100 ? 't-max' : p >= 50 ? 't-high' : p >= 20 ? 't-mid' : 't-low';
-      openModal('share-modal');
-    }
-
-    function shareText() {
-      return `I've watched ${watched.size}/${TOTAL} MCU titles (${pct()}%) — ${rankFor(pct()).name}. Track yours:`;
-    }
-
-    /* ═══════════════════════════════════════════
-       SNAP
-    ═══════════════════════════════════════════ */
-    function executeSnap() {
-      closeModal($('#snap-modal'));
-      const g = $('#gauntlet');
-      g.classList.add('active');
-      setTimeout(() => {
-        g.classList.add('snap');
-        $('#snap-flash').classList.remove('go'); void $('#snap-flash').offsetWidth; $('#snap-flash').classList.add('go');
-        const victims = $$('.card.watched');
-        victims.forEach((c, i) => { c.style.setProperty('--d', (Math.random() * 0.6).toFixed(2) + 's'); c.classList.add('dusting'); });
-        setTimeout(() => {
-          watched.clear(); save(); lastRank = RANKS[0];
-          victims.forEach(c => { c.classList.remove('dusting'); c.style.removeProperty('--d'); syncCard(+c.dataset.id); });
-          updateAll();
-          g.classList.remove('active', 'snap');
-          toast('Perfectly balanced, as all things should be.');
-        }, victims.length ? 1800 : 700);
-      }, 750);
-    }
-
-    /* ═══════════════════════════════════════════
-       STUDIO INTRO
-    ═══════════════════════════════════════════ */
-    let introTimers = [];
-    function playIntro() {
-      const intro = $('#studio-intro');
-      const flip = $('#intro-flip');
-      const pics = ALL_ITEMS.slice(0, 14).map(posterSrc);
-      pics.forEach(src => { const i = new Image(); i.src = src; });
-      introTimers.forEach(clearTimeout); introTimers = [];
-      intro.classList.remove('logo-in', 'blackout');
-      intro.classList.add('play');
-      document.body.style.overflow = 'hidden';
-      let k = 0;
-      const flipInt = setInterval(() => { flip.style.backgroundImage = `url("${pics[k++ % pics.length]}")`; }, 110);
-      introTimers.push(setTimeout(() => intro.classList.add('logo-in'), 1100));
-      introTimers.push(setTimeout(() => clearInterval(flipInt), 2200));
-      introTimers.push(setTimeout(() => intro.classList.add('blackout'), 3300));
-      introTimers.push(setTimeout(endIntro, 3900));
-      introTimers.push(flipInt);
-      function endIntro() {
-        clearInterval(flipInt);
-        introTimers.forEach(clearTimeout);
-        intro.classList.remove('play', 'logo-in', 'blackout');
-        document.body.style.overflow = '';
-      }
-      intro.onclick = endIntro;
-    }
-
-    /* ═══════════════════════════════════════════
-       HERO: count-up stats + particle dust
-    ═══════════════════════════════════════════ */
-    function countUp() {
-      $('#hero-titles').dataset.target = TOTAL;
-      $('#hero-phases').dataset.target = MCU_DATA.filter(p => p.phaseNum !== '00').length;
-      $$('.hero-stat-num').forEach(el => {
-        const target = +el.dataset.target, suffix = el.dataset.suffix || '';
-        const start = performance.now(), dur = 1200;
-        const step = now => {
-          const t = Math.min(1, (now - start) / dur);
-          el.textContent = Math.round(target * (1 - Math.pow(1 - t, 3))) + suffix;
-          if (t < 1) requestAnimationFrame(step);
-        };
-        requestAnimationFrame(step);
-      });
-    }
-
-    function heroParticles() {
-      const c = $('#hero-canvas'), ctx = c.getContext('2d');
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      let w, h, parts = [], running = true, dpr = Math.min(devicePixelRatio || 1, 2);
-      const resize = () => {
-        w = c.clientWidth; h = c.clientHeight;
-        c.width = w * dpr; c.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const n = Math.round(Math.min(70, w * h / 18000));
-        parts = Array.from({ length: n }, () => ({
-          x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.4 + 0.3,
-          vx: (Math.random() - 0.5) * 0.15, vy: -(Math.random() * 0.25 + 0.05),
-          a: Math.random() * 0.5 + 0.15, g: Math.random() < 0.35
-        }));
-      };
-      const tick = () => {
-        if (!running) return;
-        ctx.clearRect(0, 0, w, h);
-        for (const p of parts) {
-          p.x += p.vx; p.y += p.vy;
-          if (p.y < -5) { p.y = h + 5; p.x = Math.random() * w; }
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = p.g ? `rgba(0,230,118,${p.a})` : `rgba(255,255,255,${p.a * 0.7})`;
-          ctx.fill();
-        }
-        requestAnimationFrame(tick);
-      };
-      resize(); tick();
-      addEventListener('resize', resize, { passive: true });
-      new IntersectionObserver(([e]) => { const was = running; running = e.isIntersecting; if (running && !was) tick(); }).observe($('#hero'));
-    }
-
-    /* ═══════════════════════════════════════════
-       EVENTS
-    ═══════════════════════════════════════════ */
-    function bind() {
-      const container = $('#timeline-container');
-      container.addEventListener('click', e => {
-        if (e.target.closest('[data-watch]')) return;
-        const card = e.target.closest('.card');
-        if (card) toggleWatched(+card.dataset.id);
-      });
-      container.addEventListener('keydown', e => {
-        if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('card')) {
-          e.preventDefault(); toggleWatched(+e.target.dataset.id);
-        }
-      });
-
-      $$('.nav-filter-btn').forEach(b => b.addEventListener('click', () => { applyFilter(b.dataset.filter); updateNextBanner(); }));
-
-      $('#doomsday-btn').addEventListener('click', () => {
-        applyFilter('doomsday'); updateNextBanner(); scrollToTimeline();
-        toast(`⚡ ${ALL_ITEMS.filter(i => i.dd).length} essentials to watch before Doomsday`);
-      });
-      $$('[data-scroll-to-timeline]').forEach(b => b.addEventListener('click', scrollToTimeline));
-
-      $('#next-action').addEventListener('click', () => {
-        if (currentFilter === 'doomsday') { applyFilter('all'); updateNextBanner(); return; }
-        const n = nextUp();
-        if (!n) return;
-        if (currentFilter !== 'all' && currentFilter !== 'unwatched') applyFilter('all');
-        const card = document.getElementById('card-' + n.id);
-        card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-        setTimeout(() => card.focus({ preventScroll: true }), 500);
-      });
-
-      $('#reset-btn').addEventListener('click', () => openModal('snap-modal'));
-      $('#snap-confirm').addEventListener('click', executeSnap);
-      $('#share-btn').addEventListener('click', openShare);
-
-      $$('.modal-overlay').forEach(m => {
-        m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-close]')) closeModal(m); });
-      });
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') $$('.modal-overlay.open').forEach(closeModal);
-      });
-
-      $('#share-native').addEventListener('click', async () => {
-        const text = shareText(), url = location.href.split('#')[0];
-        try {
-          if (navigator.share) { await navigator.share({ title: 'MCU Timeline', text, url }); return; }
-          await navigator.clipboard.writeText(`${text} ${url}`);
-          toast('Copied to clipboard');
-        } catch { /* user cancelled */ }
-      });
-      $$('[data-social]').forEach(b => b.addEventListener('click', () => {
-        const text = encodeURIComponent(shareText()), url = encodeURIComponent(location.href.split('#')[0]);
-        const links = {
-          whatsapp: `https://wa.me/?text=${text}%20${url}`,
-          telegram: `https://t.me/share/url?url=${url}&text=${text}`,
-          facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-        };
-        window.open(links[b.dataset.social], '_blank', 'noopener');
-      }));
-
-      $('#replay-intro').addEventListener('click', playIntro);
-
-      const scrollBtn = $('#scroll-top');
-      scrollBtn.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
-      const header = $('#timeline-anchor');
-      let stuck = false;
-      addEventListener('scroll', () => {
-        scrollBtn.classList.toggle('visible', scrollY > innerHeight * 0.8);
-        const nowStuck = header.getBoundingClientRect().top <= 0 && scrollY > 10;
-        if (nowStuck && !stuck) { header.classList.remove('slide-in'); void header.offsetWidth; header.classList.add('slide-in'); }
-        stuck = nowStuck;
-      }, { passive: true });
-    }
-
-    /* ═══════════════════════════════════════════
-       INIT
-    ═══════════════════════════════════════════ */
-    renderAll();
-    lastRank = rankFor(pct());
-    updateAll();
-    bind();
-    countUp();
-    heroParticles();
-    if (!sessionStorage.getItem('mcu-intro-played')) {
-      sessionStorage.setItem('mcu-intro-played', '1');
-      playIntro();
-    }
-  </script>
+  <!-- APPLICATION ENTRY SCRIPT -->
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>

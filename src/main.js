@@ -450,8 +450,8 @@ function renderInfinitySaga() {
       counter.textContent = `TITLE ${curNum} / ${totNum}`;
     }
 
-    const isMobile = window.innerWidth < 640;
-    const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
+    const isMobile = window.innerWidth <= 768;
+    const isTablet = window.innerWidth > 768 && window.innerWidth < 1024;
     
     // Exact Originkit constants matching Image 2:
     // MAX_VISIBLE = 2 (exactly 5 cards in view: -2, -1, 0, +1, +2)
@@ -842,7 +842,7 @@ function renderRoundCarouselRing(list) {
 
   if (hud) hud.style.display = 'flex';
 
-  const isMobile = window.innerWidth <= 680;
+  const isMobile = window.innerWidth <= 768;
   const cardWidth = isMobile ? 220 : 270;
   const spacing = count > 20 ? 2.2 : (count > 8 ? 2.6 : 3.0);
   const factor = 1 + spacing * 0.15;
@@ -1061,7 +1061,7 @@ function initRoundCarouselControls() {
   // Window resize handler
   window.addEventListener('resize', () => {
     if (roundCarouselList && roundCarouselList.length > 0) {
-      const isMobile = window.innerWidth <= 680;
+      const isMobile = window.innerWidth <= 768;
       const cardWidth = isMobile ? 220 : 270;
       const count = roundCarouselList.length;
       if (count > 1) {

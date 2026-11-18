@@ -268,7 +268,30 @@ export class BookshelfCoverFlip {
     this.updateCurrentPageBooks();
     this.renderDOM();
     this.setupListeners();
-    this.startLoop();
+    this.setupVisibilityObserver();
+  }
+
+  setupVisibilityObserver() {
+    this.isRunning = false;
+    if (typeof IntersectionObserver !== 'undefined' && this.container) {
+      this.io = new IntersectionObserver(([entry]) => {
+        const inView = entry.isIntersecting;
+        if (inView && !this.isRunning) {
+          this.isRunning = true;
+          this.startLoop();
+        } else if (!inView && this.isRunning) {
+          this.isRunning = false;
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+        }
+      }, { rootMargin: '100px 0px' });
+      this.io.observe(this.container);
+    } else {
+      this.isRunning = true;
+      this.startLoop();
+    }
   }
 
   setItems(newItems) {
@@ -581,7 +604,7 @@ export class BookshelfCoverFlip {
     let last = -1;
 
     const tick = (now) => {
-      if (!this.isAlive) return;
+      if (!this.isAlive || !this.isRunning) return;
       this.rafId = requestAnimationFrame(tick);
 
       const dt = last < 0 ? 0 : Math.min((now - last) / 1000, 1 / 20);
@@ -686,7 +709,9 @@ export class BookshelfCoverFlip {
 
   destroy() {
     this.isAlive = false;
+    this.isRunning = false;
     cancelAnimationFrame(this.rafId);
     if (this.ro) this.ro.disconnect();
+    if (this.io) this.io.disconnect();
   }
 }

@@ -760,7 +760,7 @@ section {
 .hero-doom-bg-stage {
   position: absolute;
   inset: -1%;
-  background: #020604 url('/images/doom-entrance-4k.jpg') center 20% / cover no-repeat;
+  background: #020604 url('/images/doom-entrance-opt.webp') center 20% / cover no-repeat;
   z-index: 0;
   image-rendering: -webkit-optimize-contrast;
   animation: doomEntranceBreath 22s ease-in-out infinite alternate;
@@ -3644,7 +3644,7 @@ section {
 
 .round-card-back {
   transform: rotateY(180deg);
-  background: #06110a url('/images/doom-smoke-bg.jpg') center/cover;
+  background: #06110a url('/images/doom-smoke-bg.webp') center/cover;
   border: 1px solid rgba(0, 230, 118, 0.18);
   box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.9);
   filter: brightness(0.35);
@@ -6742,7 +6742,7 @@ body {
 #doom-site-backdrop .smoke-drift {
   position: absolute;
   inset: -6%;
-  background: url('/images/doom-smoke-bg.jpg') center center / cover no-repeat;
+  background: url('/images/doom-smoke-bg.webp') center center / cover no-repeat;
   will-change: transform, opacity;
   backface-visibility: hidden;
 }

@@ -1,5 +1,3 @@
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { timelineData, phasesData, DOOMSDAY_BRANCHES } from './data/timeline.js';
 import { charactersData } from './data/characters.js';
 import { networkGraphData } from './data/network.js';
@@ -7,8 +5,6 @@ import { stonesData } from './data/stones.js';
 import { STUDIO_ASSETS, STONE_MEDIA } from './data/mediaRegistry.js';
 import { DoomsdaySphereGallery } from './components/sphere-gallery.js';
 import { BookshelfCoverFlip } from './components/bookshelf-cover-flip.js';
-
-gsap.registerPlugin(ScrollTrigger);
 
 /* ═══════════════════════════════════════════════════════════════════
    GLOBAL STATE & STORAGE
@@ -227,8 +223,14 @@ function initHeroParticleCanvas() {
     });
   }
 
-  let animFrame;
+  let animFrame = null;
+  let isHeroVisible = true;
+
   function render() {
+    if (!isHeroVisible) {
+      animFrame = null;
+      return;
+    }
     ctx.clearRect(0, 0, width, height);
 
     // Draw central Yggdrasil energy trunk & subtle multidimensional rays
@@ -268,7 +270,22 @@ function initHeroParticleCanvas() {
 
     animFrame = requestAnimationFrame(render);
   }
-  render();
+
+  const heroSec = document.getElementById('hero');
+  if (heroSec && typeof IntersectionObserver !== 'undefined') {
+    const heroObserver = new IntersectionObserver(([entry]) => {
+      isHeroVisible = entry.isIntersecting;
+      if (isHeroVisible && !animFrame) {
+        render();
+      } else if (!isHeroVisible && animFrame) {
+        cancelAnimationFrame(animFrame);
+        animFrame = null;
+      }
+    }, { rootMargin: '50px' });
+    heroObserver.observe(heroSec);
+  } else {
+    render();
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -311,38 +328,46 @@ function initMultiverseNav() {
   }
   updateStoneDots();
 
+  let ticking = false;
   window.addEventListener('scroll', () => {
-    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
-    if (progressLine) progressLine.style.width = `${progress}%`;
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+        if (progressLine) progressLine.style.width = `${progress}%`;
 
-    if (window.scrollY > 80) {
-      nav.classList.add('scrolled');
-    } else {
-      nav.classList.remove('scrolled');
-    }
-
-    // Active link highlighting
-    const sections = ['multiverse-nexus', 'infinity-saga-section', 'multiverse-saga-section', 'doomsday-fast-track-section', 'characters-section', 'marvel-network-section', 'stones-altar-section', 'archive-section'];
-    let current = '';
-
-    for (const secId of sections) {
-      const sec = document.getElementById(secId);
-      if (sec) {
-        const rect = sec.getBoundingClientRect();
-        if (rect.top <= 200 && rect.bottom >= 200) {
-          current = secId;
-          break;
+        if (window.scrollY > 80) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
         }
-      }
-    }
 
-    navLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('href') === `#${current}`) {
-        link.classList.add('active');
-      }
-    });
+        // Active link highlighting
+        const sections = ['multiverse-nexus', 'infinity-saga-section', 'multiverse-saga-section', 'doomsday-fast-track-section', 'characters-section', 'marvel-network-section', 'stones-altar-section', 'archive-section'];
+        let current = '';
+
+        for (const secId of sections) {
+          const sec = document.getElementById(secId);
+          if (sec) {
+            const rect = sec.getBoundingClientRect();
+            if (rect.top <= 250 && rect.bottom >= 150) {
+              current = secId;
+              break;
+            }
+          }
+        }
+
+        navLinks.forEach(link => {
+          const isActive = link.getAttribute('href') === `#${current}`;
+          if (link.classList.contains('active') !== isActive) {
+            link.classList.toggle('active', isActive);
+          }
+        });
+
+        ticking = false;
+      });
+      ticking = true;
+    }
   }, { passive: true });
 }
 
@@ -414,7 +439,7 @@ function renderInfinitySaga() {
         const isCrossover = t.isCrossover;
         return `
           <div class="coverflow-3d-card ${isWatched ? 'watched' : ''}" data-id="${t.id}" data-index="${idx}" role="button" aria-label="${t.title}" tabindex="0">
-            <img src="${t.poster}" alt="${t.title}" class="coverflow-card-poster-img" loading="lazy" draggable="false" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
+            <img src="${t.poster}" alt="${t.title}" class="coverflow-card-poster-img" loading="lazy" decoding="async" draggable="false" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
             <div class="coverflow-card-gradient" aria-hidden="true"></div>
             <div class="coverflow-card-info-overlay">
               <div class="coverflow-badge-row">
@@ -620,6 +645,19 @@ function renderInfinitySaga() {
     updateCoverflow();
   }, { passive: true });
 
+  // Pause autoplay when section is out of view
+  const infinitySec = document.getElementById('infinity-saga-section');
+  if (infinitySec && typeof IntersectionObserver !== 'undefined') {
+    const infObs = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) {
+        stopInfinityAutoplay();
+      } else if (infinityIsAutoplay) {
+        startInfinityAutoplay();
+      }
+    }, { rootMargin: '50px' });
+    infObs.observe(infinitySec);
+  }
+
   // Initial layout calculation
   updateCoverflow();
 }
@@ -649,7 +687,7 @@ function renderMultiverseSaga() {
     return `
       <div class="multiverse-item-card ${isWatched ? 'watched' : ''} ${isUpcoming ? 'upcoming' : ''}" data-id="${t.id}">
         <div class="multiverse-card-poster">
-          <img src="${t.poster}" alt="${t.title}" loading="lazy" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
+          <img src="${t.poster}" alt="${t.title}" loading="lazy" decoding="async" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
           <div class="dim-badge">${dimBadge}</div>
           <div class="status-badge ${isUpcoming ? 'upcoming-badge' : 'released-badge'}">
             ${isUpcoming ? '⏳ Upcoming' : '✓ Released'}
@@ -872,7 +910,7 @@ function renderRoundCarouselRing(list) {
         <!-- Front Face -->
         <div class="round-card-face round-card-front">
           <div class="round-card-media">
-            <img src="${c.image}" alt="${c.name}" loading="lazy" onerror="handleImageError(this, '${safeName}', '${c.accentColor || '#1a233a'}', '${fbPoster}')" />
+            <img src="${c.image}" alt="${c.name}" loading="lazy" decoding="async" onerror="handleImageError(this, '${safeName}', '${c.accentColor || '#1a233a'}', '${fbPoster}')" />
             <div class="round-card-universe">${c.universe}</div>
             <div class="round-card-audit">${rawAnomalies}</div>
           </div>
@@ -1079,7 +1117,13 @@ function initRoundCarouselControls() {
 
   // Physics & Animation Loop (RAF)
   roundCarouselLastTime = performance.now();
+  let isCharSectionInView = true;
+
   function draw(now) {
+    if (!isCharSectionInView) {
+      roundCarouselRafId = null;
+      return;
+    }
     const dt = roundCarouselLastTime ? (now - roundCarouselLastTime) / 1000 : 0;
     roundCarouselLastTime = now;
     const f = Math.min(dt, 0.1);
@@ -1099,6 +1143,21 @@ function initRoundCarouselControls() {
     }
 
     roundCarouselRafId = requestAnimationFrame(draw);
+  }
+
+  const charSec = document.getElementById('characters-section');
+  if (charSec && typeof IntersectionObserver !== 'undefined') {
+    const charObs = new IntersectionObserver(([entry]) => {
+      isCharSectionInView = entry.isIntersecting;
+      if (isCharSectionInView && !roundCarouselRafId) {
+        roundCarouselLastTime = performance.now();
+        roundCarouselRafId = requestAnimationFrame(draw);
+      } else if (!isCharSectionInView && roundCarouselRafId) {
+        cancelAnimationFrame(roundCarouselRafId);
+        roundCarouselRafId = null;
+      }
+    }, { rootMargin: '100px' });
+    charObs.observe(charSec);
   }
 
   if (roundCarouselRafId) {
@@ -1146,7 +1205,7 @@ function renderCharacterGallery() {
       return `
         <div class="character-card" data-id="${c.id}" style="--char-accent: ${c.accentColor || '#3C8DFF'}">
           <div class="char-card-media">
-            <img src="${c.image}" alt="${c.name}" loading="lazy" onerror="handleImageError(this, '${safeName}', '${c.accentColor || '#1a233a'}', '${fbPoster}')" />
+            <img src="${c.image}" alt="${c.name}" loading="lazy" decoding="async" onerror="handleImageError(this, '${safeName}', '${c.accentColor || '#1a233a'}', '${fbPoster}')" />
             <div class="char-universe-pill">${c.universe}</div>
             <div class="char-audit-status">${rawAnomalies}</div>
           </div>
@@ -1535,9 +1594,6 @@ function initStudioIntro() {
   if (skipBtn) {
     skipBtn.addEventListener('click', dismissStudioIntro);
   }
-
-  // Always play the 3-second Marvel Studios opening animation on load
-  playStudioIntro();
 }
 
 function playCloudTransition(onCovered, onComplete, duration = 650) {
@@ -1619,9 +1675,9 @@ function initMultiverseTreeBranches() {
 
     playCloudTransition(() => {
       if (doomStage) {
-        doomStage.style.background = `#020805 url('/images/loki-multiverse-4k.jpg') center 24% / cover no-repeat`;
+        doomStage.style.background = `#020805 url('/images/loki-tile-opt.webp') center 24% / cover no-repeat`;
       } else {
-        heroSec.style.background = `#020805 url('/images/loki-multiverse-4k.jpg') center 24% / cover no-repeat`;
+        heroSec.style.background = `#020805 url('/images/loki-tile-opt.webp') center 24% / cover no-repeat`;
       }
 
       if (doomPerimeterHud) doomPerimeterHud.style.display = 'none';
@@ -1645,7 +1701,7 @@ function initMultiverseTreeBranches() {
           const isWatched = watchedSet.has(String(m.id));
           return `
             <div class="loki-movie-card-chip" data-movie-id="${m.id}">
-              <img src="${poster}" alt="${m.title}" loading="lazy" />
+              <img src="${poster}" alt="${m.title}" loading="lazy" decoding="async" />
               <div class="loki-movie-chip-info">
                 <strong>${m.title} ${isWatched ? '✓' : ''}</strong>
                 <span>${m.year}</span>
@@ -1697,9 +1753,9 @@ function initMultiverseTreeBranches() {
     activeHeroBranchIdx = null;
     playCloudTransition(() => {
       if (doomStage) {
-        doomStage.style.background = `#020604 url('/images/doom-entrance-4k.jpg') center 20% / cover no-repeat`;
+        doomStage.style.background = `#020604 url('/images/doom-entrance-opt.webp') center 20% / cover no-repeat`;
       } else {
-        heroSec.style.background = `#020604 url('/images/doom-entrance-4k.jpg') center 20% / cover no-repeat`;
+        heroSec.style.background = `#020604 url('/images/doom-entrance-opt.webp') center 20% / cover no-repeat`;
       }
 
       if (doomPerimeterHud) doomPerimeterHud.style.display = 'grid';
@@ -1798,7 +1854,7 @@ function renderDoomsdaySection() {
     return `
       <div class="dd-card ${isWatched ? 'watched' : ''}" data-id="${item.id}">
         <div class="dd-card-top">
-          <img src="${item.poster}" alt="${item.title}" class="dd-poster" loading="lazy" onerror="handleImageError(this, '${safeTitle}')" />
+          <img src="${item.poster}" alt="${item.title}" class="dd-poster" loading="lazy" decoding="async" onerror="handleImageError(this, '${safeTitle}')" />
           <div class="dd-card-info">
             <div>
               <span class="dd-category-tag">${item.doomsdayCategory || 'Essential'}</span>
@@ -2226,10 +2282,18 @@ function initTrailerIntermissions() {
         });
       });
 
+      let isIntermissionInView = false;
+      if (typeof IntersectionObserver !== 'undefined') {
+        const io = new IntersectionObserver(([entry]) => {
+          isIntermissionInView = entry.isIntersecting;
+        }, { threshold: 0.1 });
+        io.observe(firstIntermission);
+      } else {
+        isIntermissionInView = true;
+      }
+
       setInterval(() => {
-        const rect = firstIntermission.getBoundingClientRect();
-        const inView = rect.top < window.innerHeight * 0.85 && rect.bottom > 80;
-        if (inView && !document.hidden) {
+        if (isIntermissionInView && !document.hidden) {
           applySlate((currentSlate + 1) % TRAILER_ROTATION_SLATES.length);
         }
       }, 6500);
@@ -2262,7 +2326,7 @@ function renderArchiveCardHTML(t, nextUnwatchedId) {
   return `
     <div class="archive-card ${isWatched ? 'watched' : ''}" id="archive-card-${t.id}" data-id="${t.id}">
       <div class="archive-card-poster">
-        <img src="${t.poster}" alt="${t.title}" loading="lazy" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
+        <img src="${t.poster}" alt="${t.title}" loading="lazy" decoding="async" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
         ${isNext ? `<div class="archive-next-badge">NEXT UP</div>` : ''}
         ${t.doomsdayEssential ? `<div class="archive-dd-badge">⚡ DOOMSDAY</div>` : ''}
         <div class="archive-seq-pill">#${orderNum}</div>
@@ -3073,6 +3137,7 @@ function initEasterEggs() {
    INITIALIZE EVERYTHING ON DOM READY
 ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
+  // 1. CRITICAL IMMEDIATE RENDER (Hero, Countdown, Nav, Continuum Realities)
   initStudioIntro();
   initHeroParticleCanvas();
   initHeroStats();
@@ -3081,18 +3146,49 @@ document.addEventListener('DOMContentLoaded', () => {
   initMultiverseNav();
   initTrailerIntermissions();
   renderBranchRealities();
-  renderInfinitySaga();
-  renderMultiverseSaga();
-  initMultiverseTabs();
-  initDoomsdayFastTrack();
-  renderCharacterGallery();
-  initCharacterFilters();
-  initMarvelNetwork();
-  initNetworkControls();
-  renderStonesAltars();
-  renderMovieArchive();
-  initArchiveControls();
-  initShareModal();
-  initModalHandlers();
-  initEasterEggs();
+
+  // If page loaded with a deep-link anchor, initialize all sections immediately
+  if (window.location.hash && window.location.hash.length > 1) {
+    renderInfinitySaga();
+    renderMultiverseSaga();
+    initMultiverseTabs();
+    initDoomsdayFastTrack();
+    renderCharacterGallery();
+    initCharacterFilters();
+    initMarvelNetwork();
+    initNetworkControls();
+    renderStonesAltars();
+    renderMovieArchive();
+    initArchiveControls();
+    initShareModal();
+    initModalHandlers();
+    initEasterEggs();
+    return;
+  }
+
+  // 2. PROGRESSIVE BACKGROUND SCHEDULING (Zero frame drops, instant first paint)
+  const scheduleTask = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
+
+  scheduleTask(() => {
+    renderInfinitySaga();
+    renderMultiverseSaga();
+    initMultiverseTabs();
+    initDoomsdayFastTrack();
+  });
+
+  scheduleTask(() => {
+    renderCharacterGallery();
+    initCharacterFilters();
+    initMarvelNetwork();
+    initNetworkControls();
+    renderStonesAltars();
+  });
+
+  scheduleTask(() => {
+    renderMovieArchive();
+    initArchiveControls();
+    initShareModal();
+    initModalHandlers();
+    initEasterEggs();
+  });
 });

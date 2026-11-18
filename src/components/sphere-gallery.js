@@ -647,8 +647,31 @@ export class DoomsdaySphereGallery {
     // Prepare textures for items
     this.loadMedia();
 
-    // Start render loop
-    this.startLoop();
+    // Start render loop with visibility awareness
+    this.setupVisibilityObserver();
+  }
+
+  setupVisibilityObserver() {
+    this.isRunning = false;
+    if (typeof IntersectionObserver !== 'undefined' && this.container) {
+      this.io = new IntersectionObserver(([entry]) => {
+        const inView = entry.isIntersecting;
+        if (inView && !this.isRunning) {
+          this.isRunning = true;
+          this.startLoop();
+        } else if (!inView && this.isRunning) {
+          this.isRunning = false;
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+        }
+      }, { rootMargin: '100px 0px' });
+      this.io.observe(this.container);
+    } else {
+      this.isRunning = true;
+      this.startLoop();
+    }
   }
 
   setItems(newItems) {
@@ -937,7 +960,7 @@ export class DoomsdaySphereGallery {
     let prev = performance.now();
 
     const frame = () => {
-      if (!this.isAlive) return;
+      if (!this.isAlive || !this.isRunning) return;
       this.rafId = requestAnimationFrame(frame);
 
       const now = performance.now();
@@ -1247,8 +1270,10 @@ export class DoomsdaySphereGallery {
 
   destroy() {
     this.isAlive = false;
+    this.isRunning = false;
     cancelAnimationFrame(this.rafId);
     if (this.ro) this.ro.disconnect();
+    if (this.io) this.io.disconnect();
 
     const gl = this.gl;
     if (!gl) return;

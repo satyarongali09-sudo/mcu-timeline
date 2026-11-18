@@ -13,6 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400;1,600&display=swap" />
 
+  <!-- Preload Critical LCP Hero Background -->
+  <link rel="preload" as="image" href="/images/doom-entrance-opt.webp" type="image/webp" fetchpriority="high" />
+
   <!-- Master Multiverse Stylesheet -->
   <link rel="stylesheet" href="/src/styles/multiverse.css" />
 </head>
@@ -225,7 +228,7 @@
 
         <!-- SPIDER-VERSE / PS5 STYLE INTERACTIVE MEDIA PORTAL TILE FOR GOD LOKI'S TREE -->
         <div class="loki-portal-media-tile" id="btn-open-loki-tree" role="button" tabindex="0" aria-label="Open God Loki's Multiverse Tree">
-          <img src="/images/loki-multiverse-4k.jpg" alt="God Loki Holding the Multiverse Tree" class="loki-tile-bg" />
+          <img src="/images/loki-tile-opt.webp" alt="God Loki Holding the Multiverse Tree" class="loki-tile-bg" loading="lazy" decoding="async" />
           <div class="loki-tile-overlay">
             <span class="loki-tile-tag">YGGDRASIL NEXUS • 7 REALITIES</span>
             <div class="loki-tile-play-orb">▶</div>

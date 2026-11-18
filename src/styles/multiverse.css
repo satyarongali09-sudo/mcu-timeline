@@ -899,10 +899,65 @@ section {
 }
 
 .ticket-collapse-alert-ribbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 2px;
+  width: 100%;
+}
+
+.ticket-ribbon-left {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 2px;
+}
+
+.ticket-ribbon-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ticket-intel-chip {
+  font-family: var(--font-captain);
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(0, 230, 118, 0.12);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  color: #86EFAC;
+  white-space: nowrap;
+}
+
+.ticket-intel-btn {
+  font-family: var(--font-eternal);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(234, 179, 8, 0.16);
+  border: 1px solid rgba(234, 179, 8, 0.5);
+  color: #FDE047;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.ticket-intel-btn:hover {
+  background: #EAB308;
+  color: #000;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.6);
+  transform: scale(1.04);
+}
+
+.ticket-dual-gateways {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
 }
 
 .ticket-alert-pulse {
@@ -929,9 +984,9 @@ section {
 
 .ticket-alert-tag {
   font-family: var(--font-captain);
-  font-size: clamp(0.52rem, 0.75vw, 0.64rem);
+  font-size: clamp(0.5rem, 0.72vw, 0.62rem);
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #FCA5A5;
   text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
@@ -945,14 +1000,25 @@ section {
   background: linear-gradient(135deg, rgba(8, 28, 18, 0.82) 0%, rgba(4, 16, 11, 0.92) 55%, rgba(32, 10, 16, 0.85) 100%);
   border: 1px solid rgba(0, 230, 118, 0.32);
   border-left: 3px solid #EF4444;
-  border-radius: 12px;
-  padding: clamp(0.52rem, 1vh, 0.72rem) clamp(0.6rem, 1.2vw, 0.9rem);
+  border-radius: 11px;
+  padding: clamp(0.44rem, 0.9vh, 0.64rem) clamp(0.55rem, 1.1vw, 0.85rem);
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 230, 118, 0.14);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.85), 0 0 18px rgba(0, 230, 118, 0.12);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
   cursor: pointer;
+}
+
+.btn-ticket-district {
+  border-left-color: #EAB308;
+  background: linear-gradient(135deg, rgba(8, 28, 22, 0.82) 0%, rgba(4, 16, 12, 0.92) 55%, rgba(30, 24, 8, 0.85) 100%);
+}
+
+.btn-ticket-district:hover {
+  border-color: #FACC15;
+  border-left-color: #FDE047;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.94), 0 0 32px rgba(234, 179, 8, 0.35), 0 0 20px rgba(0, 230, 118, 0.25);
 }
 
 .btn-doom-ticket-collapse:hover {
@@ -988,7 +1054,7 @@ section {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .ticket-badge-pill {
@@ -1005,13 +1071,25 @@ section {
   box-shadow: 0 0 6px #FF5252;
 }
 
+.ticket-dot-gold {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #FACC15;
+  box-shadow: 0 0 6px #FACC15;
+}
+
 .ticket-badge-text {
   font-family: var(--font-eternal);
-  font-size: clamp(0.56rem, 0.8vw, 0.68rem);
+  font-size: clamp(0.54rem, 0.78vw, 0.65rem);
   font-weight: 700;
   letter-spacing: 0.14em;
   color: #FCA5A5;
   text-transform: uppercase;
+}
+
+.btn-ticket-district .ticket-badge-text {
+  color: #FDE68A;
 }
 
 .ticket-live-chip {
@@ -1019,11 +1097,25 @@ section {
   padding: 1px 5px;
   border-radius: 4px;
   font-family: var(--font-captain);
-  font-size: 0.5rem;
+  font-size: 0.48rem;
   font-weight: 800;
   letter-spacing: 0.1em;
   color: #032512;
   background: #00E676;
+  text-shadow: none;
+  margin-left: auto;
+}
+
+.ticket-gold-chip {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: var(--font-captain);
+  font-size: 0.48rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #1C1917;
+  background: #FACC15;
   text-shadow: none;
   margin-left: auto;
 }
@@ -1038,9 +1130,9 @@ section {
 
 .ticket-action-text {
   font-family: var(--font-avengero);
-  font-size: clamp(0.86rem, 1.25vw, 1.15rem);
+  font-size: clamp(0.8rem, 1.15vw, 1.05rem);
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #FFFFFF;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9), 0 0 16px rgba(0, 230, 118, 0.45);
@@ -1052,11 +1144,21 @@ section {
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.95), 0 0 22px rgba(0, 230, 118, 0.75);
 }
 
+.btn-ticket-district:hover .ticket-action-text {
+  color: #FEF08A;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.95), 0 0 22px rgba(234, 179, 8, 0.75);
+}
+
 .ticket-action-arrow {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #00E676;
   text-shadow: 0 0 12px #00E676;
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-ticket-district .ticket-action-arrow {
+  color: #FACC15;
+  text-shadow: 0 0 12px #FACC15;
 }
 
 .btn-doom-ticket-collapse:hover .ticket-action-arrow {
@@ -1065,12 +1167,177 @@ section {
 
 .ticket-sub-lore {
   font-family: var(--font-captain);
-  font-size: clamp(0.5rem, 0.72vw, 0.6rem);
-  letter-spacing: 0.12em;
+  font-size: clamp(0.48rem, 0.68vw, 0.58rem);
+  letter-spacing: 0.1em;
   color: #86EFAC;
   text-transform: uppercase;
   opacity: 0.9;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85);
+}
+
+.btn-ticket-district .ticket-sub-lore {
+  color: #FDE047;
+}
+
+/* ==========================================================================
+   DOOMSDAY THEATRICAL DOSSIER MODAL STYLES
+   ========================================================================== */
+.doomsday-dossier-dialog {
+  max-width: 660px;
+  width: 90vw;
+  background: linear-gradient(180deg, #091C13 0%, #030D08 100%);
+  border: 1px solid rgba(0, 230, 118, 0.38);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.96), 0 0 45px rgba(0, 230, 118, 0.22);
+  border-radius: 16px;
+  padding: clamp(1.2rem, 2.5vw, 2rem);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.dossier-top-badge {
+  font-family: var(--font-captain);
+  font-size: 0.64rem;
+  letter-spacing: 0.22em;
+  color: #86EFAC;
+  margin-bottom: 4px;
+}
+
+.dossier-title {
+  font-family: var(--font-avengero);
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+  letter-spacing: 0.08em;
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2F4E7 55%, #68C682 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 0.8rem;
+}
+
+.dossier-quick-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.2rem;
+}
+
+.d-chip {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--font-eternal);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #E2E8F0;
+}
+
+.dossier-subheading {
+  font-family: var(--font-captain);
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  color: #FACC15;
+  text-transform: uppercase;
+  margin: 1.1rem 0 0.4rem;
+}
+
+.dossier-text {
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: #CBD5E1;
+}
+
+.dossier-universes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 0.6rem;
+}
+
+.u-card {
+  background: rgba(4, 18, 12, 0.7);
+  border: 1px solid rgba(0, 230, 118, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.u-card strong {
+  font-family: var(--font-avengero);
+  font-size: 0.85rem;
+  color: #86EFAC;
+}
+
+.u-card span {
+  font-size: 0.74rem;
+  color: #CBD5E1;
+  line-height: 1.35;
+}
+
+.dossier-intel-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spec-label {
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #94A3B8;
+}
+
+.spec-val {
+  font-size: 0.76rem;
+  color: #F1F5F9;
+}
+
+.dossier-actions-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 1.4rem;
+}
+
+.btn-dossier-book {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-family: var(--font-avengero);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  transition: all 0.25s ease;
+}
+
+.bms-action {
+  background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+  color: #FFF;
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+}
+
+.district-action {
+  background: linear-gradient(135deg, #EAB308 0%, #CA8A04 100%);
+  color: #000;
+  box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+}
+
+.btn-dossier-book:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
 }
 
 /* Spider-Verse / PS5 Style Interactive Media Portal Tile (Left Bottom) */
@@ -4745,28 +5012,45 @@ footer.agency-footer {
     letter-spacing: 0.08em;
   }
   .btn-doom-ticket-collapse {
-    padding: 0.4rem 0.5rem;
-    border-radius: 9px;
+    padding: 0.35rem 0.45rem;
+    border-radius: 8px;
   }
   .ticket-alert-tag {
-    font-size: 0.48rem;
+    font-size: 0.46rem;
   }
   .ticket-badge-text {
-    font-size: 0.52rem;
+    font-size: 0.5rem;
   }
-  .ticket-live-chip {
+  .ticket-live-chip,
+  .ticket-gold-chip {
+    font-size: 0.4rem;
+    padding: 0 3px;
+  }
+  .ticket-action-text {
+    font-size: 0.72rem;
+  }
+  .ticket-action-arrow {
+    font-size: 0.75rem;
+  }
+  .ticket-sub-lore {
+    font-size: 0.42rem;
+    line-height: 1.2;
+  }
+  .ticket-intel-chip {
     font-size: 0.42rem;
     padding: 0 4px;
   }
-  .ticket-action-text {
-    font-size: 0.76rem;
-  }
-  .ticket-action-arrow {
-    font-size: 0.8rem;
-  }
-  .ticket-sub-lore {
+  .ticket-intel-btn {
     font-size: 0.44rem;
-    line-height: 1.25;
+    padding: 1px 5px;
+  }
+  .doomsday-dossier-dialog {
+    padding: 1.1rem;
+    width: 95vw;
+  }
+  .dossier-actions-footer {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   .loki-portal-media-tile {
     height: 92px;

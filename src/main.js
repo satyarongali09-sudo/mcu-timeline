@@ -1367,10 +1367,12 @@ function initDoomsdayFastTrack() {
     });
   });
 
-  // Calibrated exact target: Dec 17, 2026 11:29:59 AM IST (2026-12-17T05:59:59Z)
-  // At Wed, Nov 18, 2026 08:58:04 AM IST -> 00 MONTHS : 29 DAYS : 02 HOURS : 31 MIN : 55 SEC
-  const DOOMSDAY_TARGET_MS = Date.parse('2026-12-17T05:59:59Z');
-  const SECRET_WARS_TARGET_MS = Date.parse('2027-12-17T05:59:59Z');
+  // Calibrated exact target synchronized with avengerscountdown.com & global theatrical premiere:
+  // Dec 18, 2026 05:00:00 UTC (10:30:00 AM IST)
+  // Perfectly synchronized to Indian Standard Time (IST)
+  const DOOMSDAY_TARGET_ISO = '2026-12-18T05:00:00Z';
+  const DOOMSDAY_TARGET_MS = Date.parse(DOOMSDAY_TARGET_ISO);
+  const SECRET_WARS_TARGET_MS = Date.parse('2027-12-17T05:00:00Z');
 
   const elMonths = document.getElementById('cd-months');
   const elDays = document.getElementById('cd-days');
@@ -1381,6 +1383,35 @@ function initDoomsdayFastTrack() {
   const swEl = document.getElementById('dd-countdown-secretwars');
 
   let prevValues = { m: '', d: '', h: '', min: '', s: '' };
+
+  function addUTCMonths(date, months) {
+    const d = new Date(date);
+    d.setUTCDate(1);
+    d.setUTCMonth(d.getUTCMonth() + months);
+    const maxDays = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+    d.setUTCDate(Math.min(date.getUTCDate(), maxDays));
+    return d;
+  }
+
+  function computeDoomsdayTimeLeft(targetMs, now) {
+    const targetDate = new Date(targetMs);
+    const nowDate = new Date(now);
+    if (nowDate >= targetDate) {
+      return { months: 0, days: 0, hours: 0, minutes: 0, seconds: 0, totalDays: 0 };
+    }
+    let n = (targetDate.getUTCFullYear() - nowDate.getUTCFullYear()) * 12 + targetDate.getUTCMonth() - nowDate.getUTCMonth();
+    if (addUTCMonths(nowDate, n) > targetDate) n--;
+    const l = Math.floor((targetDate.getTime() - addUTCMonths(nowDate, n).getTime()) / 1000);
+    const totalDays = Math.floor((targetDate.getTime() - nowDate.getTime()) / 86400000);
+    return {
+      months: n,
+      days: Math.floor(l / 86400),
+      hours: Math.floor(l / 3600) % 24,
+      minutes: Math.floor(l / 60) % 60,
+      seconds: l % 60,
+      totalDays
+    };
+  }
 
   function updateDigitWithScroll(el, newVal, key, isMinuteOrHigher = false) {
     if (!el) return;
@@ -1399,20 +1430,13 @@ function initDoomsdayFastTrack() {
 
   function tickDoomsdayCountdown() {
     const now = Date.now();
-    const diffSec = Math.max(0, Math.floor((DOOMSDAY_TARGET_MS - now) / 1000));
+    const time = computeDoomsdayTimeLeft(DOOMSDAY_TARGET_MS, now);
 
-    const totalDays = Math.floor(diffSec / 86400);
-    const months = Math.floor(totalDays / 30);
-    const days = totalDays % 30;
-    const hours = Math.floor((diffSec % 86400) / 3600);
-    const minutes = Math.floor((diffSec % 3600) / 60);
-    const seconds = diffSec % 60;
-
-    const strM = String(months).padStart(2, '0');
-    const strD = String(days).padStart(2, '0');
-    const strH = String(hours).padStart(2, '0');
-    const strMin = String(minutes).padStart(2, '0');
-    const strS = String(seconds).padStart(2, '0');
+    const strM = String(time.months).padStart(2, '0');
+    const strD = String(time.days).padStart(2, '0');
+    const strH = String(time.hours).padStart(2, '0');
+    const strMin = String(time.minutes).padStart(2, '0');
+    const strS = String(time.seconds).padStart(2, '0');
 
     updateDigitWithScroll(elMonths, strM, 'm', true);
     updateDigitWithScroll(elDays, strD, 'd', true);
@@ -1421,7 +1445,7 @@ function initDoomsdayFastTrack() {
     updateDigitWithScroll(elSeconds, strS, 's', false);
 
     if (ddEl) {
-      ddEl.textContent = `DEC 17, 2026 (${totalDays}d ${strH}h ${strMin}m)`;
+      ddEl.textContent = `DEC 18, 2026 (${time.totalDays}d ${strH}h ${strMin}m)`;
     }
     if (swEl) {
       const swDiff = SECRET_WARS_TARGET_MS - now;
@@ -1434,6 +1458,32 @@ function initDoomsdayFastTrack() {
 
   tickDoomsdayCountdown();
   setInterval(tickDoomsdayCountdown, 1000);
+
+  // Wire Doomsday Theatrical Dossier modal
+  const dossierModal = document.getElementById('doomsday-theatrical-dossier-modal');
+  const btnOpenDossier = document.getElementById('btn-open-doomsday-dossier');
+  const btnCloseDossier = document.getElementById('btn-close-doomsday-dossier');
+
+  if (btnOpenDossier && dossierModal) {
+    btnOpenDossier.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dossierModal.classList.add('active');
+    });
+  }
+  if (btnCloseDossier && dossierModal) {
+    btnCloseDossier.addEventListener('click', (e) => {
+      e.preventDefault();
+      dossierModal.classList.remove('active');
+    });
+  }
+  if (dossierModal) {
+    dossierModal.addEventListener('click', (e) => {
+      if (e.target === dossierModal) {
+        dossierModal.classList.remove('active');
+      }
+    });
+  }
 
   renderDoomsdaySection();
 }

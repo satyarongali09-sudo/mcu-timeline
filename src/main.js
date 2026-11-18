@@ -962,6 +962,8 @@ let activeHeroBranchIdx = null;
 
 function initMultiverseTreeBranches() {
   const heroSec = document.getElementById('hero');
+  const doomStage = document.getElementById('hero-doom-bg-stage');
+  const countdownWidget = document.getElementById('hero-doomsday-countdown-widget');
   const backBtn = document.getElementById('tree-hero-back-btn');
   const nextBtn = document.getElementById('tree-hero-next-btn');
   const badgeEl = document.getElementById('tree-hero-badge');
@@ -978,11 +980,16 @@ function initMultiverseTreeBranches() {
     playCloudTransition(() => {
       const isMobile = window.innerWidth <= 900;
       const bgUrl = isMobile && branch.mobAsset ? branch.mobAsset : branch.asset;
-      heroSec.style.background = `#010407 url('${bgUrl}') center center / cover no-repeat`;
+      if (doomStage) {
+        doomStage.style.background = `#010407 url('${bgUrl}') center center / cover no-repeat`;
+      } else {
+        heroSec.style.background = `#010407 url('${bgUrl}') center center / cover no-repeat`;
+      }
 
       if (badgeEl) badgeEl.textContent = `YGGDRASIL BRANCH 0${branchIdx} • ${branch.label}`;
-      if (titleEl) titleEl.innerHTML = `<span style="color:#fff;">${branch.title}</span>`;
+      if (titleEl) titleEl.innerHTML = `<span class="prepare-main-word" style="font-size: clamp(2.4rem, 6vw, 4.6rem);">${branch.title}</span>`;
       if (subEl) subEl.textContent = branch.tagline;
+      if (countdownWidget) countdownWidget.style.display = 'none';
       if (statsStrip) statsStrip.style.display = 'none';
       if (backBtn) backBtn.style.display = 'inline-flex';
       if (nextBtn) {
@@ -1030,13 +1037,21 @@ function initMultiverseTreeBranches() {
     if (!heroSec) return;
     activeHeroBranchIdx = null;
     playCloudTransition(() => {
-      const isMobile = window.innerWidth <= 900;
-      const treeBg = isMobile ? STUDIO_ASSETS.heroTreeMobile : STUDIO_ASSETS.heroTreeDesktop;
-      heroSec.style.background = `#010407 url('${treeBg}') center center / cover no-repeat`;
+      if (doomStage) {
+        doomStage.style.background = `#030806 url('/images/doom-entrance-hero.png') center 22% / cover no-repeat`;
+      } else {
+        heroSec.style.background = `#030806 url('/images/doom-entrance-hero.png') center 22% / cover no-repeat`;
+      }
 
-      if (badgeEl) badgeEl.textContent = 'Official Multiverse Continuum • Earth-616 & Divergent Realities';
-      if (titleEl) titleEl.innerHTML = `THE MARVEL<br/><span style="background: linear-gradient(135deg, #FF2A2A, #FF8A00, #3C8DFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">MULTIVERSE</span>`;
-      if (subEl) subEl.textContent = 'An interactive cosmic continuum mapping 79 canonical titles, 44 audited characters, 6 cosmic singularities, and mathematically modeled relationship network science.';
+      if (badgeEl) badgeEl.textContent = "COURAGE ISN'T ENOUGH.";
+      if (titleEl) {
+        titleEl.innerHTML = `
+          <span class="prepare-main-word">PREPARE.</span>
+          <span class="prepare-sub-brand">THE MARVEL MULTIVERSE • AVENGERS: DOOMSDAY</span>
+        `;
+      }
+      if (subEl) subEl.textContent = 'An interactive cosmic continuum mapping 79 canonical titles, 49 audited characters, 6 cosmic singularities, and mathematically modeled relationship network science.';
+      if (countdownWidget) countdownWidget.style.display = 'block';
       if (statsStrip) statsStrip.style.display = 'flex';
       if (backBtn) backBtn.style.display = 'none';
       if (nextBtn) nextBtn.style.display = 'none';
@@ -1137,15 +1152,73 @@ function initDoomsdayFastTrack() {
     });
   });
 
-  // Update countdown labels
+  // Calibrated exact target: Dec 17, 2026 11:29:59 AM IST (2026-12-17T05:59:59Z)
+  // At Wed, Nov 18, 2026 08:58:04 AM IST -> 00 MONTHS : 29 DAYS : 02 HOURS : 31 MIN : 55 SEC
+  const DOOMSDAY_TARGET_MS = Date.parse('2026-12-17T05:59:59Z');
+  const SECRET_WARS_TARGET_MS = Date.parse('2027-12-17T05:59:59Z');
+
+  const elMonths = document.getElementById('cd-months');
+  const elDays = document.getElementById('cd-days');
+  const elHours = document.getElementById('cd-hours');
+  const elMinutes = document.getElementById('cd-minutes');
+  const elSeconds = document.getElementById('cd-seconds');
+  const ddEl = document.getElementById('dd-countdown-doomsday');
   const swEl = document.getElementById('dd-countdown-secretwars');
-  if (swEl) {
-    const swDiff = Date.parse('May 7, 2027') - Date.now();
-    if (swDiff > 0) {
-      const days = Math.ceil(swDiff / (1000 * 60 * 60 * 24));
-      swEl.textContent = `MAY 7, 2027 (${days}d)`;
+
+  let prevValues = { m: '', d: '', h: '', min: '', s: '' };
+
+  function updateDigitWithScroll(el, newVal, key, isMinuteOrHigher = false) {
+    if (!el) return;
+    if (prevValues[key] !== newVal) {
+      const hadPrev = prevValues[key] !== '';
+      prevValues[key] = newVal;
+      el.textContent = newVal;
+      if (hadPrev) {
+        const animClass = isMinuteOrHigher ? 'minute-pulse' : 'tick-scroll';
+        el.classList.remove('tick-scroll', 'minute-pulse');
+        void el.offsetWidth;
+        el.classList.add(animClass);
+      }
     }
   }
+
+  function tickDoomsdayCountdown() {
+    const now = Date.now();
+    const diffSec = Math.max(0, Math.floor((DOOMSDAY_TARGET_MS - now) / 1000));
+
+    const totalDays = Math.floor(diffSec / 86400);
+    const months = Math.floor(totalDays / 30);
+    const days = totalDays % 30;
+    const hours = Math.floor((diffSec % 86400) / 3600);
+    const minutes = Math.floor((diffSec % 3600) / 60);
+    const seconds = diffSec % 60;
+
+    const strM = String(months).padStart(2, '0');
+    const strD = String(days).padStart(2, '0');
+    const strH = String(hours).padStart(2, '0');
+    const strMin = String(minutes).padStart(2, '0');
+    const strS = String(seconds).padStart(2, '0');
+
+    updateDigitWithScroll(elMonths, strM, 'm', true);
+    updateDigitWithScroll(elDays, strD, 'd', true);
+    updateDigitWithScroll(elHours, strH, 'h', true);
+    updateDigitWithScroll(elMinutes, strMin, 'min', true);
+    updateDigitWithScroll(elSeconds, strS, 's', false);
+
+    if (ddEl) {
+      ddEl.textContent = `DEC 17, 2026 (${totalDays}d ${strH}h ${strMin}m)`;
+    }
+    if (swEl) {
+      const swDiff = SECRET_WARS_TARGET_MS - now;
+      if (swDiff > 0) {
+        const swDays = Math.ceil(swDiff / (1000 * 60 * 60 * 24));
+        swEl.textContent = `DEC 17, 2027 (${swDays}d)`;
+      }
+    }
+  }
+
+  tickDoomsdayCountdown();
+  setInterval(tickDoomsdayCountdown, 1000);
 
   renderDoomsdaySection();
 }

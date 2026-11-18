@@ -26,6 +26,14 @@
     <div class="cinema-blackout" id="intro-blackout"></div>
   </div>
 
+  <!-- PERSISTENT FULL-SITE FLOATING DOOM EMERALD GAS OVERLAY -->
+  <div id="doom-ambient-gas-overlay" aria-hidden="true">
+    <div class="doom-gas-plume doom-gas-layer-1"></div>
+    <div class="doom-gas-plume doom-gas-layer-2"></div>
+    <div class="doom-gas-plume doom-gas-layer-3"></div>
+    <div class="doom-gas-vignette"></div>
+  </div>
+
   <!-- Scroll Progress Indicator -->
   <div id="scroll-progress-line" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
 
@@ -74,8 +82,9 @@
     </div>
   </nav>
 
-  <!-- SECTION 1: CINEMATIC HERO & INTERACTIVE 7-BRANCH MULTIVERSE TREE -->
+  <!-- SECTION 1: DOCTOR DOOM ENTRANCE HERO, COUNTDOWN & INTERACTIVE 7-BRANCH MULTIVERSE TREE -->
   <header id="hero">
+    <div class="hero-doom-bg-stage" id="hero-doom-bg-stage"></div>
     <canvas id="hero-canvas"></canvas>
 
     <!-- 7 Interactive Multiverse Tree Branch Click Hotspots -->
@@ -91,17 +100,52 @@
 
     <!-- Floating Branch Navigation Controls (Active when inspecting a branch) -->
     <button id="tree-hero-back-btn" class="tree-hero-back-btn" style="display: none;">
-      ← RETURN TO TREE
+      ← RETURN TO DOOM ENTRANCE
     </button>
     <button id="tree-hero-next-btn" class="tree-hero-next-btn" style="display: none;">
       NEXT BRANCH →
     </button>
 
     <div class="hero-content" id="multiverse-overview-overlay">
-      <div class="hero-badge" id="tree-hero-badge">Official Multiverse Continuum • Earth-616 &amp; Divergent Realities</div>
-      <h1 class="hero-title" id="tree-hero-title">THE MARVEL<br/><span style="background: linear-gradient(135deg, #FF2A2A, #FF8A00, #3C8DFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">MULTIVERSE</span></h1>
-      <p class="hero-subtitle" id="tree-hero-subtitle">An interactive cosmic continuum mapping 79 canonical titles, 44 audited characters, 6 cosmic singularities, and mathematically modeled relationship network science.</p>
-      
+      <div class="hero-doom-kicker" id="tree-hero-badge">COURAGE ISN'T ENOUGH.</div>
+      <h1 class="hero-title hero-doom-prepare" id="tree-hero-title">
+        <span class="prepare-main-word">PREPARE.</span>
+        <span class="prepare-sub-brand">THE MARVEL MULTIVERSE • AVENGERS: DOOMSDAY</span>
+      </h1>
+      <p class="hero-subtitle" id="tree-hero-subtitle">An interactive cosmic continuum mapping 79 canonical titles, 49 audited characters, 6 cosmic singularities, and mathematically modeled relationship network science.</p>
+
+      <!-- OFFICIAL AVENGERS: DOOMSDAY LIVE SCROLLING COUNTDOWN -->
+      <div class="hero-doomsday-countdown" id="hero-doomsday-countdown-widget" role="timer" aria-label="Avengers: Doomsday Live Countdown">
+        <div class="doom-cd-header">AVENGERS: DOOMSDAY COUNTDOWN</div>
+        <div class="doom-cd-sub">DOOMSDAY IS COMING</div>
+        <div class="doom-cd-clock-row">
+          <div class="doom-cd-unit">
+            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-months">00</span></div>
+            <span class="doom-cd-unit-lbl">MONTHS</span>
+          </div>
+          <span class="doom-cd-colon">:</span>
+          <div class="doom-cd-unit">
+            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-days">29</span></div>
+            <span class="doom-cd-unit-lbl">DAYS</span>
+          </div>
+          <span class="doom-cd-colon">:</span>
+          <div class="doom-cd-unit">
+            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-hours">02</span></div>
+            <span class="doom-cd-unit-lbl">HOURS</span>
+          </div>
+          <span class="doom-cd-colon">:</span>
+          <div class="doom-cd-unit">
+            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-minutes">31</span></div>
+            <span class="doom-cd-unit-lbl">MIN</span>
+          </div>
+          <span class="doom-cd-colon">:</span>
+          <div class="doom-cd-unit">
+            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-seconds">55</span></div>
+            <span class="doom-cd-unit-lbl">SEC</span>
+          </div>
+        </div>
+      </div>
+
       <div class="hero-stats-strip" id="hero-stats-strip">
         <div class="hero-stat-box">
           <span class="hero-stat-val" id="stat-total-titles">79</span>
@@ -114,7 +158,7 @@
         </div>
         <div class="hero-stat-sep">/</div>
         <div class="hero-stat-box">
-          <span class="hero-stat-val" id="stat-total-characters">44</span>
+          <span class="hero-stat-val" id="stat-total-characters">49</span>
           <span class="hero-stat-lbl">Nexus Beings</span>
         </div>
         <div class="hero-stat-sep">/</div>
@@ -149,7 +193,7 @@
       <div id="tree-earth-panel" class="tree-earth-panel" style="display: none;"></div>
 
       <div class="hero-scroll-cue">
-        <span>Scroll or Click a Tree Branch to Explore Realities</span>
+        <span>Scroll Through the Doom Mist or Select a Branch</span>
         <div class="scroll-arrow">↓</div>
       </div>
     </div>
@@ -262,20 +306,24 @@
   <section id="doomsday-fast-track-section">
     <div class="doomsday-fast-track-banner">
       <div class="dd-banner-top">
-        <div>
+        <div class="dd-banner-intro-col">
           <span class="section-tag" style="color: #00E676;">OFFICIAL ROADMAP // AVENGERS: DOOMSDAY &amp; SECRET WARS</span>
           <h2 class="section-heading" style="margin-bottom: 0.35rem;">DOOMSDAY FAST-TRACK WATCHLIST</h2>
           <p class="section-lead">Short on time before Victor Von Doom arrives? Track the 13 essential MCU &amp; Multiverse releases that establish the core rules of Incursions, the TVA, Anchor Beings, and the new frontline teams.</p>
+          <div class="dd-countdown-cluster" style="margin-top: 1.1rem;">
+            <div class="dd-countdown-box">
+              <span class="dd-cd-label">AVENGERS: DOOMSDAY</span>
+              <span class="dd-cd-date" id="dd-countdown-doomsday">DEC 17, 2026</span>
+            </div>
+            <div class="dd-countdown-box">
+              <span class="dd-cd-label">AVENGERS: SECRET WARS</span>
+              <span class="dd-cd-date" id="dd-countdown-secretwars">DEC 17, 2027</span>
+            </div>
+          </div>
         </div>
-        <div class="dd-countdown-cluster">
-          <div class="dd-countdown-box">
-            <span class="dd-cd-label">AVENGERS: DOOMSDAY</span>
-            <span class="dd-cd-date" id="dd-countdown-doomsday">MAY 1, 2026</span>
-          </div>
-          <div class="dd-countdown-box">
-            <span class="dd-cd-label">AVENGERS: SECRET WARS</span>
-            <span class="dd-cd-date" id="dd-countdown-secretwars">MAY 7, 2027</span>
-          </div>
+        <div class="dd-prepare-poster-card" title="Courage Isn't Enough. Prepare. — Doctor Doom">
+          <img src="/images/doom-prepare-poster.png" alt="Courage Isn't Enough. Prepare. Doctor Doom" loading="lazy" />
+          <div class="dd-prepare-caption">COURAGE ISN'T ENOUGH. <strong>PREPARE.</strong></div>
         </div>
       </div>
 
@@ -311,7 +359,7 @@
     <div class="trailer-intermission-inner">
       <div class="trailer-telemetry-bar">
         <span class="trailer-rec-dot"></span>
-        <span class="trailer-event-tag">CLASSIFIED TVA DOSSIERS // <strong>44 NEXUS BEINGS</strong></span>
+        <span class="trailer-event-tag">CLASSIFIED TVA DOSSIERS // <strong>49 NEXUS BEINGS</strong></span>
         <div class="trailer-soundwave" aria-hidden="true"></div>
       </div>
       <h2 class="trailer-hype-headline" data-hype-text="EVERY UNIVERSE HAS AN END." data-accents="EVERY:ember,UNIVERSE:white,END.:crimson">
@@ -332,7 +380,7 @@
       </div>
 
       <div class="char-filter-pills">
-        <button class="char-pill active" data-category="all">All Beings (44)</button>
+        <button class="char-pill active" data-category="all">All Beings (49)</button>
         <button class="char-pill" data-category="Avengers">Avengers</button>
         <button class="char-pill" data-category="Fantastic Four">Fantastic Four</button>
         <button class="char-pill" data-category="Cosmic">Cosmic</button>

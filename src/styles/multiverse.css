@@ -2992,14 +2992,182 @@ section {
   padding: 3.5rem 2rem;
   max-width: 1320px;
   margin: 0 auto;
+  position: relative;
+}
+
+.saga-header-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+  margin-bottom: 2.5rem;
 }
 
 .saga-phase-tabs {
   display: flex;
   justify-content: center;
   gap: 0.8rem;
-  margin-bottom: 2.2rem;
   flex-wrap: wrap;
+}
+
+.multiverse-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 20, 14, 0.85);
+  border: 1px solid rgba(0, 230, 118, 0.28);
+  border-radius: 40px;
+  padding: 4px 6px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.m-view-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94A3B8;
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-family: var(--font-captain);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.m-view-btn:hover:not(.active) {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.m-view-btn.active {
+  background: rgba(0, 230, 118, 0.2);
+  color: #00E676;
+  border-color: rgba(0, 230, 118, 0.6);
+  box-shadow: 0 0 16px rgba(0, 230, 118, 0.35);
+}
+
+/* ─── 3D BOOKSHELF COVER FLIP STAGE ─── */
+.bookshelf-stage-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto 3rem;
+  background: radial-gradient(circle at 50% 35%, rgba(12, 36, 22, 0.5) 0%, rgba(3, 8, 5, 0.95) 85%);
+  border: 1px solid rgba(0, 230, 118, 0.25);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 230, 118, 0.1);
+  backdrop-filter: blur(16px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.bookshelf-shelf-container {
+  position: relative;
+  width: 100%;
+  height: 560px;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bookshelf HUD Controls Bar */
+.bookshelf-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: 1.1rem 2rem;
+  background: rgba(5, 14, 9, 0.95);
+  border-top: 1px solid rgba(0, 230, 118, 0.2);
+  flex-wrap: wrap;
+}
+
+.bookshelf-hud-telemetry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 220px;
+}
+
+.bookshelf-hud-tag {
+  font-family: var(--font-captain);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  color: #00E676;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 2px;
+}
+
+.bookshelf-hud-active-title {
+  font-family: var(--font-avengero);
+  font-size: 1.18rem;
+  color: #FFFFFF;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px rgba(0, 230, 118, 0.4);
+  margin-bottom: 2px;
+  max-width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bookshelf-hud-counter {
+  font-family: var(--font-captain);
+  font-size: 0.72rem;
+  color: #94A3B8;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.bookshelf-hud-btn {
+  background: rgba(10, 28, 18, 0.85);
+  border: 1px solid rgba(0, 230, 118, 0.35);
+  color: #00E676;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-family: var(--font-captain);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 12px rgba(0, 230, 118, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bookshelf-hud-btn:hover {
+  background: rgba(0, 230, 118, 0.25);
+  color: #FFFFFF;
+  border-color: #00E676;
+  box-shadow: 0 0 20px rgba(0, 230, 118, 0.45);
+  transform: translateY(-1px);
+}
+
+.bookshelf-hud-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .bookshelf-shelf-container {
+    height: 480px;
+  }
+  .bookshelf-hud {
+    padding: 0.9rem 1.2rem;
+    gap: 0.8rem;
+  }
+  .bookshelf-hud-active-title {
+    font-size: 0.95rem;
+  }
 }
 
 .phase-tab-btn {

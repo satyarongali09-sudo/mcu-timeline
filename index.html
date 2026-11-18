@@ -499,14 +499,40 @@
 
   <!-- SECTION 5: THE MULTIVERSE SAGA (PHASES 4, 5, 6 & INCURSIONS) -->
   <section id="multiverse-saga-section">
-    <div class="saga-phase-tabs">
-      <button class="phase-tab-btn active" data-phase="all">All Multiverse</button>
-      <button class="phase-tab-btn" data-phase="4">Phase 4 (Fracturing Realities)</button>
-      <button class="phase-tab-btn" data-phase="5">Phase 5 (Incursions & Variants)</button>
-      <button class="phase-tab-btn" data-phase="6">Phase 6 (Doomsday & Secret Wars)</button>
+    <div class="saga-header-controls">
+      <div class="saga-phase-tabs">
+        <button class="phase-tab-btn active" data-phase="all">All Multiverse</button>
+        <button class="phase-tab-btn" data-phase="4">Phase 4 (Fracturing Realities)</button>
+        <button class="phase-tab-btn" data-phase="5">Phase 5 (Incursions & Variants)</button>
+        <button class="phase-tab-btn" data-phase="6">Phase 6 (Doomsday & Secret Wars)</button>
+      </div>
+
+      <div class="multiverse-view-toggle" role="group" aria-label="Multiverse View Mode">
+        <button class="m-view-btn active" id="btn-view-bookshelf" title="3D Bookshelf Cover Flip">📚 3D Bookshelf</button>
+        <button class="m-view-btn" id="btn-view-multi-grid" title="Tactical Cards Grid">⊞ Cards Grid</button>
+      </div>
     </div>
 
-    <div class="multiverse-cards-grid" id="multiverse-saga-cards">
+    <!-- ORIGINKIT 3D BOOKSHELF COVER FLIP STAGE -->
+    <div class="bookshelf-stage-wrapper" id="bookshelf-stage-wrapper">
+      <div class="bookshelf-shelf-container" id="bookshelf-container">
+        <!-- 3D Bookshelf injected dynamically by BookshelfCoverFlip -->
+      </div>
+
+      <!-- Bookshelf Floating HUD Controls & Volume Navigator -->
+      <div class="bookshelf-hud">
+        <button class="bookshelf-hud-btn" id="btn-shelf-prev" aria-label="Previous Volume">◀ PREV VOL</button>
+        <div class="bookshelf-hud-telemetry">
+          <span class="bookshelf-hud-tag">THE MULTIVERSE ARCHIVES // 3D BOOKSHELF</span>
+          <strong class="bookshelf-hud-active-title" id="shelf-active-title">LOKI (SEASON 1)</strong>
+          <span class="bookshelf-hud-counter" id="shelf-active-counter">VOLUME 01 OF 07 • 6 RELEASES ON SHELF</span>
+        </div>
+        <button class="bookshelf-hud-btn" id="btn-shelf-next" aria-label="Next Volume">NEXT VOL ▶</button>
+        <button class="bookshelf-hud-btn" id="btn-shelf-autoplay" aria-label="Toggle Auto-Play">⏸ AUTO</button>
+      </div>
+    </div>
+
+    <div class="multiverse-cards-grid" id="multiverse-saga-cards" style="display: none;">
       <!-- Populated via renderMultiverseSaga() -->
     </div>
   </section>

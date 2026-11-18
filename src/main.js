@@ -6,6 +6,7 @@ import { networkGraphData } from './data/network.js';
 import { stonesData } from './data/stones.js';
 import { STUDIO_ASSETS, STONE_MEDIA } from './data/mediaRegistry.js';
 import { DoomsdaySphereGallery } from './components/sphere-gallery.js';
+import { BookshelfCoverFlip } from './components/bookshelf-cover-flip.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -619,6 +620,10 @@ function renderInfinitySaga() {
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 5: THE MULTIVERSE SAGA (PHASES 4, 5, 6 & INCURSIONS)
 ═══════════════════════════════════════════════════════════════════ */
+let bookshelfInstance = null;
+let bookshelfControlsBound = false;
+let activeMultiverseView = 'bookshelf'; // 'bookshelf' | 'grid'
+
 function renderMultiverseSaga() {
   const container = document.getElementById('multiverse-saga-cards');
   if (!container) return;
@@ -628,6 +633,7 @@ function renderMultiverseSaga() {
     multiverseTitles = multiverseTitles.filter(t => t.phase === parseInt(activeMultiversePhase, 10));
   }
 
+  // 1. Render fallback / toggleable tactical grid cards
   container.innerHTML = multiverseTitles.map(t => {
     const isWatched = watchedSet.has(t.id);
     const isUpcoming = t.status === 'upcoming';
@@ -661,6 +667,37 @@ function renderMultiverseSaga() {
       if (item) openMovieModal(item);
     });
   });
+
+  // 2. Initialize or Update Originkit 3D Bookshelf Cover Flip
+  const shelfContainer = document.getElementById('bookshelf-container');
+  if (shelfContainer) {
+    if (!bookshelfInstance) {
+      bookshelfInstance = new BookshelfCoverFlip({
+        container: shelfContainer,
+        items: multiverseTitles,
+        size: 460,
+        spineWidth: 14,
+        speed: 50,
+        onBookSelect: (item) => {
+          openMovieModal(item);
+        },
+        onActiveChange: (activeItem, curPage, totalPages, countOnShelf) => {
+          const titleEl = document.getElementById('shelf-active-title');
+          const counterEl = document.getElementById('shelf-active-counter');
+          if (titleEl && activeItem) {
+            titleEl.textContent = activeItem.title;
+          }
+          if (counterEl) {
+            const padPage = String(curPage).padStart(2, '0');
+            const padTotal = String(totalPages).padStart(2, '0');
+            counterEl.textContent = `VOLUME ${padPage} OF ${padTotal} • ${countOnShelf} RELEASES ON SHELF`;
+          }
+        }
+      });
+    } else {
+      bookshelfInstance.setItems(multiverseTitles);
+    }
+  }
 }
 
 function initMultiverseTabs() {
@@ -673,6 +710,62 @@ function initMultiverseTabs() {
       renderMultiverseSaga();
     });
   });
+
+  // Wire Bookshelf HUD and View Mode switcher only once
+  if (!bookshelfControlsBound) {
+    bookshelfControlsBound = true;
+
+    const prevBtn = document.getElementById('btn-shelf-prev');
+    const nextBtn = document.getElementById('btn-shelf-next');
+    const autoBtn = document.getElementById('btn-shelf-autoplay');
+    const btnBookshelf = document.getElementById('btn-view-bookshelf');
+    const btnGrid = document.getElementById('btn-view-multi-grid');
+    const stageWrapper = document.getElementById('bookshelf-stage-wrapper');
+    const gridContainer = document.getElementById('multiverse-saga-cards');
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (bookshelfInstance) bookshelfInstance.prevPage();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        if (bookshelfInstance) bookshelfInstance.nextPage();
+      });
+    }
+
+    if (autoBtn) {
+      autoBtn.addEventListener('click', () => {
+        if (bookshelfInstance) {
+          const isPlaying = bookshelfInstance.toggleAutoplay();
+          autoBtn.textContent = isPlaying ? '⏸ AUTO' : '▶ PLAY';
+          autoBtn.style.color = isPlaying ? '#00E676' : '#94A3B8';
+        }
+      });
+    }
+
+    if (btnBookshelf && btnGrid && stageWrapper && gridContainer) {
+      btnBookshelf.addEventListener('click', () => {
+        activeMultiverseView = 'bookshelf';
+        btnBookshelf.classList.add('active');
+        btnGrid.classList.remove('active');
+        stageWrapper.style.display = 'block';
+        gridContainer.style.display = 'none';
+        if (bookshelfInstance) {
+          bookshelfInstance.measure();
+        }
+      });
+
+      btnGrid.addEventListener('click', () => {
+        activeMultiverseView = 'grid';
+        btnGrid.classList.add('active');
+        btnBookshelf.classList.remove('active');
+        stageWrapper.style.display = 'none';
+        gridContainer.style.display = 'grid';
+      });
+    }
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

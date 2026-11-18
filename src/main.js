@@ -997,9 +997,9 @@ function initMultiverseTreeBranches() {
 
     playCloudTransition(() => {
       if (doomStage) {
-        doomStage.style.background = `#020805 url('/images/loki-multiverse-4k.jpg') center 18% / cover no-repeat`;
+        doomStage.style.background = `#020805 url('/images/loki-multiverse-4k.jpg') center 24% / cover no-repeat`;
       } else {
-        heroSec.style.background = `#020805 url('/images/loki-multiverse-4k.jpg') center 18% / cover no-repeat`;
+        heroSec.style.background = `#020805 url('/images/loki-multiverse-4k.jpg') center 24% / cover no-repeat`;
       }
 
       if (doomPerimeterHud) doomPerimeterHud.style.display = 'none';

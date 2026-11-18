@@ -982,7 +982,7 @@ function updateStoneFeaturePanel(stoneId) {
   const section = document.getElementById('stones-altar-section');
   if (section) {
     section.style.setProperty('--active-stone-color', s.color);
-    section.style.background = `radial-gradient(circle at center 40%, ${s.glow} 0%, rgba(5, 7, 12, 0.98) 70%)`;
+    section.style.background = `radial-gradient(circle at center 40%, ${s.glow} 0%, rgba(3, 10, 6, 0.42) 70%)`;
   }
 
   const journeyHTML = (s.timelineJourney || []).map(step => `

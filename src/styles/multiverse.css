@@ -5114,3 +5114,148 @@ footer.agency-footer {
     margin: 0 auto;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   CONTINUOUS SITE-WIDE DOOM SMOKE BACKDROP
+   One fixed smoke world behind the entire site, so the Doom entrance,
+   intermissions and every section read as a single seamless page.
+═══════════════════════════════════════════════════════════════════ */
+body {
+  background: transparent;
+}
+
+#doom-site-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: #030a06;
+}
+
+#doom-site-backdrop .smoke-base,
+#doom-site-backdrop .smoke-drift {
+  position: absolute;
+  inset: -6%;
+  background: url('/images/doom-smoke-bg.jpg') center center / cover no-repeat;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Crisp master plate — slow "breathing" so the smoke feels alive */
+#doom-site-backdrop .smoke-base {
+  animation: doomSmokeBreath 38s ease-in-out infinite alternate;
+}
+
+/* Two translucent copies drift in opposite directions → soft billowing smoke */
+#doom-site-backdrop .smoke-drift-a {
+  opacity: 0.32;
+  mix-blend-mode: screen;
+  animation: doomSmokeDriftA 46s ease-in-out infinite alternate;
+}
+
+#doom-site-backdrop .smoke-drift-b {
+  opacity: 0.22;
+  mix-blend-mode: screen;
+  transform: scaleX(-1);
+  animation: doomSmokeDriftB 58s ease-in-out infinite alternate;
+}
+
+/* Gentle legibility tint — keeps the smoke vivid but text readable */
+#doom-site-backdrop .smoke-tint {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 45%, rgba(2, 8, 5, 0.18) 0%, rgba(2, 8, 5, 0.42) 70%, rgba(1, 4, 2, 0.62) 100%),
+    linear-gradient(180deg, rgba(2, 6, 4, 0.18) 0%, rgba(2, 6, 4, 0.30) 100%);
+}
+
+@keyframes doomSmokeBreath {
+  0%   { transform: scale(1.00) translate3d(0, 0, 0); }
+  100% { transform: scale(1.06) translate3d(-1%, -1.2%, 0); }
+}
+
+@keyframes doomSmokeDriftA {
+  0%   { transform: scale(1.12) translate3d(-3%, 1.5%, 0); opacity: 0.24; }
+  50%  { opacity: 0.36; }
+  100% { transform: scale(1.18) translate3d(3%, -1.5%, 0); opacity: 0.28; }
+}
+
+@keyframes doomSmokeDriftB {
+  0%   { transform: scaleX(-1) scale(1.16) translate3d(2.5%, -1%, 0); opacity: 0.16; }
+  50%  { opacity: 0.26; }
+  100% { transform: scaleX(-1) scale(1.10) translate3d(-2.5%, 1.5%, 0); opacity: 0.20; }
+}
+
+/* ── Remove the hard "cut" between sections: let the smoke show through ── */
+#hero {
+  background: transparent;
+}
+
+/* Doom photo dissolves into the smoke world instead of ending on a hard edge */
+.hero-doom-bg-stage {
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 72%, rgba(0, 0, 0, 0.55) 86%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 72%, rgba(0, 0, 0, 0.55) 86%, transparent 100%);
+}
+
+#hero::before {
+  background:
+    linear-gradient(90deg, rgba(2, 6, 4, 0.45) 0%, rgba(2, 6, 4, 0.12) 24%, transparent 45%, transparent 55%, rgba(2, 6, 4, 0.12) 76%, rgba(2, 6, 4, 0.45) 100%);
+}
+
+.trailer-intermission {
+  background: transparent;
+  border-top: none;
+  border-bottom: none;
+}
+
+.trailer-intermission::before {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.16) 55%, transparent 85%),
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(232, 57, 43, 0.07) 0%, transparent 70%);
+}
+
+#infinity-saga-section {
+  background: transparent;
+}
+
+#finale-section {
+  background: radial-gradient(circle at center, rgba(232, 57, 43, 0.12) 0%, rgba(2, 8, 5, 0.35) 70%, transparent 100%);
+}
+
+/* Smoked-glass panels instead of solid black slabs */
+.phase-intermission-banner {
+  background: rgba(3, 10, 6, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.doomsday-fast-track-banner {
+  background: linear-gradient(165deg, rgba(6, 18, 12, 0.62) 0%, rgba(3, 8, 6, 0.72) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+footer.agency-footer {
+  background: linear-gradient(180deg, transparent 0%, rgba(1, 4, 2, 0.78) 35%, rgba(1, 4, 2, 0.92) 100%);
+  border-top: none;
+}
+
+/* Mobile: lighter compositing (one drift layer) — same look, less GPU */
+@media (max-width: 680px) {
+  #doom-site-backdrop .smoke-drift-b {
+    display: none;
+  }
+  #doom-site-backdrop .smoke-base,
+  #doom-site-backdrop .smoke-drift {
+    background-position: 38% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #doom-site-backdrop .smoke-base,
+  #doom-site-backdrop .smoke-drift {
+    animation: none;
+  }
+}

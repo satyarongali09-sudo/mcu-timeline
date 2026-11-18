@@ -887,6 +887,192 @@ section {
   margin-top: 2px;
 }
 
+/* ==========================================================================
+   CREATIVE TICKET CTA: BOOKMYSHOW IS COLLAPSING // DOCTOR DOOM THEMED
+   ========================================================================== */
+.hero-doom-ticket-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: -0.15rem;
+}
+
+.ticket-collapse-alert-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 2px;
+}
+
+.ticket-alert-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #EF4444;
+  box-shadow: 0 0 10px #EF4444;
+  animation: incursionRadarPulse 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes incursionRadarPulse {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 1;
+    box-shadow: 0 0 6px #EF4444, 0 0 12px rgba(239, 68, 68, 0.6);
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.6;
+    box-shadow: 0 0 14px #EF4444, 0 0 22px rgba(239, 68, 68, 0.9);
+  }
+}
+
+.ticket-alert-tag {
+  font-family: var(--font-captain);
+  font-size: clamp(0.52rem, 0.75vw, 0.64rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #FCA5A5;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.btn-doom-ticket-collapse {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  background: linear-gradient(135deg, rgba(8, 28, 18, 0.82) 0%, rgba(4, 16, 11, 0.92) 55%, rgba(32, 10, 16, 0.85) 100%);
+  border: 1px solid rgba(0, 230, 118, 0.32);
+  border-left: 3px solid #EF4444;
+  border-radius: 12px;
+  padding: clamp(0.52rem, 1vh, 0.72rem) clamp(0.6rem, 1.2vw, 0.9rem);
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 230, 118, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-doom-ticket-collapse:hover {
+  transform: translateY(-2px) scale(1.012);
+  border-color: #00E676;
+  border-left-color: #FF5252;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.94), 0 0 32px rgba(0, 230, 118, 0.35), 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.btn-doom-ticket-collapse:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.ticket-btn-shimmer {
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 230, 118, 0.18), rgba(255, 255, 255, 0.12), transparent);
+  transform: skewX(-24deg);
+  pointer-events: none;
+  animation: ticketSweep 4.5s ease-in-out infinite;
+}
+
+@keyframes ticketSweep {
+  0% { left: -120%; }
+  35%, 100% { left: 160%; }
+}
+
+.ticket-btn-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ticket-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ticket-dot-red {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #FF5252;
+  box-shadow: 0 0 6px #FF5252;
+}
+
+.ticket-badge-text {
+  font-family: var(--font-eternal);
+  font-size: clamp(0.56rem, 0.8vw, 0.68rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #FCA5A5;
+  text-transform: uppercase;
+}
+
+.ticket-live-chip {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: var(--font-captain);
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #032512;
+  background: #00E676;
+  text-shadow: none;
+  margin-left: auto;
+}
+
+.ticket-main-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 1px;
+}
+
+.ticket-action-text {
+  font-family: var(--font-avengero);
+  font-size: clamp(0.86rem, 1.25vw, 1.15rem);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9), 0 0 16px rgba(0, 230, 118, 0.45);
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.btn-doom-ticket-collapse:hover .ticket-action-text {
+  color: #A7F3D0;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.95), 0 0 22px rgba(0, 230, 118, 0.75);
+}
+
+.ticket-action-arrow {
+  font-size: 0.95rem;
+  color: #00E676;
+  text-shadow: 0 0 12px #00E676;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-doom-ticket-collapse:hover .ticket-action-arrow {
+  transform: translateX(4px) scale(1.15);
+}
+
+.ticket-sub-lore {
+  font-family: var(--font-captain);
+  font-size: clamp(0.5rem, 0.72vw, 0.6rem);
+  letter-spacing: 0.12em;
+  color: #86EFAC;
+  text-transform: uppercase;
+  opacity: 0.9;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85);
+}
+
 /* Spider-Verse / PS5 Style Interactive Media Portal Tile (Left Bottom) */
 .loki-portal-media-tile {
   position: relative;
@@ -4557,6 +4743,30 @@ footer.agency-footer {
   .doom-cd-unit-lbl {
     font-size: 0.38rem;
     letter-spacing: 0.08em;
+  }
+  .btn-doom-ticket-collapse {
+    padding: 0.4rem 0.5rem;
+    border-radius: 9px;
+  }
+  .ticket-alert-tag {
+    font-size: 0.48rem;
+  }
+  .ticket-badge-text {
+    font-size: 0.52rem;
+  }
+  .ticket-live-chip {
+    font-size: 0.42rem;
+    padding: 0 4px;
+  }
+  .ticket-action-text {
+    font-size: 0.76rem;
+  }
+  .ticket-action-arrow {
+    font-size: 0.8rem;
+  }
+  .ticket-sub-lore {
+    font-size: 0.44rem;
+    line-height: 1.25;
   }
   .loki-portal-media-tile {
     height: 92px;

@@ -354,49 +354,77 @@ a {
   transition: width 0.1s linear;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   FLOATING GLASS DYNAMIC ISLAND NAVIGATION (RAILROAD.AI AESTHETIC)
+═══════════════════════════════════════════════════════════════════ */
 #multiverse-nav {
   position: fixed;
-  top: 0;
+  top: 18px;
   left: 0;
   width: 100%;
   z-index: 9999;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.08) 55%, transparent 100%);
-  border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: transparent !important;
+  border: none !important;
   border-radius: 0;
-  padding: 12px clamp(14px, 2.6vw, 42px);
+  padding: 0 clamp(16px, 3.2vw, 48px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  transition: background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease;
+  gap: 12px;
+  pointer-events: none; /* Allows natural click-through to background */
+  transition: top 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s ease;
+  box-shadow: none !important;
 }
 
 #multiverse-nav.scrolled {
-  background: rgba(3, 8, 5, 0.86);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(112, 204, 134, 0.22);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.72);
+  top: 10px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
+/* ─── 1. LEFT BRAND CAPSULE ISLAND ─── */
 .nav-brand {
-  display: flex;
+  pointer-events: auto;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
+  padding: 7px 18px 7px 14px;
+  border-radius: 9999px;
+  background: rgba(4, 14, 8, 0.52);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(134, 239, 172, 0.22);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 1.5px rgba(255, 255, 255, 0.12), 0 0 20px rgba(0, 230, 118, 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-brand:hover {
+  background: rgba(6, 20, 12, 0.7);
+  border-color: rgba(0, 230, 118, 0.5);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 230, 118, 0.22);
+  transform: translateY(-1px);
+}
+
+#multiverse-nav.scrolled .nav-brand {
+  background: rgba(2, 10, 6, 0.82);
+  border-color: rgba(0, 230, 118, 0.35);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.72);
 }
 
 .nav-logo-badge {
   font-family: var(--font-avengero);
-  font-size: clamp(0.95rem, 1.3vw, 1.18rem);
+  font-size: clamp(0.92rem, 1.1vw, 1.08rem);
   letter-spacing: 0.08em;
-  color: #fff;
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   gap: 4px;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+  text-decoration: none;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
+
 .nav-logo-badge span {
   color: #00E676;
 }
@@ -404,7 +432,7 @@ a {
 .nav-infinity-cluster {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   margin-left: 2px;
 }
 
@@ -416,106 +444,206 @@ a {
   opacity: 0.36;
   transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
 }
+
 .nav-stone-dot.active {
   opacity: 1;
   filter: drop-shadow(0 0 6px currentColor);
-  transform: scale(1.22);
+  transform: scale(1.25);
 }
 
+/* ─── 2. CENTER FLOATING PILL NAVIGATION (RAILROAD.AI AESTHETIC) ─── */
 .nav-links {
-  display: flex;
+  pointer-events: auto;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
   align-items: center;
-  gap: clamp(0.55rem, 1.25vw, 1.35rem);
-  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 3px;
+  padding: 5px 8px;
+  border-radius: 9999px;
+  background: rgba(4, 14, 8, 0.52);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(134, 239, 172, 0.25);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.52), inset 0 1px 1.5px rgba(255, 255, 255, 0.15), 0 0 25px rgba(0, 230, 118, 0.08);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.nav-links:hover {
+  background: rgba(6, 20, 12, 0.7);
+  border-color: rgba(0, 230, 118, 0.45);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65), 0 0 30px rgba(0, 230, 118, 0.2);
+}
+
+#multiverse-nav.scrolled .nav-links {
+  background: rgba(2, 10, 6, 0.85);
+  border-color: rgba(0, 230, 118, 0.38);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 230, 118, 0.15);
 }
 
 .nav-link {
-  font-family: var(--font-body);
-  font-size: clamp(0.68rem, 0.85vw, 0.8rem);
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: clamp(0.74rem, 0.82vw, 0.82rem);
   font-weight: 500;
-  letter-spacing: 0.06em;
-  color: rgba(235, 245, 238, 0.78);
-  transition: color 0.25s ease, text-shadow 0.25s ease;
-  position: relative;
-  padding: 4px 0;
+  letter-spacing: 0.02em;
+  color: rgba(220, 240, 230, 0.75);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  text-decoration: none;
   white-space: nowrap;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
-.nav-link:hover, .nav-link.active {
+
+.nav-link:hover {
   color: #FFFFFF;
-  text-shadow: 0 0 14px rgba(0, 230, 118, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  text-shadow: 0 0 12px rgba(0, 230, 118, 0.45);
 }
+
+.nav-link.active {
+  color: #00E676 !important;
+  background: rgba(0, 230, 118, 0.16);
+  border-color: rgba(0, 230, 118, 0.42);
+  box-shadow: 0 0 16px rgba(0, 230, 118, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+}
+
+.nav-link.active::after {
+  display: none !important;
+}
+
 .nav-link-doomsday {
   color: #86EFAC !important;
-  font-weight: 700;
-}
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #00E676;
-  border-radius: 2px;
-  box-shadow: 0 0 8px #00E676;
+  font-weight: 600;
 }
 
+.nav-link-doomsday:hover {
+  background: rgba(0, 230, 118, 0.18);
+  border-color: rgba(0, 230, 118, 0.5);
+}
+
+/* ─── 3. RIGHT ACTIONS CAPSULE DOCK ─── */
 .nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.nav-watch-summary-pill {
+  pointer-events: auto;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: rgba(8, 22, 14, 0.55);
-  border: 1px solid rgba(134, 239, 172, 0.24);
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 0.66rem;
+  flex-shrink: 0;
+  padding: 5px 8px;
+  border-radius: 9999px;
+  background: rgba(4, 14, 8, 0.52);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(134, 239, 172, 0.22);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-actions:hover {
+  background: rgba(6, 20, 12, 0.7);
+  border-color: rgba(0, 230, 118, 0.5);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 230, 118, 0.22);
+}
+
+#multiverse-nav.scrolled .nav-actions {
+  background: rgba(2, 10, 6, 0.82);
+  border-color: rgba(0, 230, 118, 0.35);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.72);
+}
+
+/* Primary Watch Progress Capsule Button (matches Railroad.ai "Get Started" glowing accent) */
+.nav-watch-summary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.22) 0%, rgba(16, 185, 129, 0.35) 100%);
+  border: 1px solid rgba(0, 230, 118, 0.55);
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #E2F2E6;
+  color: #FFFFFF;
   white-space: nowrap;
-  backdrop-filter: blur(8px);
+  text-decoration: none;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.25);
   transition: all 0.25s ease;
 }
+
 .nav-watch-summary-pill:hover {
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.35) 0%, rgba(16, 185, 129, 0.5) 100%);
   border-color: #00E676;
-  background: rgba(12, 34, 21, 0.82);
+  box-shadow: 0 0 22px rgba(0, 230, 118, 0.5);
+  transform: translateY(-1px);
 }
+
 .nav-pill-sep {
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
 .nav-btn-track,
 .nav-btn-doom {
-  background: rgba(8, 20, 13, 0.48);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #E2F2E6;
-  font-size: 0.64rem;
+  background: transparent;
+  border: 1px solid transparent;
+  color: rgba(220, 240, 230, 0.8);
+  font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 18px;
+  padding: 5px 10px;
+  border-radius: 9999px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  backdrop-filter: blur(8px);
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  cursor: pointer;
 }
+
 .nav-btn-track:hover,
 .nav-btn-doom:hover {
-  background: rgba(0, 230, 118, 0.2);
-  border-color: #00E676;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
   color: #FFFFFF;
-  box-shadow: 0 0 14px rgba(0, 230, 118, 0.35);
+  box-shadow: 0 0 12px rgba(0, 230, 118, 0.2);
+}
+
+@media (max-width: 1260px) {
+  .nav-link {
+    padding: 5px 10px;
+    font-size: 0.74rem;
+  }
+}
+
+@media (max-width: 1040px) {
+  #multiverse-nav {
+    flex-wrap: wrap;
+    gap: 10px;
+    top: 12px;
+    padding: 0 16px;
+  }
+  .nav-links {
+    position: relative;
+    left: auto;
+    transform: none;
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 5px 10px;
+  }
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .btn-skip-studio-intro {
@@ -4692,12 +4820,6 @@ footer.agency-footer {
 }
 
 @media (max-width: 768px) {
-  .nav-links {
-    display: none;
-  }
-  .nav-mobile-toggle {
-    display: flex;
-  }
   .agency-footer-container {
     grid-template-columns: 1fr;
     gap: 2.5rem;
@@ -5695,14 +5817,6 @@ footer.agency-footer {
 }
 
 @media (max-width: 1080px) {
-  #multiverse-nav {
-    padding: 8px 12px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  #multiverse-nav::-webkit-scrollbar {
-    display: none;
-  }
   .hero-callout-connector,
   .hero-vertical-watermark {
     display: none;

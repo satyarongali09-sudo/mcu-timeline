@@ -380,7 +380,7 @@ function renderBranchRealities() {
 ═══════════════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 4: 3D COVERFLOW SLIDESHOW GALLERY (INFINITY SAGA)
-   Based on Originkit / Framer 3D Smooth Perspective Slideshow
+   Faithful to Originkit / Framer 3D Smooth Perspective Slideshow
 ═══════════════════════════════════════════════════════════════════ */
 let infinityActiveIndex = 0;
 let infinityAutoplayTimer = null;
@@ -397,26 +397,29 @@ function renderInfinitySaga() {
 
   if (infinityActiveIndex >= n) infinityActiveIndex = 0;
 
-  // Render cards inside 3D coverflow track container
+  // Render cards with full-bleed poster and elegant overlay matching Image 2
   stage.innerHTML = `
     <div class="coverflow-3d-track" id="infinity-coverflow-track">
       ${infinityTitles.map((t, idx) => {
         const isWatched = watchedSet.has(t.id);
         const isCrossover = t.isCrossover;
         return `
-          <div class="coverflow-3d-card saga-movie-card ${isWatched ? 'watched' : ''}" data-id="${t.id}" data-index="${idx}" role="button" aria-label="${t.title}" tabindex="0">
-            <div class="saga-card-poster">
-              <img src="${t.poster}" alt="${t.title}" loading="lazy" draggable="false" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
-              <div class="saga-phase-tag">Phase ${t.phase}</div>
-              ${isCrossover ? `<div class="saga-crossover-tag">✦ Crossover</div>` : ''}
-              <div class="saga-order-badge">#${t.releaseOrder}</div>
-            </div>
-            <div class="saga-card-info">
-              <div class="saga-card-meta">
-                <span title="In-Universe Era">🕐 ${t.inUniverseYear || t.year}</span>
-                <span>${t.year}</span>
+          <div class="coverflow-3d-card ${isWatched ? 'watched' : ''}" data-id="${t.id}" data-index="${idx}" role="button" aria-label="${t.title}" tabindex="0">
+            <img src="${t.poster}" alt="${t.title}" class="coverflow-card-poster-img" loading="lazy" draggable="false" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
+            <div class="coverflow-card-gradient" aria-hidden="true"></div>
+            <div class="coverflow-card-info-overlay">
+              <div class="coverflow-badge-row">
+                <span class="coverflow-phase-tag">Phase ${t.phase}</span>
+                ${isCrossover ? `<span class="coverflow-crossover-tag">✦ Crossover</span>` : ''}
+                <span class="coverflow-order-tag">#${t.releaseOrder}</span>
               </div>
-              <h4 class="saga-card-title ${t.franchiseFont || ''}">${t.title}</h4>
+              <h3 class="coverflow-card-title ${t.franchiseFont || ''}">${t.title}</h3>
+              <div class="coverflow-card-meta">
+                <span class="meta-timeline">🕐 ${t.inUniverseYear || t.year}</span>
+                <span class="meta-dot">•</span>
+                <span class="meta-year">${t.year}</span>
+                ${isWatched ? '<span class="meta-watched-badge">✓ WATCHED</span>' : ''}
+              </div>
             </div>
             <div class="coverflow-card-dim" aria-hidden="true"></div>
             <div class="coverflow-card-spotlight" aria-hidden="true"></div>
@@ -441,14 +444,16 @@ function renderInfinitySaga() {
     const isMobile = window.innerWidth < 640;
     const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
     
-    // Geometry values based on Originkit 3D Coverflow spec
-    const gap = isMobile ? 5.2 : isTablet ? 6.8 : 8.2;
-    const stepX = gap * 28; // horizontal card spacing in px
+    // Exact Originkit constants matching Image 2:
+    // MAX_VISIBLE = 2 (exactly 5 cards in view: -2, -1, 0, +1, +2)
+    // tilt = 14, sideTilt = 7, depth = 240, scaleStep = 0.16
+    const gap = isMobile ? 5.2 : isTablet ? 6.8 : 7.6;
+    const stepX = gap * 30; // 228px on desktop, exactly spacing cards next to each other
     const depth = isMobile ? 180 : 240;
-    const tilt = isMobile ? 8 : 12; // Y-tilt angle in degrees
-    const sideTilt = isMobile ? 3 : 6; // Z-tilt banking in degrees
-    const scaleStep = 0.15;
-    const maxVisible = isMobile ? 2 : 4; // up to 9 cards visible across wide screens
+    const tilt = isMobile ? 10 : 14; // Y tilt inwards
+    const sideTilt = isMobile ? 4 : 7; // Z tilt banking
+    const scaleStep = 0.16;
+    const maxVisible = 2; // Exact match to Image 2: 2 cards left, 1 center, 2 cards right
 
     cards.forEach((card, i) => {
       let rel = i - infinityActiveIndex;
@@ -460,10 +465,10 @@ function renderInfinitySaga() {
       const visible = ax <= maxVisible;
       const isActive = rel === 0;
 
-      const sc = Math.max(0.42, 1 - ax * scaleStep);
+      const sc = Math.max(0.4, 1 - ax * scaleStep);
       const tx = rel * stepX;
       const tz = -ax * depth;
-      const ry = -Math.sign(rel) * Math.min(38, Math.abs(rel) * tilt);
+      const ry = -rel * tilt; // -rel * tilt tilts inwards towards center
       const rz = rel * sideTilt;
 
       card.style.transform = `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`;
@@ -472,6 +477,12 @@ function renderInfinitySaga() {
       card.style.pointerEvents = visible ? 'auto' : 'none';
       card.setAttribute('aria-hidden', !visible);
       card.classList.toggle('active', isActive);
+
+      // Inactive card dim overlay opacity: 0 for active, 0.45 for ±1, 0.65 for ±2
+      const dimOverlay = card.querySelector('.coverflow-card-dim');
+      if (dimOverlay) {
+        dimOverlay.style.opacity = isActive ? '0' : (ax === 1 ? '0.45' : '0.65');
+      }
     });
   }
 
@@ -488,7 +499,7 @@ function renderInfinitySaga() {
   // If clicking on an inactive card, smoothly slide it to center.
   // If clicking on the active center card, open the movie detail dossier modal!
   cards.forEach(card => {
-    card.addEventListener('click', (e) => {
+    card.addEventListener('click', () => {
       const idx = parseInt(card.dataset.index, 10);
       if (idx !== infinityActiveIndex) {
         if (infinityLock) return;

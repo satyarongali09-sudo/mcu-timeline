@@ -5,6 +5,7 @@ import { charactersData } from './data/characters.js';
 import { networkGraphData } from './data/network.js';
 import { stonesData } from './data/stones.js';
 import { STUDIO_ASSETS, STONE_MEDIA } from './data/mediaRegistry.js';
+import { DoomsdaySphereGallery } from './components/sphere-gallery.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -1627,8 +1628,11 @@ function initMultiverseTreeBranches() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   SECTION 5B: DOOMSDAY FAST-TRACK WATCHLIST
+   SECTION 5B: DOOMSDAY FAST-TRACK WATCHLIST (WITH 3D SPHERE GALLERY)
 ═══════════════════════════════════════════════════════════════════ */
+let doomsdaySphereInstance = null;
+let doomsdaySphereControlsBound = false;
+
 function renderDoomsdaySection() {
   const grid = document.getElementById('doomsday-grid');
   if (!grid) return;
@@ -1648,6 +1652,46 @@ function renderDoomsdaySection() {
     filtered = essentialItems.filter(t => t.doomsdayCategory === activeDoomsdayTab);
   }
 
+  // --- Update or Initialize 3D Sphere Gallery -------------------
+  const stageEl = document.getElementById('dd-sphere-stage-container');
+  const canvasEl = document.getElementById('dd-sphere-canvas');
+  if (stageEl && canvasEl) {
+    if (!doomsdaySphereInstance) {
+      doomsdaySphereInstance = new DoomsdaySphereGallery({
+        container: stageEl,
+        canvas: canvasEl,
+        items: filtered,
+        branches: Math.max(16, filtered.length * 2),
+        speed: 18,
+        direction: 'counterclockwise',
+        scale: 62,
+        size: 27,
+        hover: 200,
+        rounded: 18,
+        coreColor: '#00E676',
+        lineColor: 'rgba(0, 230, 118, 0.45)',
+        coreSize: 22,
+        onHoverChange: (item) => {
+          const titleEl = document.getElementById('dd-sphere-active-title');
+          const subEl = document.getElementById('dd-sphere-active-sub');
+          if (titleEl && titleEl.textContent !== item.title) {
+            titleEl.textContent = item.title;
+          }
+          if (subEl) {
+            subEl.textContent = `${item.doomsdayCategory || 'Essential'} • ${item.inUniverseYear || item.year} • Click to inspect classified intel`;
+          }
+        },
+        onItemSelect: (item) => {
+          openMovieModal(item);
+        }
+      });
+    } else {
+      doomsdaySphereInstance.branches = Math.max(16, filtered.length * 2);
+      doomsdaySphereInstance.setItems(filtered);
+    }
+  }
+
+  // --- Render Tactical Cards Grid ------------------------------
   grid.innerHTML = filtered.map(item => {
     const isWatched = watchedSet.has(item.id);
     const safeTitle = item.title.replace(/'/g, "\\'");
@@ -1702,6 +1746,62 @@ function initDoomsdayFastTrack() {
       renderDoomsdaySection();
     });
   });
+
+  // Wire View Toggles (🌐 3D Sphere ⇄ ⊞ Cards Grid)
+  const btnSphere = document.getElementById('btn-view-dd-sphere');
+  const btnCards = document.getElementById('btn-view-dd-cards');
+  const stageEl = document.getElementById('dd-sphere-gallery-wrapper');
+  const gridEl = document.getElementById('doomsday-grid');
+
+  if (btnSphere && btnCards && stageEl && gridEl && !doomsdaySphereControlsBound) {
+    btnSphere.onclick = () => {
+      btnSphere.classList.add('active');
+      btnCards.classList.remove('active');
+      stageEl.style.display = 'block';
+      gridEl.style.display = 'none';
+      if (doomsdaySphereInstance && doomsdaySphereInstance.resize) {
+        doomsdaySphereInstance.resize();
+      }
+    };
+    btnCards.onclick = () => {
+      btnCards.classList.add('active');
+      btnSphere.classList.remove('active');
+      stageEl.style.display = 'none';
+      gridEl.style.display = 'grid';
+    };
+
+    // HUD controls: Spin Direction, Autoplay, Reset
+    const btnSpinDir = document.getElementById('btn-sphere-spin-dir');
+    if (btnSpinDir) {
+      btnSpinDir.onclick = () => {
+        if (doomsdaySphereInstance) {
+          doomsdaySphereInstance.toggleDirection();
+          btnSpinDir.textContent = doomsdaySphereInstance.direction === 'clockwise' ? '⇄ CLOCKWISE' : '⇄ ANTICLOCKWISE';
+        }
+      };
+    }
+
+    const btnAuto = document.getElementById('btn-sphere-autoplay');
+    if (btnAuto) {
+      btnAuto.onclick = () => {
+        if (doomsdaySphereInstance) {
+          const isPlaying = doomsdaySphereInstance.toggleAutoplay();
+          btnAuto.textContent = isPlaying ? '⏸ PAUSE' : '▶ AUTO';
+        }
+      };
+    }
+
+    const btnReset = document.getElementById('btn-sphere-reset');
+    if (btnReset) {
+      btnReset.onclick = () => {
+        if (doomsdaySphereInstance) {
+          doomsdaySphereInstance.resetView();
+        }
+      };
+    }
+
+    doomsdaySphereControlsBound = true;
+  }
 
   // Calibrated exact target synchronized with avengerscountdown.com & global theatrical premiere:
   // Dec 18, 2026 05:00:00 UTC (10:30:00 AM IST)

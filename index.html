@@ -555,7 +555,39 @@
         <button class="dd-tab-btn" data-dd-tab="New Teams & Lead-Ins">New Teams &amp; Lead-Ins (4)</button>
       </div>
 
-      <div class="doomsday-essentials-grid" id="doomsday-grid">
+      <!-- 3D SPHERE NEXUS VIEW MODE CONTROLS & WEBGL CANVAS -->
+      <div class="dd-sphere-gallery-wrapper" id="dd-sphere-gallery-wrapper">
+        <div class="dd-sphere-view-header">
+          <div class="dd-sphere-telemetry-badge">
+            <span class="dd-sphere-rec-pulse"></span>
+            <span class="dd-sphere-tag">MULTIVERSE SINGULARITY // 3D SPHERE NEXUS</span>
+          </div>
+          <div class="dd-sphere-view-toggle" role="group" aria-label="Doomsday Watchlist View Mode">
+            <button class="dd-view-toggle-btn active" id="btn-view-dd-sphere" title="3D Spherical Multiverse Gallery">🌐 3D Sphere</button>
+            <button class="dd-view-toggle-btn" id="btn-view-dd-cards" title="Tactical Dossier Cards">⊞ Cards Grid</button>
+          </div>
+        </div>
+
+        <div class="dd-sphere-stage-container" id="dd-sphere-stage-container" role="region" aria-label="3D Doomsday Multiverse Sphere Gallery">
+          <canvas id="dd-sphere-canvas" class="dd-sphere-canvas"></canvas>
+
+          <!-- Floating HUD Controls -->
+          <div class="dd-sphere-hud">
+            <div class="dd-sphere-hud-left">
+              <span class="dd-sphere-hud-hint">DRAG TO ORBIT • SCROLL TO ZOOM • HOVER FOR MAGNETIC PULL</span>
+              <div class="dd-sphere-active-title" id="dd-sphere-active-title">THE FANTASTIC FOUR: FIRST STEPS</div>
+              <div class="dd-sphere-active-sub" id="dd-sphere-active-sub">CLICK ANY NODE TO OPEN CLASSIFIED DOSSIER &amp; TRACK WATCHLIST</div>
+            </div>
+            <div class="dd-sphere-hud-right">
+              <button class="dd-sphere-hud-btn" id="btn-sphere-spin-dir" title="Reverse Spin Direction">⇄ REVERSE</button>
+              <button class="dd-sphere-hud-btn" id="btn-sphere-autoplay" title="Toggle Auto-Spin">⏸ PAUSE</button>
+              <button class="dd-sphere-hud-btn" id="btn-sphere-reset" title="Reset Camera View">⟲ RESET</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doomsday-essentials-grid" id="doomsday-grid" style="display: none;">
         <!-- Populated via renderDoomsdaySection() -->
       </div>
     </div>

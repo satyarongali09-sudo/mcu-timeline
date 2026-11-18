@@ -261,7 +261,7 @@ export const CHARACTER_PORTRAIT_REGISTRY = {
   },
   'mysterio': {
     portrait: `${SUPERHERO_CDN_BASE}/479-mysterio.jpg`,
-    fallbackPoster: `${VERCEL_ASSET_BASE}/photos/46.jpg?v=2`,
+    fallbackPoster: `/images/spiderman-far-from-home.jpg`,
     name: 'Mysterio',
     universe: 'MCU Canon (Earth-616)'
   },

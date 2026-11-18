@@ -857,12 +857,29 @@ function markStoneDiscovered(stoneId) {
 /* ═══════════════════════════════════════════════════════════════════
    3-SECOND MARVEL STUDIOS INTRO & INTERACTIVE 7-BRANCH MULTIVERSE TREE
 ═══════════════════════════════════════════════════════════════════ */
+let introTimers = [];
+
+function dismissStudioIntro() {
+  introTimers.forEach(t => clearTimeout(t));
+  introTimers = [];
+  const intro = document.getElementById('marvel-studio-intro');
+  if (!intro) return;
+  intro.classList.add('intro-exit');
+  document.body.style.overflow = '';
+  setTimeout(() => {
+    intro.style.display = 'none';
+  }, 450);
+}
+
 function playStudioIntro() {
   const intro = document.getElementById('marvel-studio-intro');
   const redBg = document.getElementById('intro-red-bg');
   const logoStage = document.getElementById('intro-logo-stage');
   const blackout = document.getElementById('intro-blackout');
   if (!intro) return;
+
+  introTimers.forEach(t => clearTimeout(t));
+  introTimers = [];
 
   intro.style.display = 'flex';
   intro.classList.remove('intro-exit');
@@ -871,16 +888,16 @@ function playStudioIntro() {
   blackout?.classList.remove('active');
   document.body.style.overflow = 'hidden';
 
-  setTimeout(() => redBg?.classList.add('active'), 250);
-  setTimeout(() => logoStage?.classList.add('revealed'), 500);
-  setTimeout(() => blackout?.classList.add('active'), 2300);
-  setTimeout(() => {
+  introTimers.push(setTimeout(() => redBg?.classList.add('active'), 200));
+  introTimers.push(setTimeout(() => logoStage?.classList.add('revealed'), 450));
+  introTimers.push(setTimeout(() => blackout?.classList.add('active'), 2250));
+  introTimers.push(setTimeout(() => {
     intro.classList.add('intro-exit');
     document.body.style.overflow = '';
-  }, 2750);
-  setTimeout(() => {
+  }, 2700));
+  introTimers.push(setTimeout(() => {
     intro.style.display = 'none';
-  }, 3200);
+  }, 3150));
 }
 
 function initStudioIntro() {
@@ -892,10 +909,13 @@ function initStudioIntro() {
     });
   }
 
-  if (!sessionStorage.getItem('mcu-intro-played-v2')) {
-    sessionStorage.setItem('mcu-intro-played-v2', '1');
-    playStudioIntro();
+  const skipBtn = document.getElementById('btn-skip-studio-intro');
+  if (skipBtn) {
+    skipBtn.addEventListener('click', dismissStudioIntro);
   }
+
+  // Always play the 3-second Marvel Studios opening animation on load
+  playStudioIntro();
 }
 
 function playCloudTransition(onCovered, onComplete, duration = 650) {
@@ -933,9 +953,9 @@ function playCloudTransition(onCovered, onComplete, duration = 650) {
       const py = puff.yRatio * h;
       const grad = ctx.createRadialGradient(px, py, 0, px, py, puff.radius);
       const a = Math.min(1, opacityCurve * puff.density);
-      grad.addColorStop(0, `rgba(2, 4, 8, ${a})`);
-      grad.addColorStop(0.5, `rgba(5, 10, 18, ${a * 0.9})`);
-      grad.addColorStop(1, 'rgba(2, 4, 8, 0)');
+      grad.addColorStop(0, `rgba(2, 6, 4, ${a})`);
+      grad.addColorStop(0.5, `rgba(6, 18, 11, ${a * 0.92})`);
+      grad.addColorStop(1, 'rgba(2, 6, 4, 0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(px, py, puff.radius, 0, Math.PI * 2);
@@ -963,70 +983,87 @@ let activeHeroBranchIdx = null;
 function initMultiverseTreeBranches() {
   const heroSec = document.getElementById('hero');
   const doomStage = document.getElementById('hero-doom-bg-stage');
-  const countdownWidget = document.getElementById('hero-doomsday-countdown-widget');
+  const doomPerimeterHud = document.getElementById('hero-doom-perimeter-hud');
+  const lokiTreeStage = document.getElementById('loki-tree-interactive-stage');
   const backBtn = document.getElementById('tree-hero-back-btn');
   const nextBtn = document.getElementById('tree-hero-next-btn');
-  const badgeEl = document.getElementById('tree-hero-badge');
-  const titleEl = document.getElementById('tree-hero-title');
-  const subEl = document.getElementById('tree-hero-subtitle');
   const earthPanel = document.getElementById('tree-earth-panel');
-  const statsStrip = document.getElementById('hero-stats-strip');
+  const openLokiTreeBtn = document.getElementById('btn-open-loki-tree');
 
-  function activateBranch(branchIdx) {
-    const branch = DOOMSDAY_BRANCHES[branchIdx];
+  function activateBranch(branchIdx = 4) {
+    const branch = DOOMSDAY_BRANCHES[branchIdx] || DOOMSDAY_BRANCHES[4];
     if (!branch || !heroSec) return;
     activeHeroBranchIdx = branchIdx;
 
     playCloudTransition(() => {
-      const isMobile = window.innerWidth <= 900;
-      const bgUrl = isMobile && branch.mobAsset ? branch.mobAsset : branch.asset;
       if (doomStage) {
-        doomStage.style.background = `#010407 url('${bgUrl}') center center / cover no-repeat`;
+        doomStage.style.background = `#020805 url('/images/loki-multiverse-tree.jpg') center 18% / cover no-repeat`;
       } else {
-        heroSec.style.background = `#010407 url('${bgUrl}') center center / cover no-repeat`;
+        heroSec.style.background = `#020805 url('/images/loki-multiverse-tree.jpg') center 18% / cover no-repeat`;
       }
 
-      if (badgeEl) badgeEl.textContent = `YGGDRASIL BRANCH 0${branchIdx} • ${branch.label}`;
-      if (titleEl) titleEl.innerHTML = `<span class="prepare-main-word" style="font-size: clamp(2.4rem, 6vw, 4.6rem);">${branch.title}</span>`;
-      if (subEl) subEl.textContent = branch.tagline;
-      if (countdownWidget) countdownWidget.style.display = 'none';
-      if (statsStrip) statsStrip.style.display = 'none';
+      if (doomPerimeterHud) doomPerimeterHud.style.display = 'none';
+      if (lokiTreeStage) lokiTreeStage.style.display = 'flex';
       if (backBtn) backBtn.style.display = 'inline-flex';
       if (nextBtn) {
         nextBtn.style.display = 'inline-flex';
         const nextIdx = (branchIdx % 7) + 1;
-        nextBtn.textContent = `NEXT BRANCH (${nextIdx}) →`;
+        nextBtn.textContent = `NEXT TIMELINE BRANCH (0${nextIdx}) →`;
       }
 
-      document.querySelectorAll('.hero-branch-chip').forEach(chip => {
-        chip.classList.toggle('active', parseInt(chip.dataset.branch, 10) === branchIdx);
+      document.querySelectorAll('.hero-branch-chip, .loki-strand-node').forEach(node => {
+        node.classList.toggle('active', parseInt(node.dataset.branch, 10) === branchIdx);
       });
 
       if (earthPanel) {
         earthPanel.style.display = 'block';
-        earthPanel.innerHTML = `
-          <div class="earth-panel-header">
-            <span style="color: ${branch.color};">CONNECTED ESSENTIAL TITLES (${branch.movies.length})</span>
-            <span style="color: var(--text-secondary); font-size: 0.65rem;">Click title to open or jump</span>
-          </div>
-          <div class="earth-movies-grid">
-            ${branch.movies.map(m => `
-              <div class="earth-movie-chip" data-movie-id="${m.id}">
-                <div class="earth-movie-title">${m.title}</div>
-                <div class="earth-movie-year">${m.year}</div>
+        const moviesHTML = branch.movies.map(m => {
+          const item = timelineData.find(t => t.id === String(m.id));
+          const poster = item?.poster || `https://mcu-timelines.vercel.app/photos/${m.id}.jpg?v=2`;
+          const isWatched = watchedSet.has(String(m.id));
+          return `
+            <div class="loki-movie-card-chip" data-movie-id="${m.id}">
+              <img src="${poster}" alt="${m.title}" loading="lazy" />
+              <div class="loki-movie-chip-info">
+                <strong>${m.title} ${isWatched ? '✓' : ''}</strong>
+                <span>${m.year}</span>
               </div>
-            `).join('')}
+            </div>
+          `;
+        }).join('');
+
+        earthPanel.innerHTML = `
+          <div class="loki-console-top">
+            <div class="loki-console-title-block">
+              <div class="loki-console-kicker">YGGDRASIL BRANCH 0${branchIdx} // ${branch.universeCode || branch.label}</div>
+              <h3>${branch.title}</h3>
+              <p class="loki-console-lore">${branch.lokiAnalysis || branch.tagline}</p>
+            </div>
+            <div class="loki-telemetry-badges">
+              <div class="loki-t-pill">
+                <small>TEMPORAL ERA</small>
+                <strong>${branch.temporalSpan || 'Multiverse Era'}</strong>
+              </div>
+              <div class="loki-t-pill">
+                <small>ANCHOR BEING</small>
+                <strong>${branch.anchorBeing || 'Nexus Anchor'}</strong>
+              </div>
+              <div class="loki-t-pill">
+                <small>DOOMSDAY STATUS</small>
+                <strong style="color: ${branch.color};">${branch.incursionStatus || 'ACTIVE BRANCH'}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="loki-movies-row">
+            ${moviesHTML}
           </div>
         `;
-        earthPanel.querySelectorAll('.earth-movie-chip').forEach(chip => {
+
+        earthPanel.querySelectorAll('.loki-movie-card-chip').forEach(chip => {
           chip.addEventListener('click', () => {
             const mId = chip.dataset.movieId;
-            const cardEl = document.querySelector(`.archive-card[data-id="${mId}"]`);
-            if (cardEl) {
-              cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              const item = timelineData.find(t => t.id === String(mId));
-              if (item) setTimeout(() => openMovieModal(item), 550);
-            }
+            const item = timelineData.find(t => t.id === String(mId));
+            if (item) openMovieModal(item);
           });
         });
       }
@@ -1038,27 +1075,20 @@ function initMultiverseTreeBranches() {
     activeHeroBranchIdx = null;
     playCloudTransition(() => {
       if (doomStage) {
-        doomStage.style.background = `#030806 url('/images/doom-entrance-hero.png') center 22% / cover no-repeat`;
+        doomStage.style.background = `#020604 url('/images/doom-entrance-hero.png') center 18% / cover no-repeat`;
       } else {
-        heroSec.style.background = `#030806 url('/images/doom-entrance-hero.png') center 22% / cover no-repeat`;
+        heroSec.style.background = `#020604 url('/images/doom-entrance-hero.png') center 18% / cover no-repeat`;
       }
 
-      if (badgeEl) badgeEl.textContent = "COURAGE ISN'T ENOUGH.";
-      if (titleEl) {
-        titleEl.innerHTML = `
-          <span class="prepare-main-word">PREPARE.</span>
-          <span class="prepare-sub-brand">THE MARVEL MULTIVERSE • AVENGERS: DOOMSDAY</span>
-        `;
-      }
-      if (subEl) subEl.textContent = 'An interactive cosmic continuum mapping 79 canonical titles, 49 audited characters, 6 cosmic singularities, and mathematically modeled relationship network science.';
-      if (countdownWidget) countdownWidget.style.display = 'block';
-      if (statsStrip) statsStrip.style.display = 'flex';
+      if (doomPerimeterHud) doomPerimeterHud.style.display = 'grid';
+      if (lokiTreeStage) lokiTreeStage.style.display = 'none';
       if (backBtn) backBtn.style.display = 'none';
       if (nextBtn) nextBtn.style.display = 'none';
-      if (earthPanel) earthPanel.style.display = 'none';
-      document.querySelectorAll('.hero-branch-chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.hero-branch-chip, .loki-strand-node').forEach(c => c.classList.remove('active'));
     });
   }
+
+  openLokiTreeBtn?.addEventListener('click', () => activateBranch(4));
 
   document.querySelectorAll('[data-branch]').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -1490,21 +1520,35 @@ function updateUpNextBanner(sortedList) {
   const banner = document.getElementById('up-next-banner');
   const titleEl = document.getElementById('up-next-title');
   const jumpBtn = document.getElementById('up-next-jump-btn');
+  const heroNextTitle = document.getElementById('hero-up-next-title');
+  const heroNextBtn = document.getElementById('hero-up-next-jump-btn');
 
-  if (!banner || !titleEl) return null;
+  const scrollToNext = () => {
+    if (!nextItem) return;
+    const card = document.getElementById(`archive-card-${nextItem.id}`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.style.boxShadow = '0 0 30px #00E676';
+      setTimeout(() => { card.style.boxShadow = ''; }, 1800);
+    }
+  };
+
+  if (heroNextTitle) {
+    heroNextTitle.textContent = nextItem
+      ? `${nextItem.title} (${nextItem.inUniverseYear || nextItem.year})`
+      : 'All 77 Titles Completed! 🏆';
+  }
+  if (heroNextBtn) {
+    heroNextBtn.onclick = scrollToNext;
+  }
+
+  if (!banner || !titleEl) return nextItem ? nextItem.id : null;
 
   if (nextItem) {
     banner.style.display = 'flex';
     titleEl.textContent = `${nextItem.title} (${nextItem.year}) • ${nextItem.dimension}`;
     if (jumpBtn) {
-      jumpBtn.onclick = () => {
-        const card = document.getElementById(`archive-card-${nextItem.id}`);
-        if (card) {
-          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          card.style.boxShadow = '0 0 30px #FF2A2A';
-          setTimeout(() => { card.style.boxShadow = ''; }, 1800);
-        }
-      };
+      jumpBtn.onclick = scrollToNext;
     }
     return nextItem.id;
   } else {
@@ -1644,7 +1688,13 @@ function toggleWatched(id) {
 function updateArchiveStats() {
   const total = timelineData.length;
   const count = [...watchedSet].filter(id => timelineData.some(t => t.id === String(id))).length;
+  const unwatched = Math.max(0, total - count);
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+
+  const essentialItems = timelineData.filter(t => t.doomsdayEssential);
+  const totalEssential = essentialItems.length;
+  const watchedEssential = essentialItems.filter(t => watchedSet.has(t.id)).length;
+  const needEssential = Math.max(0, totalEssential - watchedEssential);
 
   const countEl = document.getElementById('archive-watched-count');
   const pctEl = document.getElementById('archive-watched-pct');
@@ -1653,6 +1703,31 @@ function updateArchiveStats() {
   if (countEl) countEl.textContent = `${count} / ${total}`;
   if (pctEl) pctEl.textContent = `${pct}%`;
   if (rankEl) rankEl.textContent = getRankBadge(pct);
+
+  // Sync Top Navbar Live Watch Summary Pill
+  const navWatchedRatio = document.getElementById('nav-watched-ratio');
+  const navDoomsdayRatio = document.getElementById('nav-doomsday-ratio');
+  if (navWatchedRatio) navWatchedRatio.textContent = `🛡️ ${count}/${total} Watched`;
+  if (navDoomsdayRatio) navDoomsdayRatio.textContent = `⚡ ${watchedEssential}/${totalEssential} Doomsday`;
+
+  // Sync Opening Hero Live Watch Telemetry Widget
+  const heroWatchedEl = document.getElementById('hero-stat-watched');
+  const heroUnwatchedEl = document.getElementById('hero-stat-unwatched');
+  const heroDdNeedEl = document.getElementById('hero-stat-dd-need');
+  const heroPctEl = document.getElementById('hero-telemetry-pct');
+  const heroBarFillEl = document.getElementById('hero-telemetry-bar-fill');
+  const heroRankEl = document.getElementById('hero-telemetry-rank');
+
+  if (heroWatchedEl) heroWatchedEl.textContent = `${count} / ${total}`;
+  if (heroUnwatchedEl) heroUnwatchedEl.textContent = `${unwatched}`;
+  if (heroDdNeedEl) {
+    heroDdNeedEl.textContent = needEssential === 0 ? '✓ Ready!' : `${needEssential} Left`;
+    const lbl = heroDdNeedEl.nextElementSibling;
+    if (lbl) lbl.textContent = `Need for Doomsday (${watchedEssential}/${totalEssential})`;
+  }
+  if (heroPctEl) heroPctEl.textContent = `${pct}%`;
+  if (heroBarFillEl) heroBarFillEl.style.width = `${pct}%`;
+  if (heroRankEl) heroRankEl.textContent = getRankBadge(pct);
 
   // Sync Infinity Stone nav dots with sixths of watch progress
   const placedStones = Math.floor((count / total) * 6 + 1e-9);

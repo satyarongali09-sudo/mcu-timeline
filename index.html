@@ -23,6 +23,7 @@
     <div class="logo-stage" id="intro-logo-stage">
       <img src="https://mcu-timelines.vercel.app/marvel_logo_pristine_2x.webp" alt="MARVEL STUDIOS" class="marvel-studios-pristine-img" draggable="false" />
     </div>
+    <button id="btn-skip-studio-intro" class="btn-skip-studio-intro" aria-label="Skip Intro">SKIP INTRO →</button>
     <div class="cinema-blackout" id="intro-blackout"></div>
   </div>
 
@@ -37,14 +38,14 @@
   <!-- Scroll Progress Indicator -->
   <div id="scroll-progress-line" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
 
-  <!-- SECTION 2: STICKY MULTIVERSE NAV -->
+  <!-- SECTION 2: STICKY MULTIVERSE NAV (DOCTOR DOOM EMERALD OBSIDIAN THEME) -->
   <nav id="multiverse-nav" aria-label="Multiverse Navigation">
     <div class="nav-brand">
       <a href="#hero" class="nav-logo-badge" id="mcu-logo" title="Click 6 times to assemble the Infinity Stones">
         <span>MARVEL</span> MULTIVERSE
       </a>
       
-      <!-- Infinity Stone Discovery Tracker in Nav (with real reference stone assets) -->
+      <!-- Infinity Stone Discovery Tracker in Nav -->
       <div class="nav-infinity-cluster" id="infinity-stones-row" title="Infinity Stones Attunement Tracker">
         <span class="nav-stone-dot" data-stone="reality" style="color: #E84B4B;" title="Reality Stone"></span>
         <span class="nav-stone-dot" data-stone="space" style="color: #3C8DFF;" title="Space Stone"></span>
@@ -59,7 +60,7 @@
       <a href="#multiverse-nexus" class="nav-link">Continuum</a>
       <a href="#infinity-saga-section" class="nav-link">Infinity Saga</a>
       <a href="#multiverse-saga-section" class="nav-link">Multiverse Saga</a>
-      <a href="#doomsday-fast-track-section" class="nav-link" style="color: #00E676;">⚡ Doomsday Track</a>
+      <a href="#doomsday-fast-track-section" class="nav-link nav-link-doomsday">⚡ Doomsday Track</a>
       <a href="#characters-section" class="nav-link">Dossiers</a>
       <a href="#marvel-network-section" class="nav-link">Network</a>
       <a href="#stones-altar-section" class="nav-link">Stones</a>
@@ -67,135 +68,249 @@
     </div>
 
     <div class="nav-actions">
-      <button id="audio-toggle-btn" class="nav-btn-track" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 0.72rem; border-color: rgba(255,255,255,0.15);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
-        <span>Cosmic Audio</span>
+      <a href="#archive-section" id="nav-watch-summary-pill" class="nav-watch-summary-pill" title="Your Live Watch Progress — Click to jump to Archive">
+        <span id="nav-watched-ratio">🛡️ 0/77 Watched</span>
+        <span class="nav-pill-sep">•</span>
+        <span id="nav-doomsday-ratio" style="color: #00E676;">⚡ 0/13 Doomsday</span>
+      </a>
+
+      <button id="audio-toggle-btn" class="nav-btn-track nav-btn-doom">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+        <span>Audio</span>
       </button>
 
-      <button id="nav-share-trigger" class="nav-btn-track" style="border-color: #3C8DFF; color: #3C8DFF;" title="Share Watch Progress Card">
+      <button id="nav-share-trigger" class="nav-btn-track nav-btn-doom" title="Share Watch Progress Card">
         Share
       </button>
 
-      <button id="nav-snap-trigger" class="nav-btn-track" style="border-color: #8257FF; color: #8257FF;" title="Thanos Snap Easter Egg">
+      <button id="nav-snap-trigger" class="nav-btn-track nav-btn-doom" title="Thanos Snap Reset">
         🤌 Snap
       </button>
     </div>
   </nav>
 
-  <!-- SECTION 1: DOCTOR DOOM ENTRANCE HERO, COUNTDOWN & INTERACTIVE 7-BRANCH MULTIVERSE TREE -->
+  <!-- SECTION 1: DOCTOR DOOM DOMINATING ENTRANCE & GOD LOKI MULTIVERSE TREE -->
   <header id="hero">
     <div class="hero-doom-bg-stage" id="hero-doom-bg-stage"></div>
     <canvas id="hero-canvas"></canvas>
 
-    <!-- 7 Interactive Multiverse Tree Branch Click Hotspots -->
-    <div id="hero-branch-triggers" class="hero-branch-triggers" aria-label="Interactive Multiverse Tree Branches">
-      <button class="branch-click-spot branch-spot-1" data-branch="1" title="Branch I: Mutant Legacy (Earth-10005)"></button>
-      <button class="branch-click-spot branch-spot-2" data-branch="2" title="Branch II: Avengers Origins"></button>
-      <button class="branch-click-spot branch-spot-3" data-branch="3" title="Branch III: Infinity Climax"></button>
-      <button class="branch-click-spot branch-spot-4" data-branch="4" title="Branch IV: Sacred Timeline & God Loki"></button>
-      <button class="branch-click-spot branch-spot-5" data-branch="5" title="Branch V: Dimensional Beacons & Incursions"></button>
-      <button class="branch-click-spot branch-spot-6" data-branch="6" title="Branch VI: Vibranium & Void Refugees"></button>
-      <button class="branch-click-spot branch-spot-7" data-branch="7" title="Branch VII: New World Order & Doom Lead-Ins"></button>
-    </div>
-
-    <!-- Floating Branch Navigation Controls (Active when inspecting a branch) -->
+    <!-- Floating Branch Navigation Controls (Active when in God Loki Multiverse Tree Mode) -->
     <button id="tree-hero-back-btn" class="tree-hero-back-btn" style="display: none;">
       ← RETURN TO DOOM ENTRANCE
     </button>
     <button id="tree-hero-next-btn" class="tree-hero-next-btn" style="display: none;">
-      NEXT BRANCH →
+      NEXT TIMELINE BRANCH →
     </button>
 
-    <div class="hero-content" id="multiverse-overview-overlay">
-      <div class="hero-doom-kicker" id="tree-hero-badge">COURAGE ISN'T ENOUGH.</div>
-      <h1 class="hero-title hero-doom-prepare" id="tree-hero-title">
-        <span class="prepare-main-word">PREPARE.</span>
-        <span class="prepare-sub-brand">THE MARVEL MULTIVERSE • AVENGERS: DOOMSDAY</span>
-      </h1>
-      <p class="hero-subtitle" id="tree-hero-subtitle">An interactive cosmic continuum mapping 79 canonical titles, 49 audited characters, 6 cosmic singularities, and mathematically modeled relationship network science.</p>
+    <!-- MODE A: DOCTOR DOOM ENTRANCE PERIMETER HUD (Center 100% Open for Doctor Doom) -->
+    <div class="hero-perimeter-hud" id="hero-doom-perimeter-hud">
+      <!-- LEFT HUD COLUMN: COURAGE ISN'T ENOUGH / PREPARE / COMPACT SCROLLING COUNTDOWN -->
+      <aside class="hero-hud-col hero-hud-left">
+        <div class="hero-doom-kicker" id="tree-hero-badge">COURAGE ISN'T ENOUGH.</div>
+        <h1 class="hero-title hero-doom-prepare" id="tree-hero-title">
+          <span class="prepare-main-word">PREPARE.</span>
+          <span class="prepare-sub-brand">AVENGERS: DOOMSDAY • THE MULTIVERSE SAGA</span>
+        </h1>
+        <p class="hero-subtitle" id="tree-hero-subtitle">
+          Victor Von Doom emerges as parallel realities fracture across 77 canonical MCU &amp; Multiverse releases, 49 audited Nexus Beings, and 7 Yggdrasil timeline branches.
+        </p>
 
-      <!-- OFFICIAL AVENGERS: DOOMSDAY LIVE SCROLLING COUNTDOWN -->
-      <div class="hero-doomsday-countdown" id="hero-doomsday-countdown-widget" role="timer" aria-label="Avengers: Doomsday Live Countdown">
-        <div class="doom-cd-header">AVENGERS: DOOMSDAY COUNTDOWN</div>
-        <div class="doom-cd-sub">DOOMSDAY IS COMING</div>
-        <div class="doom-cd-clock-row">
-          <div class="doom-cd-unit">
-            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-months">00</span></div>
-            <span class="doom-cd-unit-lbl">MONTHS</span>
+        <!-- COMPACT LIVE SCROLLING DOOMSDAY COUNTDOWN -->
+        <div class="hero-doomsday-countdown" id="hero-doomsday-countdown-widget" role="timer" aria-label="Avengers: Doomsday Live Countdown">
+          <div class="doom-cd-top-row">
+            <span class="doom-cd-header">AVENGERS: DOOMSDAY COUNTDOWN</span>
+            <span class="doom-cd-sub">DOOMSDAY IS COMING</span>
           </div>
-          <span class="doom-cd-colon">:</span>
-          <div class="doom-cd-unit">
-            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-days">29</span></div>
-            <span class="doom-cd-unit-lbl">DAYS</span>
+          <div class="doom-cd-clock-row">
+            <div class="doom-cd-unit">
+              <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-months">00</span></div>
+              <span class="doom-cd-unit-lbl">MONTHS</span>
+            </div>
+            <span class="doom-cd-colon">:</span>
+            <div class="doom-cd-unit">
+              <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-days">29</span></div>
+              <span class="doom-cd-unit-lbl">DAYS</span>
+            </div>
+            <span class="doom-cd-colon">:</span>
+            <div class="doom-cd-unit">
+              <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-hours">02</span></div>
+              <span class="doom-cd-unit-lbl">HOURS</span>
+            </div>
+            <span class="doom-cd-colon">:</span>
+            <div class="doom-cd-unit">
+              <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-minutes">31</span></div>
+              <span class="doom-cd-unit-lbl">MIN</span>
+            </div>
+            <span class="doom-cd-colon">:</span>
+            <div class="doom-cd-unit">
+              <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-seconds">55</span></div>
+              <span class="doom-cd-unit-lbl">SEC</span>
+            </div>
           </div>
-          <span class="doom-cd-colon">:</span>
-          <div class="doom-cd-unit">
-            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-hours">02</span></div>
-            <span class="doom-cd-unit-lbl">HOURS</span>
-          </div>
-          <span class="doom-cd-colon">:</span>
-          <div class="doom-cd-unit">
-            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-minutes">31</span></div>
-            <span class="doom-cd-unit-lbl">MIN</span>
-          </div>
-          <span class="doom-cd-colon">:</span>
-          <div class="doom-cd-unit">
-            <div class="doom-cd-digit-window"><span class="doom-cd-num" id="cd-seconds">55</span></div>
-            <span class="doom-cd-unit-lbl">SEC</span>
-          </div>
+        </div>
+
+        <div class="hero-actions" id="hero-main-actions">
+          <a href="#doomsday-fast-track-section" class="btn-cosmic-primary">
+            ⚡ Doomsday Track (13)
+          </a>
+          <a href="#archive-section" class="btn-cosmic-ghost">
+            Full 77-Title Archive
+          </a>
+        </div>
+      </aside>
+
+      <!-- CENTER STAGE: UNOBSTRUCTED DOCTOR DOOM FOCAL ZONE -->
+      <div class="hero-doom-center-focal" aria-hidden="true">
+        <div class="hero-scroll-cue">
+          <span>SCROLL THROUGH THE DOOM MIST</span>
+          <div class="scroll-arrow">↓</div>
         </div>
       </div>
 
-      <div class="hero-stats-strip" id="hero-stats-strip">
-        <div class="hero-stat-box">
-          <span class="hero-stat-val" id="stat-total-titles">79</span>
-          <span class="hero-stat-lbl">Canonical Titles</span>
+      <!-- RIGHT HUD COLUMN: LIVE WATCH TELEMETRY + GOD LOKI MULTIVERSE TREE PORTAL -->
+      <aside class="hero-hud-col hero-hud-right">
+        <!-- LIVE WATCH PROGRESS & DOOMSDAY READINESS TELEMETRY WIDGET -->
+        <div class="hero-watch-telemetry-card" id="hero-watch-telemetry-card">
+          <div class="telemetry-card-head">
+            <span class="telemetry-kicker">● LIVE TIMELINE TELEMETRY</span>
+            <span class="telemetry-rank-pill" id="hero-telemetry-rank">🧬 Multiverse Newbie</span>
+          </div>
+
+          <div class="telemetry-stats-grid">
+            <div class="telemetry-stat-cell">
+              <span class="t-stat-num" id="hero-stat-watched">0 / 77</span>
+              <span class="t-stat-lbl">Movies &amp; Series Watched</span>
+            </div>
+            <div class="telemetry-stat-cell">
+              <span class="t-stat-num" id="hero-stat-unwatched" style="color: #FACC15;">77</span>
+              <span class="t-stat-lbl">Unwatched Remaining</span>
+            </div>
+            <div class="telemetry-stat-cell">
+              <span class="t-stat-num" id="hero-stat-dd-need" style="color: #00E676;">13 Left</span>
+              <span class="t-stat-lbl">Need for Doomsday (0/13)</span>
+            </div>
+            <div class="telemetry-stat-cell">
+              <span class="t-stat-num" id="stat-total-hours">331h+</span>
+              <span class="t-stat-lbl">49 Beings • 7 Phases</span>
+            </div>
+          </div>
+
+          <div class="telemetry-bar-wrap">
+            <div class="telemetry-bar-labels">
+              <span>Multiverse Completion</span>
+              <strong id="hero-telemetry-pct">0%</strong>
+            </div>
+            <div class="telemetry-bar-track">
+              <div class="telemetry-bar-fill" id="hero-telemetry-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="telemetry-up-next-row">
+            <div class="t-up-next-info">
+              <span class="t-up-next-tag">NEXT TO WATCH:</span>
+              <strong id="hero-up-next-title">Eyes of Wakanda (1260 BC)</strong>
+            </div>
+            <button id="hero-up-next-jump-btn" class="t-up-next-btn">Watch →</button>
+          </div>
+          <!-- Hidden legacy IDs preserved for JS compatibility -->
+          <span id="stat-total-titles" style="display:none;">77</span>
+          <span id="stat-total-characters" style="display:none;">49</span>
+          <span id="stat-total-phases" style="display:none;">7</span>
         </div>
-        <div class="hero-stat-sep">/</div>
-        <div class="hero-stat-box">
-          <span class="hero-stat-val" id="stat-total-hours">331h+</span>
-          <span class="hero-stat-lbl">Universe Runtime</span>
+
+        <!-- GOD LOKI YGGDRASIL MULTIVERSE TREE PORTAL -->
+        <div class="hero-loki-portal-card" id="hero-branch-selector-bar">
+          <div class="loki-portal-preview" id="btn-open-loki-tree">
+            <img src="/images/loki-multiverse-tree.jpg" alt="God Loki Holding the Multiverse Tree" class="loki-portal-thumb" />
+            <div class="loki-portal-info">
+              <span class="loki-portal-kicker">YGGDRASIL NEXUS // 7 TIMELINE STRANDS</span>
+              <h3 class="loki-portal-title">GOD LOKI'S MULTIVERSE TREE</h3>
+              <span class="loki-portal-cta">Click to Enter Interactive Tree &amp; Branches →</span>
+            </div>
+          </div>
+          <div class="loki-portal-chips">
+            <button class="hero-branch-chip" data-branch="1">I. Mutants</button>
+            <button class="hero-branch-chip" data-branch="2">II. Avengers</button>
+            <button class="hero-branch-chip" data-branch="3">III. Infinity</button>
+            <button class="hero-branch-chip" data-branch="4">IV. God Loki</button>
+            <button class="hero-branch-chip" data-branch="5">V. Incursions</button>
+            <button class="hero-branch-chip" data-branch="6">VI. Wakanda/Void</button>
+            <button class="hero-branch-chip" data-branch="7">VII. Doom Lead-Ins</button>
+          </div>
         </div>
-        <div class="hero-stat-sep">/</div>
-        <div class="hero-stat-box">
-          <span class="hero-stat-val" id="stat-total-characters">49</span>
-          <span class="hero-stat-lbl">Nexus Beings</span>
+      </aside>
+    </div>
+
+    <!-- MODE B: GOD LOKI YGGDRASIL MULTIVERSE TREE STAGE (Loki Dominating Center, Strands on Sides, Console at Bottom) -->
+    <div id="loki-tree-interactive-stage" class="loki-tree-interactive-stage" style="display: none;">
+      <div class="loki-strands-layout">
+        <!-- Left Timeline Strands (Branches I – IV) -->
+        <div class="loki-strand-column loki-strand-left">
+          <div class="loki-strand-header">LEFT TEMPORAL STRANDS</div>
+          <button class="loki-strand-node" data-branch="1">
+            <span class="strand-num">01</span>
+            <div class="strand-meta">
+              <strong>MUTANT LEGACY</strong>
+              <span>Earth-10005 • X-Men &amp; Anchors</span>
+            </div>
+          </button>
+          <button class="loki-strand-node" data-branch="2">
+            <span class="strand-num">02</span>
+            <div class="strand-meta">
+              <strong>AVENGERS ASSEMBLE</strong>
+              <span>Earth-616 • 1943–2016 Core</span>
+            </div>
+          </button>
+          <button class="loki-strand-node" data-branch="3">
+            <span class="strand-num">03</span>
+            <div class="strand-meta">
+              <strong>INFINITY CLIMAX</strong>
+              <span>2018 Snap &amp; 2023 Time Heist</span>
+            </div>
+          </button>
+          <button class="loki-strand-node" data-branch="4">
+            <span class="strand-num">04</span>
+            <div class="strand-meta">
+              <strong>GOD LOKI &amp; YGGDRASIL</strong>
+              <span>Citadel at the End of Time</span>
+            </div>
+          </button>
         </div>
-        <div class="hero-stat-sep">/</div>
-        <div class="hero-stat-box">
-          <span class="hero-stat-val" id="stat-total-phases">7</span>
-          <span class="hero-stat-lbl">Multiverse Phases</span>
+
+        <!-- Center Unobstructed God Loki Focal Area -->
+        <div class="loki-center-focal">
+          <div class="loki-crown-badge">YGGDRASIL MULTIVERSE TREE • GOD OF STORIES</div>
+        </div>
+
+        <!-- Right Timeline Strands (Branches V – VII) -->
+        <div class="loki-strand-column loki-strand-right">
+          <div class="loki-strand-header">RIGHT TEMPORAL STRANDS</div>
+          <button class="loki-strand-node" data-branch="5">
+            <span class="strand-num">05</span>
+            <div class="strand-meta">
+              <strong>INCURSIONS &amp; RIFTS</strong>
+              <span>Earth-838 &amp; Spider-Verse</span>
+            </div>
+          </button>
+          <button class="loki-strand-node" data-branch="6">
+            <span class="strand-num">06</span>
+            <div class="strand-meta">
+              <strong>WAKANDA &amp; THE VOID</strong>
+              <span>1260 BC Vibranium &amp; TVA Void</span>
+            </div>
+          </button>
+          <button class="loki-strand-node" data-branch="7">
+            <span class="strand-num">07</span>
+            <div class="strand-meta">
+              <strong>DOOMSDAY LEAD-INS</strong>
+              <span>Earth-828 (1964) → 2028 Crisis</span>
+            </div>
+          </button>
         </div>
       </div>
 
-      <div class="hero-actions" id="hero-main-actions">
-        <a href="#doomsday-fast-track-section" class="btn-cosmic-primary" style="border-color: #00E676;">
-          ⚡ Doomsday Fast-Track (13 Essentials)
-        </a>
-        <a href="#archive-section" class="btn-cosmic-ghost">
-          Explore Full 79-Title Archive
-        </a>
-      </div>
-
-      <!-- Quick-Access 7 Multiverse Tree Branch Selector Pills -->
-      <div class="hero-branch-selector-bar" id="hero-branch-selector-bar">
-        <span class="branch-bar-label">Explore Yggdrasil Branches:</span>
-        <button class="hero-branch-chip" data-branch="1">I. Mutant Legacy</button>
-        <button class="hero-branch-chip" data-branch="2">II. Avengers</button>
-        <button class="hero-branch-chip" data-branch="3">III. Infinity Climax</button>
-        <button class="hero-branch-chip" data-branch="4">IV. God Loki &amp; TVA</button>
-        <button class="hero-branch-chip" data-branch="5">V. Incursions</button>
-        <button class="hero-branch-chip" data-branch="6">VI. Void &amp; Wakanda</button>
-        <button class="hero-branch-chip" data-branch="7">VII. Doom Lead-Ins</button>
-      </div>
-
-      <!-- Connected Branch Movies Panel (Visible when a branch is selected) -->
-      <div id="tree-earth-panel" class="tree-earth-panel" style="display: none;"></div>
-
-      <div class="hero-scroll-cue">
-        <span>Scroll Through the Doom Mist or Select a Branch</span>
-        <div class="scroll-arrow">↓</div>
-      </div>
+      <!-- Bottom-Docked Loki Timeline Intelligence Console -->
+      <div id="tree-earth-panel" class="tree-earth-panel"></div>
     </div>
   </header>
 

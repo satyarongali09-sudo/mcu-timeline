@@ -382,20 +382,22 @@
     </div>
   </div>
 
-  <!-- SECTION 4: THE INFINITY SAGA (HORIZONTAL PINNED TIMELINE) -->
+  <!-- SECTION 4: THE INFINITY SAGA (3D COVERFLOW SLIDESHOW GALLERY) -->
   <section id="infinity-saga-section">
     <div class="pinned-saga-header">
       <div>
         <span class="section-tag">Phases 1 — 3 • 2008 – 2019 • Sacred Timeline Foundation</span>
-        <p class="section-lead">Scroll horizontally through the 23 cornerstone releases of the Infinity Saga.</p>
+        <p class="section-lead">Interactive 3D Coverflow gallery of the cornerstone releases of the Infinity Saga. Click or slide to explore.</p>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <button id="infinity-track-prev" class="nav-btn-track" aria-label="Scroll left" style="padding: 10px 18px;">←</button>
-        <button id="infinity-track-next" class="nav-btn-track" aria-label="Scroll right" style="padding: 10px 18px;">→</button>
+      <div class="coverflow-nav-controls">
+        <span id="infinity-coverflow-counter" class="coverflow-counter-pill">TITLE 01 / 23</span>
+        <button id="infinity-track-prev" class="nav-btn-track coverflow-arrow-btn" aria-label="Previous card">←</button>
+        <button id="infinity-track-next" class="nav-btn-track coverflow-arrow-btn" aria-label="Next card">→</button>
+        <button id="infinity-coverflow-autoplay" class="nav-btn-track coverflow-autoplay-btn" aria-label="Toggle auto slideshow">▶ AUTO</button>
       </div>
     </div>
 
-    <div id="infinity-saga-track" class="horizontal-timeline-track">
+    <div id="infinity-saga-track" class="coverflow-3d-stage" tabindex="0" role="region" aria-label="Infinity Saga 3D Coverflow Gallery">
       <!-- Populated via renderInfinitySaga() -->
     </div>
   </section>

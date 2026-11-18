@@ -378,56 +378,230 @@ function renderBranchRealities() {
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 4: THE INFINITY SAGA (HORIZONTAL PINNED TIMELINE)
 ═══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   SECTION 4: 3D COVERFLOW SLIDESHOW GALLERY (INFINITY SAGA)
+   Based on Originkit / Framer 3D Smooth Perspective Slideshow
+═══════════════════════════════════════════════════════════════════ */
+let infinityActiveIndex = 0;
+let infinityAutoplayTimer = null;
+let infinityIsAutoplay = false;
+let infinityLock = false;
+
 function renderInfinitySaga() {
-  const track = document.getElementById('infinity-saga-track');
-  if (!track) return;
+  const stage = document.getElementById('infinity-saga-track');
+  if (!stage) return;
 
   const infinityTitles = timelineData.filter(t => t.saga === 'Infinity Saga');
+  const n = infinityTitles.length;
+  if (n === 0) return;
 
-  track.innerHTML = infinityTitles.map(t => {
-    const isWatched = watchedSet.has(t.id);
-    const isCrossover = t.isCrossover;
-    return `
-      <div class="saga-movie-card ${isWatched ? 'watched' : ''}" data-id="${t.id}">
-        <div class="saga-card-poster">
-          <img src="${t.poster}" alt="${t.title}" loading="lazy" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
-          <div class="saga-phase-tag">Phase ${t.phase}</div>
-          ${isCrossover ? `<div class="saga-crossover-tag">✦ Crossover</div>` : ''}
-          <div class="saga-order-badge">#${t.releaseOrder}</div>
-        </div>
-        <div class="saga-card-info">
-          <div class="saga-card-meta">
-            <span title="In-Universe Era">🕐 ${t.inUniverseYear || t.year}</span>
-            <span>${t.year}</span>
+  if (infinityActiveIndex >= n) infinityActiveIndex = 0;
+
+  // Render cards inside 3D coverflow track container
+  stage.innerHTML = `
+    <div class="coverflow-3d-track" id="infinity-coverflow-track">
+      ${infinityTitles.map((t, idx) => {
+        const isWatched = watchedSet.has(t.id);
+        const isCrossover = t.isCrossover;
+        return `
+          <div class="coverflow-3d-card saga-movie-card ${isWatched ? 'watched' : ''}" data-id="${t.id}" data-index="${idx}" role="button" aria-label="${t.title}" tabindex="0">
+            <div class="saga-card-poster">
+              <img src="${t.poster}" alt="${t.title}" loading="lazy" draggable="false" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
+              <div class="saga-phase-tag">Phase ${t.phase}</div>
+              ${isCrossover ? `<div class="saga-crossover-tag">✦ Crossover</div>` : ''}
+              <div class="saga-order-badge">#${t.releaseOrder}</div>
+            </div>
+            <div class="saga-card-info">
+              <div class="saga-card-meta">
+                <span title="In-Universe Era">🕐 ${t.inUniverseYear || t.year}</span>
+                <span>${t.year}</span>
+              </div>
+              <h4 class="saga-card-title ${t.franchiseFont || ''}">${t.title}</h4>
+            </div>
+            <div class="coverflow-card-dim" aria-hidden="true"></div>
+            <div class="coverflow-card-spotlight" aria-hidden="true"></div>
           </div>
-          <h4 class="saga-card-title ${t.franchiseFont || ''}">${t.title}</h4>
-        </div>
-      </div>
-    `;
-  }).join('');
+        `;
+      }).join('')}
+    </div>
+  `;
 
-  // Click card to open movie detail modal
-  track.querySelectorAll('.saga-movie-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const id = card.dataset.id;
-      const item = timelineData.find(t => t.id === id);
-      if (item) openMovieModal(item);
+  const track = document.getElementById('infinity-coverflow-track');
+  if (!track) return;
+  const cards = track.querySelectorAll('.coverflow-3d-card');
+
+  function updateCoverflow() {
+    const counter = document.getElementById('infinity-coverflow-counter');
+    if (counter) {
+      const curNum = String(infinityActiveIndex + 1).padStart(2, '0');
+      const totNum = String(n).padStart(2, '0');
+      counter.textContent = `TITLE ${curNum} / ${totNum}`;
+    }
+
+    const isMobile = window.innerWidth < 640;
+    const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
+    
+    // Geometry values based on Originkit 3D Coverflow spec
+    const gap = isMobile ? 5.2 : isTablet ? 6.8 : 8.2;
+    const stepX = gap * 28; // horizontal card spacing in px
+    const depth = isMobile ? 180 : 240;
+    const tilt = isMobile ? 8 : 12; // Y-tilt angle in degrees
+    const sideTilt = isMobile ? 3 : 6; // Z-tilt banking in degrees
+    const scaleStep = 0.15;
+    const maxVisible = isMobile ? 2 : 4; // up to 9 cards visible across wide screens
+
+    cards.forEach((card, i) => {
+      let rel = i - infinityActiveIndex;
+      // Seamless infinite looping wrap
+      if (rel > n / 2) rel -= n;
+      if (rel < -n / 2) rel += n;
+
+      const ax = Math.abs(rel);
+      const visible = ax <= maxVisible;
+      const isActive = rel === 0;
+
+      const sc = Math.max(0.42, 1 - ax * scaleStep);
+      const tx = rel * stepX;
+      const tz = -ax * depth;
+      const ry = -Math.sign(rel) * Math.min(38, Math.abs(rel) * tilt);
+      const rz = rel * sideTilt;
+
+      card.style.transform = `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`;
+      card.style.zIndex = Math.round(100 - ax * 10);
+      card.style.opacity = visible ? 1 : 0;
+      card.style.pointerEvents = visible ? 'auto' : 'none';
+      card.setAttribute('aria-hidden', !visible);
+      card.classList.toggle('active', isActive);
+    });
+  }
+
+  function stepCoverflow(dir) {
+    if (infinityLock) return;
+    infinityLock = true;
+    setTimeout(() => { infinityLock = false; }, 420);
+
+    infinityActiveIndex = (((infinityActiveIndex + dir) % n) + n) % n;
+    updateCoverflow();
+  }
+
+  // Card click behavior:
+  // If clicking on an inactive card, smoothly slide it to center.
+  // If clicking on the active center card, open the movie detail dossier modal!
+  cards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      const idx = parseInt(card.dataset.index, 10);
+      if (idx !== infinityActiveIndex) {
+        if (infinityLock) return;
+        infinityLock = true;
+        setTimeout(() => { infinityLock = false; }, 420);
+        infinityActiveIndex = idx;
+        updateCoverflow();
+      } else {
+        const id = card.dataset.id;
+        const item = timelineData.find(t => t.id === id);
+        if (item) openMovieModal(item);
+      }
     });
   });
 
-  // Track scroll buttons
+  // Track button controls
   const prevBtn = document.getElementById('infinity-track-prev');
   const nextBtn = document.getElementById('infinity-track-next');
   if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      track.scrollBy({ left: -400, behavior: 'smooth' });
-    });
+    prevBtn.onclick = () => stepCoverflow(-1);
   }
   if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      track.scrollBy({ left: 400, behavior: 'smooth' });
-    });
+    nextBtn.onclick = () => stepCoverflow(1);
   }
+
+  // Autoplay button control
+  const autoBtn = document.getElementById('infinity-coverflow-autoplay');
+  if (autoBtn) {
+    autoBtn.onclick = () => {
+      infinityIsAutoplay = !infinityIsAutoplay;
+      autoBtn.classList.toggle('playing', infinityIsAutoplay);
+      autoBtn.textContent = infinityIsAutoplay ? '⏸ PAUSE' : '▶ AUTO';
+      if (infinityIsAutoplay) {
+        startInfinityAutoplay();
+      } else {
+        stopInfinityAutoplay();
+      }
+    };
+  }
+
+  function startInfinityAutoplay() {
+    stopInfinityAutoplay();
+    infinityAutoplayTimer = setInterval(() => {
+      stepCoverflow(1);
+    }, 2800);
+  }
+
+  function stopInfinityAutoplay() {
+    if (infinityAutoplayTimer) {
+      clearInterval(infinityAutoplayTimer);
+      infinityAutoplayTimer = null;
+    }
+  }
+
+  // Pause on hover over stage
+  stage.onmouseenter = () => {
+    if (infinityIsAutoplay) stopInfinityAutoplay();
+  };
+  stage.onmouseleave = () => {
+    if (infinityIsAutoplay) startInfinityAutoplay();
+  };
+
+  // Keyboard navigation when stage is focused
+  stage.onkeydown = (e) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      stepCoverflow(1);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      stepCoverflow(-1);
+    } else if (e.key === 'Enter') {
+      const item = infinityTitles[infinityActiveIndex];
+      if (item) openMovieModal(item);
+    }
+  };
+
+  // Pointer drag / swipe support
+  let pointerStartX = 0;
+  let isPointerDown = false;
+  stage.onpointerdown = (e) => {
+    pointerStartX = e.clientX;
+    isPointerDown = true;
+  };
+  stage.onpointerup = (e) => {
+    if (!isPointerDown) return;
+    isPointerDown = false;
+    const diff = e.clientX - pointerStartX;
+    if (Math.abs(diff) > 40) {
+      stepCoverflow(diff > 0 ? -1 : 1);
+    }
+  };
+  stage.onpointercancel = () => { isPointerDown = false; };
+
+  // Horizontal wheel / trackpad swipe
+  let wheelLock = false;
+  stage.onwheel = (e) => {
+    if (Math.abs(e.deltaX) > 25 || (e.shiftKey && Math.abs(e.deltaY) > 25)) {
+      e.preventDefault();
+      if (!wheelLock) {
+        wheelLock = true;
+        stepCoverflow((e.deltaX > 0 || e.deltaY > 0) ? 1 : -1);
+        setTimeout(() => { wheelLock = false; }, 360);
+      }
+    }
+  };
+
+  // Window resize recalculates geometry dynamically
+  window.addEventListener('resize', () => {
+    updateCoverflow();
+  }, { passive: true });
+
+  // Initial layout calculation
+  updateCoverflow();
 }
 
 /* ═══════════════════════════════════════════════════════════════════

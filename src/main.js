@@ -193,6 +193,13 @@ function stopCosmicTone() {
 function initHeroParticleCanvas() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
+
+  // Disable expensive particle canvas simulation on mobile devices for smooth 60fps performance
+  if (window.innerWidth <= 768) {
+    canvas.style.display = 'none';
+    return;
+  }
+
   const ctx = canvas.getContext('2d');
   let width, height;
   let particles = [];

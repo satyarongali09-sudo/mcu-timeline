@@ -1075,9 +1075,9 @@ function initMultiverseTreeBranches() {
     activeHeroBranchIdx = null;
     playCloudTransition(() => {
       if (doomStage) {
-        doomStage.style.background = `#020604 url('/images/doom-entrance-4k.jpg') center 18% / cover no-repeat`;
+        doomStage.style.background = `#020604 url('/images/doom-entrance-4k.jpg') center 20% / cover no-repeat`;
       } else {
-        heroSec.style.background = `#020604 url('/images/doom-entrance-4k.jpg') center 18% / cover no-repeat`;
+        heroSec.style.background = `#020604 url('/images/doom-entrance-4k.jpg') center 20% / cover no-repeat`;
       }
 
       if (doomPerimeterHud) doomPerimeterHud.style.display = 'grid';

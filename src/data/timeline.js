@@ -849,8 +849,8 @@ export const DOOMSDAY_BRANCHES = {
     incursionStatus: "STABILIZED VIA TVA VOID RESCUE",
     lokiAnalysis: "Held in God Loki's left-upper temporal strand. When Earth-10005's original Anchor Being perished in 2029, Wade Wilson recruited a variant Wolverine to restore the branch's quantum decay before Doctor Doom's incursions.",
     color: "#38bdf8",
-    asset: "/images/loki-multiverse-tree.jpg",
-    mobAsset: "/images/loki-multiverse-tree.jpg",
+    asset: "/images/loki-multiverse-4k.jpg",
+    mobAsset: "/images/loki-multiverse-4k.jpg",
     movies: [
       { id: "101", title: "1. X-Men", year: "2000 • Earth-10005" },
       { id: "102", title: "2. X2: X-Men United", year: "2003 • Earth-10005" },
@@ -868,8 +868,8 @@ export const DOOMSDAY_BRANCHES = {
     incursionStatus: "PRIMARY TARGET OF VICTOR VON DOOM",
     lokiAnalysis: "The foundational trunk of Earth-616. Tony Stark's technological legacy and the Tesseract's awakening in 1943 and 2012 forged the exact defensive blueprint that Doctor Doom seeks to subvert in Avengers: Doomsday.",
     color: "#34d399",
-    asset: "/images/loki-multiverse-tree.jpg",
-    mobAsset: "/images/loki-multiverse-tree.jpg",
+    asset: "/images/loki-multiverse-4k.jpg",
+    mobAsset: "/images/loki-multiverse-4k.jpg",
     movies: [
       { id: "1", title: "1. Captain America: The First Avenger", year: "1943–1945" },
       { id: "5", title: "2. Iron Man", year: "Spring 2008" },
@@ -888,8 +888,8 @@ export const DOOMSDAY_BRANCHES = {
     incursionStatus: "QUANTUM CHRONO-FRACTURE DETECTED",
     lokiAnalysis: "By traveling back to 1970, 2012, 2013, and 2014 via the Quantum Realm and destroying the six Infinity Stones in 2018, the Avengers inadvertently created the first unstable branch timelines.",
     color: "#10b981",
-    asset: "/images/loki-multiverse-tree.jpg",
-    mobAsset: "/images/loki-multiverse-tree.jpg",
+    asset: "/images/loki-multiverse-4k.jpg",
+    mobAsset: "/images/loki-multiverse-4k.jpg",
     movies: [
       { id: "35", title: "1. Avengers: Infinity War", year: "Spring 2018" },
       { id: "38", title: "2. Avengers: Endgame", year: "Oct 2023" }
@@ -906,8 +906,8 @@ export const DOOMSDAY_BRANCHES = {
     incursionStatus: "HOLDING ALL INFINITE BRANCHES ALIVE",
     lokiAnalysis: "At the center of the Multiverse sits Variant L1130 — Loki, God of Stories — physically sustaining every timeline branch with Asgardian temporal magic as Doctor Doom marches toward the Citadel.",
     color: "#00e676",
-    asset: "/images/loki-multiverse-tree.jpg",
-    mobAsset: "/images/loki-multiverse-tree.jpg",
+    asset: "/images/loki-multiverse-4k.jpg",
+    mobAsset: "/images/loki-multiverse-4k.jpg",
     movies: [
       { id: "41", title: "1. Loki (Season 1)", year: "Post-2012 Branch / TVA" },
       { id: "59", title: "2. Loki (Season 2)", year: "Yggdrasil Time Tree" },
@@ -925,8 +925,8 @@ export const DOOMSDAY_BRANCHES = {
     incursionStatus: "CRITICAL INCURSION WARNING ACTIVE",
     lokiAnalysis: "Dreamwalking via the Darkhold and cross-universe spell failures weakened the dimensional membrane between Earth-616 and Earth-838, triggering Clea's emergency incursion intervention.",
     color: "#a7f3d0",
-    asset: "/images/loki-multiverse-tree.jpg",
-    mobAsset: "/images/loki-multiverse-tree.jpg",
+    asset: "/images/loki-multiverse-4k.jpg",
+    mobAsset: "/images/loki-multiverse-4k.jpg",
     movies: [
       { id: "43", title: "1. Shang-Chi and the Legend of the Ten Rings", year: "Spring 2024" },
       { id: "47", title: "2. Spider-Man: No Way Home", year: "Late 2024" },
@@ -944,8 +944,8 @@ export const DOOMSDAY_BRANCHES = {
     incursionStatus: "STRATEGIC DEFENSE FRONT",
     lokiAnalysis: "Wakanda's millennia-old vibranium stockpile and the Void's surviving resistance fighters represent two of the most critical defensive bastions when universes collide.",
     color: "#6ee7b7",
-    asset: "/images/loki-multiverse-tree.jpg",
-    mobAsset: "/images/loki-multiverse-tree.jpg",
+    asset: "/images/loki-multiverse-4k.jpg",
+    mobAsset: "/images/loki-multiverse-4k.jpg",
     movies: [
       { id: "73", title: "1. Eyes of Wakanda", year: "1260 BC – 1896 AD" },
       { id: "53", title: "2. Black Panther: Wakanda Forever", year: "Spring 2025" },
@@ -963,8 +963,8 @@ export const DOOMSDAY_BRANCHES = {
     incursionStatus: "IMMINENT COLLISION — AVENGERS: DOOMSDAY",
     lokiAnalysis: "The final convergence vector: Reed Richards and the Fantastic Four escape Earth-828 into Earth-616 as Sam Wilson's Avengers, the New Avengers, Spider-Man, and White Vision face Doctor Doom.",
     color: "#facc15",
-    asset: "/images/loki-multiverse-tree.jpg",
-    mobAsset: "/images/loki-multiverse-tree.jpg",
+    asset: "/images/loki-multiverse-4k.jpg",
+    mobAsset: "/images/loki-multiverse-4k.jpg",
     movies: [
       { id: "72", title: "1. The Fantastic Four: First Steps", year: "1964 • Earth-828" },
       { id: "68", title: "2. Captain America: Brave New World", year: "Spring 2027" },

@@ -997,9 +997,9 @@ function initMultiverseTreeBranches() {
 
     playCloudTransition(() => {
       if (doomStage) {
-        doomStage.style.background = `#020805 url('/images/loki-multiverse-tree.jpg') center 18% / cover no-repeat`;
+        doomStage.style.background = `#020805 url('/images/loki-multiverse-4k.jpg') center 18% / cover no-repeat`;
       } else {
-        heroSec.style.background = `#020805 url('/images/loki-multiverse-tree.jpg') center 18% / cover no-repeat`;
+        heroSec.style.background = `#020805 url('/images/loki-multiverse-4k.jpg') center 18% / cover no-repeat`;
       }
 
       if (doomPerimeterHud) doomPerimeterHud.style.display = 'none';
@@ -1075,9 +1075,9 @@ function initMultiverseTreeBranches() {
     activeHeroBranchIdx = null;
     playCloudTransition(() => {
       if (doomStage) {
-        doomStage.style.background = `#020604 url('/images/doom-entrance-hero.png') center 18% / cover no-repeat`;
+        doomStage.style.background = `#020604 url('/images/doom-entrance-4k.jpg') center 18% / cover no-repeat`;
       } else {
-        heroSec.style.background = `#020604 url('/images/doom-entrance-hero.png') center 18% / cover no-repeat`;
+        heroSec.style.background = `#020604 url('/images/doom-entrance-4k.jpg') center 18% / cover no-repeat`;
       }
 
       if (doomPerimeterHud) doomPerimeterHud.style.display = 'grid';
@@ -1707,8 +1707,8 @@ function updateArchiveStats() {
   // Sync Top Navbar Live Watch Summary Pill
   const navWatchedRatio = document.getElementById('nav-watched-ratio');
   const navDoomsdayRatio = document.getElementById('nav-doomsday-ratio');
-  if (navWatchedRatio) navWatchedRatio.textContent = `🛡️ ${count}/${total} Watched`;
-  if (navDoomsdayRatio) navDoomsdayRatio.textContent = `⚡ ${watchedEssential}/${totalEssential} Doomsday`;
+  if (navWatchedRatio) navWatchedRatio.textContent = `🛡️ ${count}/${total}`;
+  if (navDoomsdayRatio) navDoomsdayRatio.textContent = `⚡ ${watchedEssential}/${totalEssential}`;
 
   // Sync Opening Hero Live Watch Telemetry Widget
   const heroWatchedEl = document.getElementById('hero-stat-watched');

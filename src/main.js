@@ -838,8 +838,255 @@ function markStoneDiscovered(stoneId) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   MARVEL TRAILER INTERMISSION ENGINE (CHARACTER-BY-CHARACTER & SOUND VISUALS)
+═══════════════════════════════════════════════════════════════════ */
+const TRAILER_ROTATION_SLATES = [
+  {
+    headline: 'THE MULTIVERSE IS COLLAPSING.',
+    accents: 'MULTIVERSE:ember,COLLAPSING.:crimson',
+    tag: 'INCURSION WARNING // <strong>AVENGERS: DOOMSDAY</strong>',
+    sub: 'Across the Sacred Timeline and branching realities, six phases of gods, soldiers, and cosmic conquerors collide toward a single point of no return.',
+    pill: 'NEXT GLOBAL EVENT: <span class="pill-highlight">AVENGERS: DOOMSDAY (MAY 2026)</span>'
+  },
+  {
+    headline: 'EVERY UNIVERSE HAS AN END.',
+    accents: 'EVERY:ember,UNIVERSE:white,END.:crimson',
+    tag: 'BEYOND THE SACRED TIMELINE // <strong>INCURSION ALERT</strong>',
+    sub: 'Parallel Earths are colliding in the dark. When two universes occupy the same space, only one can survive the impact.',
+    pill: 'OMEGA THREAT: <span class="pill-highlight">MULTIVERSE INCURSIONS</span>'
+  },
+  {
+    headline: 'THE FINAL COUNTDOWN HAS BEGUN.',
+    accents: 'FINAL:ember,COUNTDOWN:crimson,BEGUN.:white',
+    tag: 'PHASE 06 DIRECTIVE // <strong>ROAD TO DOOMSDAY</strong>',
+    sub: 'The clock is ticking across every timeline. Every alliance forged and every stone shattered leads directly to Victor Von Doom.',
+    pill: 'COUNTDOWN LOCKED: <span class="pill-highlight">AVENGERS: DOOMSDAY • MAY 1, 2026</span>'
+  },
+  {
+    headline: 'ARE YOU READY FOR DOOMSDAY?',
+    accents: 'READY:ember,DOOMSDAY?:crimson',
+    tag: 'THE CONQUEROR ARRIVES // <strong>AVENGERS: DOOMSDAY</strong>',
+    sub: 'No armor, no mystic spell, and no timeline branch is prepared for the iron mask of Doctor Doom.',
+    pill: 'THEATRICAL EVENT: <span class="pill-highlight">AVENGERS: DOOMSDAY</span>'
+  },
+  {
+    headline: 'ONE LAST BATTLE. INFINITE CONSEQUENCES.',
+    accents: 'LAST:ember,BATTLE.:crimson,INFINITE:ember,CONSEQUENCES.:crimson',
+    tag: 'THE GRAND CONVERGENCE // <strong>AVENGERS: SECRET WARS</strong>',
+    sub: 'Earth-616, Fox Mutants, the Fantastic Four, and the Spider-Verse converge for the ultimate war for existence.',
+    pill: 'SAGA FINALE: <span class="pill-highlight">AVENGERS: SECRET WARS (MAY 2027)</span>'
+  },
+  {
+    headline: 'THE END OF EVERYTHING IS JUST THE BEGINNING.',
+    accents: 'END:crimson,EVERYTHING:crimson,BEGINNING.:ember',
+    tag: 'BATTLEWORLD AWAITS // <strong>SECRET WARS & BEYOND</strong>',
+    sub: 'Out of the ashes of collapsed timelines, a new Marvel cosmos will be forged.',
+    pill: 'DESTINY: <span class="pill-highlight">AVENGERS: DOOMSDAY & SECRET WARS</span>'
+  }
+];
+
+const PHASE_INTERMISSION_COPY = {
+  0: {
+    kicker: 'PHASE 00 // LEGACY CONTINUUMS & ORIGINS',
+    headline: 'THE END OF EVERYTHING IS JUST THE BEGINNING.',
+    accents: 'END:crimson,EVERYTHING:crimson,BEGINNING.:ember',
+    sub: 'Legacy mutant realities and wartime origins that anchor the road to Avengers: Secret Wars.'
+  },
+  1: {
+    kicker: 'PHASE 01 // THE AVENGERS INITIATIVE (2008–2012)',
+    headline: 'SIX HEROES. ONE SINGULARITY. ZERO TURNING BACK.',
+    accents: 'SIX:ember,SINGULARITY.:crimson,BACK.:ember',
+    sub: 'The Tesseract awakens and Earth’s Mightiest Heroes assemble for the first time.'
+  },
+  2: {
+    kicker: 'PHASE 02 // COSMIC EXPANSION & ULTRON (2013–2015)',
+    headline: 'EVERY UNIVERSE HAS AN END.',
+    accents: 'EVERY:ember,UNIVERSE:white,END.:crimson',
+    sub: 'The Aether and Power Stone emerge in deep space while S.H.I.E.L.D. collapses from within.'
+  },
+  3: {
+    kicker: 'PHASE 03 // CIVIL WAR TO ENDGAME (2016–2019)',
+    headline: 'ONE LAST BATTLE. INFINITE CONSEQUENCES.',
+    accents: 'LAST:ember,BATTLE.:crimson,INFINITE:ember,CONSEQUENCES.:crimson',
+    sub: 'Divided heroes face Thanos across Titan and Wakanda before risking everything in the Time Heist.'
+  },
+  4: {
+    kicker: 'PHASE 04 // FRACTURING REALITIES (2021–2022)',
+    headline: 'THE MULTIVERSE IS COLLAPSING.',
+    accents: 'MULTIVERSE:ember,COLLAPSING.:crimson',
+    sub: 'He Who Remains falls, the Sacred Timeline branches, and rifts tear open across dimensions.'
+  },
+  5: {
+    kicker: 'PHASE 05 // INCURSIONS & ANCHOR BEINGS (2023–2025)',
+    headline: 'THE FINAL COUNTDOWN HAS BEGUN.',
+    accents: 'FINAL:ember,COUNTDOWN:crimson,BEGUN.:white',
+    sub: 'The Void, the Quantum Realm, and the New Avengers set the stage for Doctor Doom’s arrival.'
+  },
+  6: {
+    kicker: 'PHASE 06 // THE MULTIVERSE SAGA ENDGAME (2025–2027)',
+    headline: 'ARE YOU READY FOR DOOMSDAY?',
+    accents: 'READY:ember,DOOMSDAY?:crimson',
+    sub: 'The Fantastic Four arrive as all timelines converge in Avengers: Doomsday and Avengers: Secret Wars.'
+  }
+};
+
+function parseAccentMap(accentSpec = '') {
+  const map = {};
+  accentSpec.split(',').forEach(pair => {
+    const [word, style] = pair.split(':');
+    if (word && style) map[word.trim().toUpperCase()] = style.trim();
+  });
+  return map;
+}
+
+function buildCharRevealHTML(text, accentSpec = '') {
+  const accentMap = parseAccentMap(accentSpec);
+  const words = text.trim().split(/\s+/);
+  let charIndex = 0;
+
+  return words.map(word => {
+    const upper = word.toUpperCase();
+    const cleaned = upper.replace(/[.,?!:;]/g, '');
+    const accentType = accentMap[upper] || accentMap[cleaned] || 'white';
+    const charsHTML = [...word].map(ch => {
+      const idx = charIndex++;
+      return `<span class="tr-char" style="--char-idx: ${idx}">${ch}</span>`;
+    }).join('');
+    return `<span class="tr-word accent-${accentType}">${charsHTML}</span>`;
+  }).join(' ');
+}
+
+function buildSoundwaveHTML(barCount = 14) {
+  let bars = '';
+  for (let i = 0; i < barCount; i++) {
+    const waveIdx = Math.abs((barCount / 2) - i);
+    bars += `<span class="eq-bar" style="--eq-i: ${waveIdx}"></span>`;
+  }
+  return bars;
+}
+
+let trailerObserver = null;
+
+function observeIntermissionElements(root = document) {
+  if (!trailerObserver) {
+    trailerObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed');
+        } else if (entry.boundingClientRect.top > 0) {
+          // Re-arm when scrolling back above so the trailer reveal replays smoothly
+          entry.target.classList.remove('is-revealed');
+        }
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
+  }
+
+  root.querySelectorAll('.trailer-intermission, .phase-intermission-banner').forEach(el => {
+    trailerObserver.observe(el);
+  });
+}
+
+function initTrailerIntermissions() {
+  // Populate soundwaves
+  document.querySelectorAll('.trailer-soundwave').forEach(sw => {
+    sw.innerHTML = buildSoundwaveHTML(14);
+  });
+
+  // Convert all .trailer-hype-headline into character-by-character spans
+  document.querySelectorAll('.trailer-hype-headline').forEach(h2 => {
+    const rawText = h2.dataset.hypeText || h2.textContent.trim();
+    const accents = h2.dataset.accents || '';
+    h2.innerHTML = buildCharRevealHTML(rawText, accents);
+  });
+
+  // Setup interactive rotating slate switcher on the primary trailer intermission
+  const firstIntermission = document.querySelector('.trailer-intermission[data-intermission-idx="0"]');
+  if (firstIntermission) {
+    const switcher = firstIntermission.querySelector('.trailer-slate-switcher');
+    let currentSlate = 0;
+
+    function applySlate(idx) {
+      currentSlate = idx;
+      const slate = TRAILER_ROTATION_SLATES[idx];
+      const h2 = firstIntermission.querySelector('.trailer-hype-headline');
+      const tag = firstIntermission.querySelector('.trailer-event-tag');
+      const sub = firstIntermission.querySelector('.trailer-sub-narration');
+      const pill = firstIntermission.querySelector('.trailer-countdown-pill');
+
+      firstIntermission.classList.remove('is-revealed');
+      void firstIntermission.offsetWidth; // Reflow to retrigger character & flare animations
+
+      if (h2) h2.innerHTML = buildCharRevealHTML(slate.headline, slate.accents);
+      if (tag) tag.innerHTML = slate.tag;
+      if (sub) sub.textContent = slate.sub;
+      if (pill) pill.innerHTML = slate.pill;
+
+      if (switcher) {
+        switcher.querySelectorAll('.trailer-slate-dot').forEach((d, i) => {
+          d.classList.toggle('active', i === idx);
+        });
+      }
+
+      requestAnimationFrame(() => {
+        firstIntermission.classList.add('is-revealed');
+      });
+    }
+
+    if (switcher) {
+      switcher.innerHTML = TRAILER_ROTATION_SLATES.map((s, i) => `
+        <button class="trailer-slate-dot ${i === 0 ? 'active' : ''}" data-slate="${i}" aria-label="Show trailer message ${i + 1}: ${s.headline}"></button>
+      `).join('');
+
+      switcher.querySelectorAll('.trailer-slate-dot').forEach(btn => {
+        btn.addEventListener('click', () => {
+          applySlate(parseInt(btn.dataset.slate, 10));
+        });
+      });
+
+      // Gentle auto-rotation every 6.5s when visible in viewport
+      setInterval(() => {
+        const rect = firstIntermission.getBoundingClientRect();
+        const inView = rect.top < window.innerHeight * 0.85 && rect.bottom > 80;
+        if (inView && !document.hidden) {
+          applySlate((currentSlate + 1) % TRAILER_ROTATION_SLATES.length);
+        }
+      }, 6500);
+    }
+  }
+
+  observeIntermissionElements(document);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    SECTION 9: MOVIE ARCHIVE (RELEASE ORDER & CHRONOLOGICAL DUAL MODES)
 ═══════════════════════════════════════════════════════════════════ */
+function renderArchiveCardHTML(t) {
+  const isWatched = watchedSet.has(t.id);
+  const orderNum = activeArchiveOrder === 'chronological' ? t.chronologicalOrder : t.releaseOrder;
+  const typeLabel = t.type === 'movie' ? 'Film' : (t.type === 'series' ? 'Series' : 'Special');
+  const typeClass = t.type === 'movie' ? 'meta-type-movie' : 'meta-type-series';
+
+  return `
+    <div class="archive-card ${isWatched ? 'watched' : ''}" data-id="${t.id}">
+      <div class="archive-card-poster">
+        <img src="${t.poster}" alt="${t.title}" loading="lazy" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
+        <div class="archive-seq-pill">#${orderNum}</div>
+        <button class="archive-watched-check" data-id="${t.id}" title="Toggle Watched" aria-label="Mark ${t.title} as watched">
+          ✓
+        </button>
+      </div>
+      <div class="archive-card-body">
+        <div class="archive-card-meta">
+          <span class="${typeClass}">${typeLabel}</span>
+          <span>${t.year}</span>
+        </div>
+        <h4 class="archive-card-title">${t.title}</h4>
+        <p class="archive-card-summary">${t.synopsis || t.hook || ''}</p>
+      </div>
+    </div>
+  `;
+}
+
 function renderMovieArchive() {
   const grid = document.getElementById('archive-grid');
   if (!grid) return;
@@ -859,12 +1106,13 @@ function renderMovieArchive() {
   }
 
   // Filter by search
-  if (archiveSearchQuery.trim()) {
+  const hasSearch = Boolean(archiveSearchQuery.trim());
+  if (hasSearch) {
     const q = archiveSearchQuery.toLowerCase();
     list = list.filter(t => 
       t.title.toLowerCase().includes(q) ||
       (t.year && t.year.toString().includes(q)) ||
-      (t.phase && `phase ${t.phase}`.includes(q))
+      (t.phase !== undefined && `phase ${t.phase}`.includes(q))
     );
   }
 
@@ -872,36 +1120,54 @@ function renderMovieArchive() {
   updateArchiveStats();
 
   if (list.length === 0) {
+    grid.className = 'archive-grid';
     grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-secondary);">No titles match your archive filter.</div>`;
     return;
   }
 
-  grid.innerHTML = list.map(t => {
-    const isWatched = watchedSet.has(t.id);
-    const orderNum = activeArchiveOrder === 'chronological' ? t.chronologicalOrder : t.releaseOrder;
-    const typeLabel = t.type === 'movie' ? 'Film' : (t.type === 'series' ? 'Series' : 'Special');
-    const typeClass = t.type === 'movie' ? 'meta-type-movie' : 'meta-type-series';
+  // When browsing without an active text search, group by MCU Phases with cinematic trailer intermission banners
+  if (!hasSearch) {
+    grid.className = 'timeline-phases-stack';
+    const phasesOrder = [0, 1, 2, 3, 4, 5, 6];
+    const blocksHTML = phasesOrder.map(pNum => {
+      const phaseItems = list.filter(item => item.phase === pNum);
+      if (phaseItems.length === 0) return '';
 
-    return `
-      <div class="archive-card ${isWatched ? 'watched' : ''}" data-id="${t.id}">
-        <div class="archive-card-poster">
-          <img src="${t.poster}" alt="${t.title}" loading="lazy" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
-          <div class="archive-seq-pill">#${orderNum}</div>
-          <button class="archive-watched-check" data-id="${t.id}" title="Toggle Watched" aria-label="Mark ${t.title} as watched">
-            ✓
-          </button>
-        </div>
-        <div class="archive-card-body">
-          <div class="archive-card-meta">
-            <span class="${typeClass}">${typeLabel}</span>
-            <span>${t.year}</span>
+      const watchedInPhase = phaseItems.filter(item => watchedSet.has(item.id)).length;
+      const copy = PHASE_INTERMISSION_COPY[pNum] || PHASE_INTERMISSION_COPY[6];
+      const charHTML = buildCharRevealHTML(copy.headline, copy.accents);
+      const soundHTML = buildSoundwaveHTML(10);
+
+      return `
+        <div class="timeline-phase-block" data-phase-block="${pNum}">
+          <div class="phase-intermission-banner">
+            <div class="phase-intermission-left">
+              <div class="phase-intermission-kicker">
+                <span class="trailer-rec-dot"></span>
+                <span>${copy.kicker}</span>
+                <span class="trailer-soundwave" aria-hidden="true">${soundHTML}</span>
+              </div>
+              <h3 class="phase-intermission-quote">${charHTML}</h3>
+              <p class="phase-intermission-sub">${copy.sub}</p>
+            </div>
+            <div class="phase-intermission-right">
+              <span class="phase-meta-badge">PHASE 0${pNum}</span>
+              <span class="phase-watched-pill">${watchedInPhase} / ${phaseItems.length} WATCHED</span>
+            </div>
           </div>
-          <h4 class="archive-card-title">${t.title}</h4>
-          <p class="archive-card-summary">${t.synopsis || t.hook || ''}</p>
+          <div class="archive-grid">
+            ${phaseItems.map(renderArchiveCardHTML).join('')}
+          </div>
         </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
+
+    grid.innerHTML = blocksHTML;
+    observeIntermissionElements(grid);
+  } else {
+    grid.className = 'archive-grid';
+    grid.innerHTML = list.map(renderArchiveCardHTML).join('');
+  }
 
   // Bind clicks
   grid.querySelectorAll('.archive-card').forEach(card => {
@@ -1211,6 +1477,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroStats();
   initCosmicAudio();
   initMultiverseNav();
+  initTrailerIntermissions();
   renderBranchRealities();
   renderInfinitySaga();
   renderMultiverseSaga();

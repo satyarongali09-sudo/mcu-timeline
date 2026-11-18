@@ -330,6 +330,36 @@ export const CHARACTER_PORTRAIT_REGISTRY = {
     fallbackPoster: `${VERCEL_ASSET_BASE}/photos/27.jpg?v=2`,
     name: 'Elektra',
     universe: 'MCU Canon (Earth-616)'
+  },
+  'speed-tommy-shepherd': {
+    portrait: `${VERCEL_ASSET_BASE}/photos/77.jpg?v=2`,
+    fallbackPoster: `${SUPERHERO_CDN_BASE}/536-quicksilver.jpg`,
+    name: 'Speed (Tommy Shepherd)',
+    universe: 'MCU Canon (Earth-616 • VisionQuest)'
+  },
+  'punisher': {
+    portrait: `${SUPERHERO_CDN_BASE}/530-punisher.jpg`,
+    fallbackPoster: `${VERCEL_ASSET_BASE}/photos/25.jpg?v=2`,
+    name: 'The Punisher',
+    universe: 'MCU Canon (Earth-616)'
+  },
+  'jean-grey': {
+    portrait: `${SUPERHERO_CDN_BASE}/356-jean-grey.jpg`,
+    fallbackPoster: `${VERCEL_ASSET_BASE}/photos/101.jpg?v=2`,
+    name: 'Jean Grey / Phoenix',
+    universe: 'Fox Mutant Universe (Earth-10005)'
+  },
+  'professor-x': {
+    portrait: `${SUPERHERO_CDN_BASE}/527-professor-x.jpg`,
+    fallbackPoster: `${VERCEL_ASSET_BASE}/photos/101.jpg?v=2`,
+    name: 'Professor X',
+    universe: 'Fox Mutant Universe (Earth-10005) & Earth-838'
+  },
+  'magneto': {
+    portrait: `${SUPERHERO_CDN_BASE}/423-magneto.jpg`,
+    fallbackPoster: `${VERCEL_ASSET_BASE}/photos/102.jpg?v=2`,
+    name: 'Magneto',
+    universe: 'Fox Mutant Universe (Earth-10005)'
   }
 };
 

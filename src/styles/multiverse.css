@@ -1,7 +1,151 @@
 /* ═══════════════════════════════════════════════════════════════════
    MCU TIMELINE: THE MULTIVERSE EXPERIENCE — MASTER STYLESHEET
-   Design System Authority: design-md.md
+   Design System Authority: design-md.md + 15 Custom Marvel Franchise Fonts
 ═══════════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Avengero';
+  src: url('/fonts/AvengeroRegular-zvgl.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avengeance';
+  src: url('/fonts/Avengeance-YolO.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avengeance Heroic';
+  src: url('/fonts/AvengeanceHeroicAvengerBold-MM2J.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avengeance Mightiest';
+  src: url('/fonts/AvengeanceMightiestAvenger-837g.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heroes Assemble';
+  src: url('/fonts/HeroesAssembleRegular-Kmvl.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heroes Assemble Expanded';
+  src: url('/fonts/HeroesAssembleBoldExpanded-WELO.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'American Captain Patrius';
+  src: url('/fonts/AmericanCaptainPatrius02Fre-PvPd.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Amcap Eternal';
+  src: url('/fonts/AmcapEternal-xK95.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'American Purpose';
+  src: url('/fonts/AmericanPurposeCasual01-BzqV.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Wakanda Fanther';
+  src: url('/fonts/WakandaFanther-JRpp7.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mighty Spidey';
+  src: url('/fonts/Mightyspidey-pmaa.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Deadpool Movie';
+  src: url('/fonts/DeadpoolMovie-9AzL.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Herodevil Caps';
+  src: url('/fonts/HerodevilCapsDemoRegular-DYeaR.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Black Widow Movie';
+  src: url('/fonts/BlackWidowMovie-d95Rg.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Galactic Vanguardian';
+  src: url('/fonts/GalacticVanguardianNcv-myVP.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ace Of Swords';
+  src: url('/fonts/AceOfSwords-R9x9W.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Speedy';
+  src: url('/fonts/SpeedyRegular-7BLoE.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Deathe Maach';
+  src: url('/fonts/DeatheMaachNcv-2ejv.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --bg-void: #050505;
@@ -32,14 +176,98 @@
   --quantum-cyan: #00F0FF;
   --stark-gold: #D6B36A;
 
-  --font-display: 'Bebas Neue', sans-serif;
+  --font-display: 'Bebas Neue', 'American Captain Patrius', sans-serif;
   --font-body: 'Outfit', -apple-system, sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
+
+  /* 15 Custom Marvel Franchise Font Tokens */
+  --font-avengero: 'Avengero', 'Bebas Neue', sans-serif;
+  --font-avengeance: 'Avengeance Heroic', 'Avengeance', 'Bebas Neue', sans-serif;
+  --font-heroes-assemble: 'Heroes Assemble', 'Bebas Neue', sans-serif;
+  --font-captain: 'American Captain Patrius', 'Bebas Neue', sans-serif;
+  --font-eternal: 'Amcap Eternal', 'Bebas Neue', sans-serif;
+  --font-purpose: 'American Purpose', 'Bebas Neue', sans-serif;
+  --font-wakanda: 'Wakanda Fanther', 'Bebas Neue', sans-serif;
+  --font-spidey: 'Mighty Spidey', 'Bebas Neue', sans-serif;
+  --font-deadpool: 'Deadpool Movie', 'Bebas Neue', sans-serif;
+  --font-daredevil: 'Herodevil Caps', 'Bebas Neue', sans-serif;
+  --font-widow: 'Black Widow Movie', 'Bebas Neue', sans-serif;
+  --font-guardians: 'Galactic Vanguardian', 'Bebas Neue', sans-serif;
+  --font-thor: 'Ace Of Swords', 'Bebas Neue', sans-serif;
+  --font-speedy: 'Speedy', 'Bebas Neue', sans-serif;
+  --font-doom-dark: 'Deathe Maach', 'Bebas Neue', sans-serif;
 
   --card-radius: 14px;
   --shadow-deep: 0 16px 40px rgba(0, 0, 0, 0.85);
   --shadow-glow: 0 0 25px rgba(0, 230, 118, 0.25);
   --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Franchise-Specific Typography Classes */
+.font-franchise-avengers {
+  font-family: var(--font-avengero) !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase;
+}
+.font-franchise-spidey {
+  font-family: var(--font-spidey) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+}
+.font-franchise-wakanda {
+  font-family: var(--font-wakanda) !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase;
+}
+.font-franchise-captain {
+  font-family: var(--font-captain) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+}
+.font-franchise-deadpool {
+  font-family: var(--font-deadpool) !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase;
+}
+.font-franchise-daredevil {
+  font-family: var(--font-daredevil) !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase;
+}
+.font-franchise-widow {
+  font-family: var(--font-widow) !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase;
+}
+.font-franchise-guardians {
+  font-family: var(--font-guardians) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+}
+.font-franchise-thor {
+  font-family: var(--font-thor) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+}
+.font-franchise-speed {
+  font-family: var(--font-speedy) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+}
+.font-franchise-dark {
+  font-family: var(--font-doom-dark) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+}
+.font-franchise-eternal {
+  font-family: var(--font-eternal) !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase;
+}
+.font-franchise-purpose {
+  font-family: var(--font-purpose) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
 }
 
 *, *::before, *::after {

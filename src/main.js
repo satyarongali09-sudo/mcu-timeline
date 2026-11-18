@@ -397,10 +397,10 @@ function renderInfinitySaga() {
         </div>
         <div class="saga-card-info">
           <div class="saga-card-meta">
+            <span title="In-Universe Era">🕐 ${t.inUniverseYear || t.year}</span>
             <span>${t.year}</span>
-            <span>${t.runtime}</span>
           </div>
-          <h4 class="saga-card-title">${t.title}</h4>
+          <h4 class="saga-card-title ${t.franchiseFont || ''}">${t.title}</h4>
         </div>
       </div>
     `;
@@ -458,10 +458,10 @@ function renderMultiverseSaga() {
         </div>
         <div class="multiverse-card-details">
           <div class="multiverse-card-meta">
-            <span class="m-phase">Phase ${t.phase}</span>
+            <span class="m-phase">Phase ${t.phase} • ${t.inUniverseYear || t.year}</span>
             <span class="m-year">${t.year}</span>
           </div>
-          <h4 class="multiverse-card-title">${t.title}</h4>
+          <h4 class="multiverse-card-title ${t.franchiseFont || ''}">${t.title}</h4>
           <p class="multiverse-card-desc">${t.synopsis || t.hook || ''}</p>
         </div>
       </div>
@@ -490,7 +490,7 @@ function initMultiverseTabs() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   SECTION 6: CHARACTER UNIVERSE (AUDITED 44 CHARACTERS)
+   SECTION 6: CHARACTER UNIVERSE (AUDITED 49 CHARACTERS)
 ═══════════════════════════════════════════════════════════════════ */
 function renderCharacterGallery() {
   const grid = document.getElementById('characters-grid');
@@ -530,7 +530,7 @@ function renderCharacterGallery() {
           <div class="char-audit-status">${rawAnomalies}</div>
         </div>
         <div class="char-card-info">
-          <h3 class="char-name">${c.name}</h3>
+          <h3 class="char-name ${c.franchiseFont || ''}">${c.name}</h3>
           <div class="char-real-name">${c.realName}</div>
           <div class="char-role-badge">${c.identity} • ${c.category}</div>
           
@@ -1092,9 +1092,9 @@ function renderDoomsdaySection() {
           <div class="dd-card-info">
             <div>
               <span class="dd-category-tag">${item.doomsdayCategory || 'Essential'}</span>
-              <span class="dd-card-year">${item.year}</span>
+              <span class="dd-card-year">🕐 ${item.inUniverseYear || item.year} • ${item.year}</span>
             </div>
-            <div class="dd-card-title">${item.title}</div>
+            <div class="dd-card-title ${item.franchiseFont || ''}">${item.title}</div>
             <div class="dd-reason-box">${item.doomsdayReason}</div>
             ${item.doomsdayEpisodes ? `<div class="dd-episodes-box">💡 ${item.doomsdayEpisodes}</div>` : ''}
           </div>
@@ -1399,9 +1399,10 @@ function renderArchiveCardHTML(t, nextUnwatchedId) {
       <div class="archive-card-body">
         <div class="archive-card-meta">
           <span class="${typeClass}">${typeLabel}</span>
-          <span>${t.year}</span>
+          <span title="In-Universe Chronological Era">🕐 ${t.inUniverseYear || t.year}</span>
+          <span style="opacity:0.7;">${t.year}</span>
         </div>
-        <h4 class="archive-card-title">${t.title}</h4>
+        <h4 class="archive-card-title ${t.franchiseFont || ''}">${t.title}</h4>
         <p class="archive-card-summary">${t.synopsis || t.hook || ''}</p>
         <a href="${t.watchUrl}" target="_blank" rel="noopener noreferrer" class="archive-watch-link" onclick="event.stopPropagation();">
           <span>● Watch on ${t.watch}</span>
@@ -1817,7 +1818,7 @@ function openCharacterDossier(charObj) {
           <div style="font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: ${charObj.accentColor || '#3C8DFF'}; font-weight: 700;">
             ${charObj.category?.toUpperCase() || 'CLASSIFIED'} • ${charObj.identity}
           </div>
-          <h2>${charObj.name}</h2>
+          <h2 class="${charObj.franchiseFont || ''}">${charObj.name}</h2>
           <div class="dossier-realname">${charObj.realName}</div>
         </div>
 
@@ -1870,8 +1871,8 @@ function openMovieModal(item) {
               ${item.dimension}
             </span>
           </div>
-          <h2>${item.title}</h2>
-          <div class="dossier-realname">${item.year} • Release #${item.releaseOrder} • Chronological #${item.chronologicalOrder}</div>
+          <h2 class="${item.franchiseFont || ''}">${item.title}</h2>
+          <div class="dossier-realname">In-Universe Era: ${item.inUniverseYear || item.year} • Released: ${item.year} • Release #${item.releaseOrder} • Chronological #${item.chronologicalOrder}</div>
         </div>
 
         <p style="font-size: 0.92rem; line-height: 1.6; color: var(--text-primary);">${item.synopsis || item.hook || ''}</p>

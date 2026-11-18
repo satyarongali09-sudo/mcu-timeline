@@ -806,6 +806,96 @@ export const AUDITED_CHARACTERS = [
     networkEigen: 0.0430,
     networkBetween: 0.0070,
     rawAudit: "Verified dual affiliation with Chaste/Hand and Defenders street lore."
+  },
+  {
+    id: "speed-tommy-shepherd",
+    name: "Speed",
+    realName: "Thomas 'Tommy' Shepherd / Maximoff",
+    affiliation: "Young Avengers / Nexus Nine",
+    role: "Hero",
+    powerLevel: "Supersonic Speedster",
+    continuity: "MCU Canon (Earth-616 • VisionQuest)",
+    accentColor: "#00E676",
+    portrait: "https://mcu-timelines.vercel.app/photos/77.jpg?v=2",
+    powers: ["Supersonic Hyper-Velocity", "Kinetic Molecular Acceleration", "Vibrational Detonation", "Intangibility Phasing"],
+    bio: "Supersonic son of Wanda Maximoff and Vision and twin brother of Billy Maximoff (Wiccan). Reincarnated as Thomas Shepherd (portrayed by Ruaridh Mollica in VisionQuest), he channels hyper-velocity speed and kinetic molecular acceleration.",
+    notableAppearances: ["WandaVision (2021)", "Agatha All Along (2024)", "VisionQuest (2026)"],
+    networkDegree: 0.14,
+    networkEigen: 0.0610,
+    networkBetween: 0.0140,
+    rawAudit: "Added from Marvel.com official VisionQuest & Young Avengers dossier."
+  },
+  {
+    id: "punisher",
+    name: "The Punisher",
+    realName: "Frank Castle",
+    affiliation: "Street-Level / Defenders Ally",
+    role: "Antihero",
+    powerLevel: "Tactical Special Forces",
+    continuity: "MCU Canon (Earth-616)",
+    accentColor: "#94A3B8",
+    portrait: "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/530-punisher.jpg",
+    powers: ["USMC Force Recon Mastery", "Extreme Pain Tolerance", "Heavy Ordnance & Ballistics", "Close-Quarters Guerrilla Warfare"],
+    bio: "Decorated Marine veteran who wages a relentless one-man war on organized crime after his family's murder, clashing and teaming up with Daredevil and Spider-Man in 2027–2028.",
+    notableAppearances: ["Daredevil Season 2 (2016)", "The Punisher (2017–2019)", "Daredevil: Born Again (2025–2026)", "Spider-Man: Brand New Day (2026)"],
+    networkDegree: 0.16,
+    networkEigen: 0.0690,
+    networkBetween: 0.0180,
+    rawAudit: "Verified canonical Earth-616 trajectory through Born Again, One Last Kill, and Brand New Day."
+  },
+  {
+    id: "jean-grey",
+    name: "Jean Grey / Phoenix",
+    realName: "Dr. Jean Grey",
+    affiliation: "X-Men",
+    role: "Hero",
+    powerLevel: "Omega-Level Mutant / Cosmic Avatar",
+    continuity: "Fox Mutant Universe (Earth-10005)",
+    accentColor: "#F97316",
+    portrait: "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/356-jean-grey.jpg",
+    powers: ["Omega-Level Telepathy", "Molecular Telekinesis", "Phoenix Force Cosmic Pyrokinesis", "Psychic Astral Projection"],
+    bio: "Founding X-Men telepath and telekinetic powerhouse whose bond with the primordial Phoenix Force makes her fire and life incarnate across the mutant cosmos.",
+    notableAppearances: ["X-Men (2000)", "X2: X-Men United (2003)", "X-Men: Days of Future Past (2014)"],
+    networkDegree: 0.17,
+    networkEigen: 0.0740,
+    networkBetween: 0.0190,
+    rawAudit: "Added from Marvel.com Phoenix / Jean Grey canonical mutant dossier."
+  },
+  {
+    id: "professor-x",
+    name: "Professor X",
+    realName: "Charles Francis Xavier",
+    affiliation: "X-Men / Illuminati",
+    role: "Hero",
+    powerLevel: "Alpha-Omega Telepath",
+    continuity: "Fox Mutant Universe (Earth-10005) & Earth-838",
+    accentColor: "#38BDF8",
+    portrait: "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/527-professor-x.jpg",
+    powers: ["Planetary Telepathy (Cerebro)", "Psionic Mind Control & Shielding", "Astral Plane Combat", "Memory Restoration"],
+    bio: "Founder of Xavier's School for Gifted Youngsters and member of Earth-838's Illuminati who championed peaceful coexistence between humanity and mutantkind.",
+    notableAppearances: ["X-Men (2000)", "X2: X-Men United (2003)", "Logan (2017)", "Doctor Strange in the Multiverse of Madness (2022)"],
+    networkDegree: 0.21,
+    networkEigen: 0.0890,
+    networkBetween: 0.0290,
+    rawAudit: "Verified across Earth-10005 and Earth-838 Illuminati multiversal appearances."
+  },
+  {
+    id: "magneto",
+    name: "Magneto",
+    realName: "Erik Magnus Lehnsherr",
+    affiliation: "X-Men / Brotherhood of Mutants",
+    role: "Antihero",
+    powerLevel: "Omega-Level Electromagnetism",
+    continuity: "Fox Mutant Universe (Earth-10005)",
+    accentColor: "#A855F7",
+    portrait: "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/423-magneto.jpg",
+    powers: ["Electromagnetic Spectrum Manipulation", "Ferrous Metal & Planetary Field Control", "Magnetic Force-Field Generation", "Levitation Flight"],
+    bio: "Holocaust survivor and master of magnetism whose fierce devotion to mutant survival made him Charles Xavier's greatest rival and oldest friend.",
+    notableAppearances: ["X-Men (2000)", "X2: X-Men United (2003)", "X-Men: First Class (2011)", "Days of Future Past (2014)"],
+    networkDegree: 0.20,
+    networkEigen: 0.0860,
+    networkBetween: 0.0260,
+    rawAudit: "Verified Omega-level electromagnetic mutant profile."
   }
 ];
 
@@ -822,6 +912,7 @@ export const CATEGORIES = [
 ];
 
 import { CHARACTER_PORTRAIT_REGISTRY } from './mediaRegistry.js';
+import { getFranchiseFontClass } from './timeline.js';
 
 export const charactersData = AUDITED_CHARACTERS.map(c => {
   const reg = CHARACTER_PORTRAIT_REGISTRY[c.id] || {};
@@ -829,22 +920,22 @@ export const charactersData = AUDITED_CHARACTERS.map(c => {
   const aff = (c.affiliation || '').toLowerCase();
   const bioAndPowers = ((c.bio || '') + ' ' + (c.powers || []).join(' ')).toLowerCase();
 
-  if (aff.includes('avenger') || ['iron-man', 'captain-america', 'thor', 'black-widow', 'hulk', 'spider-man', 'black-panther', 'ant-man', 'vision', 'hawkeye', 'bucky-barnes', 'falcon', 'captain-marvel', 'scarlet-witch', 'doctor-strange', 'shang-chi'].includes(c.id)) {
+  if (aff.includes('avenger') || ['iron-man', 'captain-america', 'thor', 'black-widow', 'hulk', 'spider-man', 'black-panther', 'ant-man', 'vision', 'hawkeye', 'bucky-barnes', 'falcon', 'captain-marvel', 'scarlet-witch', 'doctor-strange', 'shang-chi', 'speed-tommy-shepherd'].includes(c.id)) {
     tags.add('Avengers');
   }
-  if (aff.includes('guardian') || aff.includes('cosmic') || aff.includes('asgard') || aff.includes('inhuman') || ['thor', 'gamora', 'star-lord', 'rocket-raccoon', 'thanos', 'captain-marvel', 'silver-surfer', 'mantis', 'valkyrie', 'hela', 'black-bolt'].includes(c.id)) {
+  if (aff.includes('guardian') || aff.includes('cosmic') || aff.includes('asgard') || aff.includes('inhuman') || ['thor', 'gamora', 'star-lord', 'rocket-raccoon', 'thanos', 'captain-marvel', 'silver-surfer', 'mantis', 'valkyrie', 'hela', 'black-bolt', 'jean-grey'].includes(c.id)) {
     tags.add('Cosmic');
   }
-  if (aff.includes('mystic') || bioAndPowers.includes('sorcer') || bioAndPowers.includes('magic') || ['doctor-strange', 'scarlet-witch', 'loki', 'moon-knight', 'doctor-doom', 'hela', 'shang-chi'].includes(c.id)) {
+  if (aff.includes('mystic') || bioAndPowers.includes('sorcer') || bioAndPowers.includes('magic') || ['doctor-strange', 'scarlet-witch', 'loki', 'moon-knight', 'doctor-doom', 'hela', 'shang-chi', 'speed-tommy-shepherd'].includes(c.id)) {
     tags.add('Mystic');
   }
-  if (aff.includes('x-men') || aff.includes('mutant') || (c.continuity || '').toLowerCase().includes('mutant') || ['wolverine', 'deadpool'].includes(c.id)) {
+  if (aff.includes('x-men') || aff.includes('mutant') || (c.continuity || '').toLowerCase().includes('mutant') || ['wolverine', 'deadpool', 'jean-grey', 'professor-x', 'magneto'].includes(c.id)) {
     tags.add('Mutants');
   }
-  if ((c.role || '').toLowerCase() === 'villain' || ['thanos', 'doctor-doom', 'green-goblin', 'doctor-octopus', 'mysterio', 'rhino', 'red-skull', 'ultron', 'hela', 'loki', 'venom'].includes(c.id)) {
+  if ((c.role || '').toLowerCase() === 'villain' || ['thanos', 'doctor-doom', 'green-goblin', 'doctor-octopus', 'mysterio', 'rhino', 'red-skull', 'ultron', 'hela', 'loki', 'venom', 'magneto'].includes(c.id)) {
     tags.add('Villains');
   }
-  if (aff.includes('defender') || ['spider-man', 'daredevil', 'luke-cage', 'elektra', 'moon-knight', 'hawkeye', 'venom'].includes(c.id)) {
+  if (aff.includes('defender') || ['spider-man', 'daredevil', 'luke-cage', 'elektra', 'moon-knight', 'hawkeye', 'venom', 'punisher'].includes(c.id)) {
     tags.add('Street Level');
   }
   if (aff.includes('fantastic') || ['mister-fantastic', 'invisible-woman', 'human-torch', 'thing', 'silver-surfer', 'doctor-doom'].includes(c.id)) {
@@ -856,6 +947,7 @@ export const charactersData = AUDITED_CHARACTERS.map(c => {
     portrait: reg.portrait || c.portrait,
     image: reg.portrait || c.portrait || c.image,
     fallbackPoster: reg.fallbackPoster || '',
+    franchiseFont: getFranchiseFontClass(c.name + ' ' + c.affiliation),
     universe: c.continuity || c.universe,
     identity: c.role || c.identity,
     category: c.affiliation || c.category || 'Independent',
@@ -865,9 +957,9 @@ export const charactersData = AUDITED_CHARACTERS.map(c => {
       : c.rawAudit,
     powerLevel: (c.powerLevel && typeof c.powerLevel === 'object') ? c.powerLevel : {
       combat: Math.round(72 + (c.networkDegree || 0.15) * 85),
-      energy: c.powers?.some(p => /energy|magic|cosmic|beam|blast|reality|sonic|flame|sorcery/i.test(p)) ? 94 : 68,
-      intelligence: /stark|genius|scientist|surgeon|pym|banner|doom|richards|octavius|vision|shuri|rocket/i.test(c.bio + ' ' + c.name + ' ' + c.realName) ? 96 : 80,
-      strength: /hulk|thor|thing|thanos|wolverine|captain|panther|cage|venom|rhino|ultron|hela|surfer|marvel/i.test(c.name) ? 95 : 76
+      energy: c.powers?.some(p => /energy|magic|cosmic|beam|blast|reality|sonic|flame|sorcery|telekinesis|electromagnetic|velocity/i.test(p)) ? 94 : 68,
+      intelligence: /stark|genius|scientist|surgeon|pym|banner|doom|richards|octavius|vision|shuri|rocket|xavier/i.test(c.bio + ' ' + c.name + ' ' + c.realName) ? 96 : 80,
+      strength: /hulk|thor|thing|thanos|wolverine|captain|panther|cage|venom|rhino|ultron|hela|surfer|marvel|phoenix/i.test(c.name) ? 95 : 76
     }
   };
 });

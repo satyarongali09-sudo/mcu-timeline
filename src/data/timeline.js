@@ -78,115 +78,323 @@ export const MCU_DATA = [{"phase":"Phase 0 — Multiverse Origins & Mutants","ph
       {"id":75,"title":"Avengers: Doomsday","year":"May 1, 2026","type":"Movie","summary":"Earth's heroes face Doctor Doom in a cataclysmic showdown that threatens the entire Marvel multiverse.","watch":"Coming May 1, 2026"},
       {"id":76,"title":"Avengers: Secret Wars","year":"May 7, 2027","type":"Movie","summary":"The ultimate battle across the multiverse — the culmination of the entire Multiverse Saga.","watch":"Coming May 7, 2027"}]}];;
 
-export const CHRONOLOGICAL_ORDER = MCU_DATA.flatMap(p => p.items).slice().sort((a,b)=>(a.id===101?-1:0));
+export const DOOMSDAY_FAST_TRACK_META = {
+  5: {
+    doomsdayEssential: true,
+    doomsdayCategory: "Core Saga",
+    doomsdayReason: "Establishes Tony Stark's origin and legacy, providing vital context for Robert Downey Jr.'s return as Doctor Doom."
+  },
+  22: {
+    doomsdayEssential: true,
+    doomsdayCategory: "Core Saga",
+    doomsdayReason: "Fractures the Avengers team, setting up the divided superhero landscape carrying into the Multiverse Saga."
+  },
+  35: {
+    doomsdayEssential: true,
+    doomsdayCategory: "Core Saga",
+    doomsdayReason: "The benchmark crossover event showing Earth's heroes assembling against an existential universal threat."
+  },
+  38: {
+    doomsdayEssential: true,
+    doomsdayCategory: "Core Saga",
+    doomsdayReason: "Direct precursor to the Multiverse Saga — Quantum Realm time travel and Infinity Stone destruction created initial multiversal rifts."
+  },
+  41: {
+    doomsdayEssential: true,
+    doomsdayCategory: "Multiverse Rules",
+    doomsdayReason: "The core rulebook for the Multiverse Saga — introduces the TVA, branching timelines, and multiversal warfare.",
+    doomsdayEpisodes: "Short on time? Watch Episode 6 ('For All Time. Always.')"
+  },
+  47: {
+    doomsdayEssential: true,
+    doomsdayCategory: "Multiverse Rules",
+    doomsdayReason: "Demonstrates the catastrophic consequences of spell failure and reality rifts bringing multiversal variants together."
+  },
+  49: {
+    doomsdayEssential: true,
+    doomsdayCategory: "Multiverse Rules",
+    doomsdayReason: "Explicitly defines 'Incursions' — the collision and mutual destruction of universes, which is the primary threat in Doomsday."
+  },
+  56: {
+    doomsdayEssential: true,
+    doomsdayCategory: "Multiverse Rules",
+    doomsdayReason: "Explores the Quantum Realm beyond space-time and the mechanics of multiversal variants across dimensions."
+  },
+  59: {
+    doomsdayEssential: true,
+    doomsdayCategory: "Multiverse Rules",
+    doomsdayReason: "Establishes God Loki, the Yggdrasil Multiversal Time Tree, and the fragile stability holding reality together.",
+    doomsdayEpisodes: "Short on time? Watch Episode 6 ('Glorious Purpose')"
+  },
+  64: {
+    doomsdayEssential: true,
+    doomsdayCategory: "New Teams & Lead-Ins",
+    doomsdayReason: "Integrates the X-Men/Fox universe into the MCU, introducing Anchor Beings, the Void, and TVA multiversal rescue."
+  },
+  69: {
+    doomsdayEssential: true,
+    doomsdayCategory: "New Teams & Lead-Ins",
+    doomsdayReason: "Assembles Earth's new pragmatic team of anti-heroes forming the main Avengers frontline defense before Doomsday."
+  },
+  72: {
+    doomsdayEssential: true,
+    doomsdayCategory: "New Teams & Lead-Ins",
+    doomsdayReason: "Introduces Marvel's First Family (Reed, Sue, Johnny, Ben) from an alternate retro-futuristic universe, setting up Doom's central rivals."
+  },
+  77: {
+    doomsdayEssential: true,
+    doomsdayCategory: "New Teams & Lead-Ins",
+    doomsdayReason: "Concludes the WandaVision trilogy — White Vision reclaims his identity alongside Tommy Maximoff (Speed) and confronts a revived Ultron before Doomsday."
+  }
+};
+
+export const DOOMSDAY_BRANCHES = {
+  1: {
+    id: "doomsday-branch-1",
+    label: "MUTANT LEGACY",
+    title: "CHAPTER I: MUTANT LEGACY & ANCHORS",
+    tagline: "The classic Fox Mutant reality introducing Wolverine, Xavier, and Magneto.",
+    color: "#3b82f6",
+    asset: "https://mcu-timelines.vercel.app/branch%201.webp",
+    mobAsset: "https://mcu-timelines.vercel.app/branch%201%20mob.webp",
+    movies: [
+      { id: "101", title: "1. X-Men (2000)", year: "2000" },
+      { id: "102", title: "2. X2: X-Men United (2003)", year: "2003" }
+    ]
+  },
+  2: {
+    id: "doomsday-branch-2",
+    label: "AVENGERS ASSEMBLE",
+    title: "CHAPTER II: AVENGERS ORIGINS & ASSEMBLY",
+    tagline: "WWII super-soldier origin & Earth's Mightiest Heroes first assembly.",
+    color: "#ff2a2a",
+    asset: "https://mcu-timelines.vercel.app/branch%202.webp",
+    mobAsset: "https://mcu-timelines.vercel.app/branch%202%20mob.webp",
+    movies: [
+      { id: "1", title: "3. Captain America: The First Avenger (2011)", year: "2011" },
+      { id: "9", title: "4. The Avengers (2012)", year: "2012" }
+    ]
+  },
+  3: {
+    id: "doomsday-branch-3",
+    label: "INFINITY CLIMAX",
+    title: "CHAPTER III: INFINITY CLIMAX",
+    tagline: "The snap of Thanos & quantum timeline fractures that cracked open the Multiverse.",
+    color: "#00f0ff",
+    asset: "https://mcu-timelines.vercel.app/branch%203.webp",
+    mobAsset: "https://mcu-timelines.vercel.app/branch%203%20mob.webp",
+    movies: [
+      { id: "35", title: "5. Avengers: Infinity War (2018)", year: "2018" },
+      { id: "38", title: "6. Avengers: Endgame (2019)", year: "2019" }
+    ]
+  },
+  4: {
+    id: "doomsday-branch-4",
+    label: "SACRED TIMELINE & TVA",
+    title: "CHAPTER IV: SACRED TIMELINE & GOD LOKI",
+    tagline: "God Loki holding all multiversal timeline branches together at the End of Time.",
+    color: "#eab308",
+    asset: "https://mcu-timelines.vercel.app/branch%204.webp",
+    mobAsset: "https://mcu-timelines.vercel.app/branch%204.webp",
+    movies: [
+      { id: "41", title: "7. Loki – Season 1 & 2", year: "2021-2023" }
+    ]
+  },
+  5: {
+    id: "doomsday-branch-5",
+    label: "DIMENSIONAL BEACONS & INCURSIONS",
+    title: "CHAPTER V: DIMENSIONAL BEACONS & INCURSIONS",
+    tagline: "Ancient ring beacons calling across dimensions & catastrophic reality collision warnings.",
+    color: "#a855f7",
+    asset: "https://mcu-timelines.vercel.app/branch%205.webp",
+    mobAsset: "https://mcu-timelines.vercel.app/branch%205%20mob.webp",
+    movies: [
+      { id: "43", title: "8. Shang-Chi and the Legend of the Ten Rings (2021)", year: "2021" },
+      { id: "47", title: "9. Spider-Man: No Way Home (2021)", year: "2021" },
+      { id: "49", title: "10. Doctor Strange in the Multiverse of Madness (2022)", year: "2022" }
+    ]
+  },
+  6: {
+    id: "doomsday-branch-6",
+    label: "VIBRANIUM & VOID REFUGEES",
+    title: "CHAPTER VI: VIBRANIUM & VOID ANCHORS",
+    tagline: "Global Vibranium geopolitics & Void hero rescue integrating Fox Mutant legacy.",
+    color: "#00d4ff",
+    asset: "https://mcu-timelines.vercel.app/branch%206.webp",
+    mobAsset: "https://mcu-timelines.vercel.app/branch%206%20mob.webp",
+    movies: [
+      { id: "53", title: "11. Black Panther: Wakanda Forever (2022)", year: "2022" },
+      { id: "64", title: "12. Deadpool & Wolverine (2024)", year: "2024" }
+    ]
+  },
+  7: {
+    id: "doomsday-branch-7",
+    label: "NEW WORLD & DOOM LEAD-INS",
+    title: "CHAPTER VII: NEW WORLD ORDER & DOOM LEAD-INS",
+    tagline: "New Avengers Adamantium war, anti-hero frontline & Marvel's First Family arrival.",
+    color: "#00e676",
+    asset: "https://mcu-timelines.vercel.app/branch%207.webp",
+    mobAsset: "https://mcu-timelines.vercel.app/branch%207%20mob.webp",
+    movies: [
+      { id: "68", title: "13. Captain America: Brave New World (2025)", year: "2025" },
+      { id: "69", title: "14. Thunderbolts* (2025)", year: "2025" },
+      { id: "72", title: "15. The Fantastic Four: First Steps (2025)", year: "2025" },
+      { id: "77", title: "16. VisionQuest (2026)", year: "2026" }
+    ]
+  }
+};
+
+function parseReleaseTimestamp(yearStr = '') {
+  const cleaned = String(yearStr).replace(/^Coming\s+/i, '').trim();
+  const parsed = Date.parse(cleaned);
+  if (!Number.isNaN(parsed)) return parsed;
+  const yearMatch = cleaned.match(/\b(19\d{2}|20\d{2})\b/);
+  return yearMatch ? Date.parse(`Jul 1, ${yearMatch[1]}`) : Date.parse('2025-12-01');
+}
+
+function getDimensionLabel(item, pNum) {
+  if (item.id === 101 || item.id === 102) return "Earth-10005 (Fox Mutant Universe)";
+  if (item.id === 64) return "Earth-10005 / The Void / TVA";
+  if (item.id === 72) return "Retro-1964 Reality (First Steps)";
+  if ([41, 59].includes(item.id)) return "TVA / End of Time (Yggdrasil)";
+  if ([42, 63, 66].includes(item.id)) return "Multiverse Prism (What If…?)";
+  if (item.id === 49) return "Earth-616 & Earth-838";
+  if (item.id === 47) return "Earth-616 (Multiverse Rift)";
+  if ([75, 76].includes(item.id)) return "Battleworld / Multiverse Convergence";
+  return "Earth-616 (Sacred Timeline)";
+}
+
+let chronoCounter = 1;
+const rawTimelineItems = MCU_DATA.flatMap(p => {
+  const pNum = parseInt(p.phaseNum, 10);
+  return p.items.map((item) => {
+    const isCrossover = /avengers|civil war|no way home|deadpool|thunderbolts|doomsday|secret wars|defenders/i.test(item.title);
+    const isUpcoming = /2026|2027|coming/i.test(item.year) || (item.watch && item.watch.toLowerCase().startsWith('coming'));
+    const cOrder = chronoCounter++;
+    const ddMeta = DOOMSDAY_FAST_TRACK_META[item.id] || {};
+    return {
+      id: String(item.id),
+      numericId: item.id,
+      title: item.title,
+      year: item.year,
+      releaseTimestamp: parseReleaseTimestamp(item.year),
+      type: item.type.toLowerCase(),
+      typeLabel: item.type,
+      summary: item.summary,
+      synopsis: item.summary,
+      hook: item.summary,
+      watch: item.watch,
+      watchUrl: `https://www.hotstar.com/in/explore?search_query=${encodeURIComponent(item.title)}`,
+      phase: pNum,
+      phaseNum: p.phaseNum,
+      phaseName: p.phase,
+      saga: pNum <= 3 ? "Infinity Saga" : "Multiverse Saga",
+      poster: `https://mcu-timelines.vercel.app/photos/${item.id}.jpg?v=2`,
+      runtime: item.type === "Movie" ? "2h 14m" : (item.type === "Series" ? "Series" : "54m"),
+      isCrossover,
+      status: isUpcoming ? "upcoming" : "released",
+      dimension: getDimensionLabel(item, pNum),
+      canonStatus: (item.id === 101 || item.id === 102) ? "Fox Mutant Legacy" : (isUpcoming ? "Upcoming Official Slate" : "MCU / Multiverse Canon"),
+      doomsdayEssential: Boolean(ddMeta.doomsdayEssential || item.dd),
+      doomsdayCategory: ddMeta.doomsdayCategory || (item.dd ? "Essential" : null),
+      doomsdayReason: ddMeta.doomsdayReason || "",
+      doomsdayEpisodes: ddMeta.doomsdayEpisodes || "",
+      chronologicalOrder: cOrder,
+      releaseOrder: 0
+    };
+  });
+});
+
+// Compute true Theatrical / Streaming Release Order sorted strictly by release date
+const sortedByRelease = [...rawTimelineItems].sort((a, b) => {
+  if (a.releaseTimestamp !== b.releaseTimestamp) return a.releaseTimestamp - b.releaseTimestamp;
+  return a.chronologicalOrder - b.chronologicalOrder;
+});
+sortedByRelease.forEach((item, index) => {
+  item.releaseOrder = index + 1;
+});
+
+export const timelineData = rawTimelineItems;
+export const CHRONOLOGICAL_ORDER = [...rawTimelineItems].sort((a, b) => a.chronologicalOrder - b.chronologicalOrder);
+export const RELEASE_ORDER = [...rawTimelineItems].sort((a, b) => a.releaseOrder - b.releaseOrder);
 
 export const phasesData = [
   {
     phase: 0,
-    title: "Multiverse Origins & Mutants",
-    years: "2000 — 2003",
-    theme: "The Legacy Continuums",
-    anchorStone: "Nexus Reality",
+    title: "Multiverse Origins & Early Era",
+    years: "2000 — 2019",
+    theme: "Fox Mutant Legacy & WWII / 1990s Origins",
+    anchorStone: "Tesseract & Mutant Gene",
     color: "#D6B36A",
     glow: "rgba(214, 179, 106, 0.4)",
-    description: "The pioneering Fox mutant and early 2000s timelines that paved the way and now collide with the sacred MCU timeline.",
-    titlesCount: 2
+    description: "The pioneering Fox Mutant reality (X-Men, X2) and chronological wartime origins of Captain America, Agent Carter, and Captain Marvel.",
+    titlesCount: 6
   },
   {
     phase: 1,
-    title: "Assembling the Avengers",
+    title: "The Infinity Saga Begins",
     years: "2008 — 2012",
     theme: "Earth's Mightiest Initiative",
     anchorStone: "Space Stone (Tesseract)",
     color: "#3C8DFF",
     glow: "rgba(60, 141, 255, 0.4)",
-    description: "Nick Fury activates the Avengers Initiative as heroes emerge from shadows to defend New York against an extraterrestrial invasion.",
+    description: "Nick Fury activates the Avengers Initiative as Iron Man, Hulk, Thor, Black Widow, and Hawkeye unite to defend New York.",
     titlesCount: 5
   },
   {
     phase: 2,
-    title: "Expanding the Cosmos",
-    years: "2013 — 2015",
-    theme: "Galactic Reach & Dark Shadows",
-    anchorStone: "Reality Stone (Aether)",
+    title: "The Expansion",
+    years: "2013 — 2017",
+    theme: "Galactic Reach, Defenders & Age of Ultron",
+    anchorStone: "Reality Stone (Aether) & Power Stone",
     color: "#E84B4B",
     glow: "rgba(232, 75, 75, 0.4)",
-    description: "S.H.I.E.L.D. crumbles from within, the Guardians traverse deep space, and Tony Stark's fear births the artificial menace Ultron.",
+    description: "S.H.I.E.L.D. crumbles from within, the Guardians of the Galaxy form in deep space, Hell's Kitchen's Defenders rise, and Ultron strikes.",
     titlesCount: 12
   },
   {
     phase: 3,
-    title: "Civil War to Endgame",
+    title: "Civil War Arc & Infinity War",
     years: "2016 — 2019",
     theme: "The Climax of Destiny",
-    anchorStone: "All Six Singularity Stones",
+    anchorStone: "All Six Infinity Stones",
     color: "#8257FF",
     glow: "rgba(130, 87, 255, 0.4)",
-    description: "Ideological rift shatters the Avengers before Thanos gathers the Infinity Stones, snapping half of all life out of existence.",
+    description: "The Sokovia Accords fracture the Avengers before Thanos collects all six Infinity Stones, leading to the Snap and the Time Heist.",
     titlesCount: 17
   },
   {
     phase: 4,
-    title: "Fracturing Realities",
+    title: "The Multiverse Saga Begins",
     years: "2021 — 2022",
     theme: "Grief, Legacy & Dimensional Rifts",
-    anchorStone: "Darkhold & Mystic Nexus",
+    anchorStone: "TVA & Darkhold Incursions",
     color: "#FF8A00",
     glow: "rgba(255, 138, 0, 0.4)",
-    description: "In the wake of the Blip, new heroes rise while Wanda Maximoff and Doctor Strange tear into the uncharted multiverse.",
+    description: "Variant Loki witnesses the fracturing of the Sacred Timeline while Spider-Man and Doctor Strange confront multiversal rifts and incursions.",
     titlesCount: 17
   },
   {
     phase: 5,
-    title: "The Kang Dynasty & Incursions",
+    title: "The Multiverse Expands",
     years: "2023 — 2025",
-    theme: "Temporal Paradox & Quantum Conquest",
-    anchorStone: "Time Variant Anchor",
+    theme: "God Loki, The Void & The New Avengers",
+    anchorStone: "Yggdrasil Time Tree",
     color: "#00E676",
     glow: "rgba(0, 230, 118, 0.4)",
-    description: "The Time Variance Authority collapses into branching timelines, Deadpool invades the MCU, and darker operatives form the Thunderbolts.",
+    description: "Loki takes the throne at the End of Time, Deadpool & Wolverine bridge Earth-10005 into the MCU, and the Thunderbolts* form the New Avengers.",
     titlesCount: 13
   },
   {
     phase: 6,
-    title: "Secret Wars & Total Convergence",
-    years: "2025 — 2027+",
-    theme: "Battleworld & The Grand Incursion",
-    anchorStone: "Multiverse Core",
+    title: "The Multiverse Saga Endgame",
+    years: "2025 — 2027",
+    theme: "First Steps, Doomsday & Secret Wars",
+    anchorStone: "Battleworld Convergence",
     color: "#FACC15",
     glow: "rgba(250, 204, 21, 0.4)",
-    description: "The Fantastic Four enter from another era, Doctor Doom stakes his claim, and all surviving realities collide in Battleworld.",
+    description: "The Fantastic Four arrive from Retro Earth-1964, White Vision returns in VisionQuest, and all realities collide in Avengers: Doomsday and Secret Wars.",
     titlesCount: 9
   }
 ];
-
-let rCount = 1;
-export const timelineData = MCU_DATA.flatMap(p => {
-  const pNum = parseInt(p.phaseNum, 10);
-  return p.items.map((item, idx) => {
-    const isCrossover = /avengers|civil war|no way home|deadpool|thunderbolts|doomsday|secret wars|defenders/i.test(item.title);
-    const isUpcoming = /2026|2027|coming/i.test(item.year) || (item.watch && item.watch.toLowerCase().startsWith('coming'));
-    const relOrder = rCount++;
-    return {
-      id: String(item.id),
-      title: item.title,
-      year: item.year,
-      type: item.type.toLowerCase(),
-      summary: item.summary,
-      synopsis: item.summary,
-      hook: item.summary,
-      watch: item.watch,
-      phase: pNum,
-      phaseNum: p.phaseNum,
-      saga: pNum <= 3 ? "Infinity Saga" : "Multiverse Saga",
-      poster: `https://mcu-timelines.vercel.app/photos/${item.id}.jpg?v=2`,
-      runtime: item.type === "Movie" ? "2h 14m" : (item.type === "Series" ? "6 Episodes" : "54m"),
-      isCrossover,
-      status: isUpcoming ? "upcoming" : "released",
-      dimension: pNum >= 4 ? (item.title.includes("Deadpool") ? "Earth-10005 / Void" : (item.title.includes("Fantastic Four") ? "Retro Earth-1964" : "Earth-616")) : "Earth-616",
-      releaseOrder: relOrder,
-      chronologicalOrder: item.id === 101 ? 1 : (item.id === 102 ? 2 : (item.id === 1 ? 3 : (item.id === 2 ? 4 : (item.id === 3 ? 5 : (item.id === 4 ? 6 : relOrder)))))
-    };
-  });
-});
 

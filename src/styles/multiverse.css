@@ -2422,3 +2422,532 @@ footer.agency-footer {
     font-size: 2.2rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   3-SECOND MARVEL STUDIOS INTRO & HERO 7-BRANCH TREE SYSTEM
+═══════════════════════════════════════════════════════════════════ */
+#marvel-studio-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 99999999;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.45s ease;
+}
+#marvel-studio-intro.intro-exit {
+  opacity: 0;
+  pointer-events: none;
+}
+.cinema-red-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #b91c1c 0%, #450a0a 65%, #000000 100%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.cinema-red-bg.active {
+  opacity: 1;
+}
+.logo-stage {
+  position: relative;
+  z-index: 2;
+  width: min(76vw, 560px);
+  opacity: 0;
+  transform: scale(1.12);
+  transition: opacity 0.75s ease, transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.logo-stage.revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+.marvel-studios-pristine-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 18px 45px rgba(0, 0, 0, 0.85));
+}
+.cinema-blackout {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: #000000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+.cinema-blackout.active {
+  opacity: 1;
+}
+
+/* Interactive 7-Branch Tree Hotspots & Selector Bar */
+.hero-branch-triggers {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+.branch-click-spot {
+  position: absolute;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 1px dashed rgba(0, 230, 118, 0.28);
+  background: radial-gradient(circle, rgba(0, 230, 118, 0.14) 0%, transparent 70%);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.branch-click-spot:hover {
+  transform: scale(1.18);
+  border-color: #00E676;
+  box-shadow: 0 0 22px rgba(0, 230, 118, 0.55);
+}
+.branch-spot-1 { top: 44%; left: 14%; }
+.branch-spot-2 { top: 22%; left: 26%; }
+.branch-spot-3 { top: 14%; left: 48%; }
+.branch-spot-4 { top: 22%; right: 24%; }
+.branch-spot-5 { top: 42%; right: 14%; }
+.branch-spot-6 { bottom: 26%; right: 20%; }
+.branch-spot-7 { bottom: 24%; left: 48%; }
+
+.hero-branch-selector-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 1.6rem;
+  padding: 10px 16px;
+  border-radius: 24px;
+  background: rgba(5, 7, 12, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+}
+.branch-bar-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #00E676;
+  margin-right: 4px;
+}
+.hero-branch-chip {
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #E2E8F0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.22s ease;
+}
+.hero-branch-chip:hover,
+.hero-branch-chip.active {
+  background: rgba(0, 230, 118, 0.2);
+  border-color: #00E676;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.35);
+}
+
+.tree-hero-back-btn,
+.tree-hero-next-btn {
+  position: absolute;
+  top: 90px;
+  z-index: 25;
+  padding: 9px 18px;
+  border-radius: 30px;
+  background: rgba(5, 7, 12, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  transition: all 0.25s ease;
+}
+.tree-hero-back-btn { left: 24px; }
+.tree-hero-next-btn { right: 24px; border-color: #00E676; color: #00E676; }
+.tree-hero-back-btn:hover,
+.tree-hero-next-btn:hover {
+  background: #00E676;
+  color: #000;
+}
+
+.tree-earth-panel {
+  margin-top: 1.5rem;
+  background: rgba(5, 7, 12, 0.88);
+  border: 1px solid rgba(0, 230, 118, 0.35);
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+  max-width: 780px;
+  width: 100%;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+}
+.earth-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.earth-movies-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.earth-movie-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.22s ease;
+}
+.earth-movie-chip:hover {
+  border-color: #00E676;
+  background: rgba(0, 230, 118, 0.14);
+  transform: translateY(-2px);
+}
+.earth-movie-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+.earth-movie-year {
+  font-size: 0.68rem;
+  color: #00E676;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DOOMSDAY FAST-TRACK WATCHLIST SECTION
+═══════════════════════════════════════════════════════════════════ */
+#doomsday-fast-track-section {
+  padding: 3.5rem 2rem;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+.doomsday-fast-track-banner {
+  background: linear-gradient(165deg, rgba(8, 20, 15, 0.92) 0%, rgba(5, 7, 12, 0.98) 100%);
+  border: 1px solid rgba(0, 230, 118, 0.28);
+  border-radius: 20px;
+  padding: 2.4rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), inset 0 0 60px rgba(0, 230, 118, 0.05);
+}
+.dd-banner-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.8rem;
+}
+.dd-countdown-cluster {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.dd-countdown-box {
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(0, 230, 118, 0.35);
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  min-width: 170px;
+}
+.dd-cd-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #00E676;
+}
+.dd-cd-date {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+.dd-progress-strip {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.6rem;
+}
+.dd-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.dd-progress-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.dd-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00E676, #3C8DFF);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.dd-pillar-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 1.8rem;
+}
+.dd-tab-btn {
+  padding: 8px 18px;
+  border-radius: 24px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.25s ease;
+}
+.dd-tab-btn:hover,
+.dd-tab-btn.active {
+  background: rgba(0, 230, 118, 0.18);
+  border-color: #00E676;
+  color: #fff;
+  box-shadow: 0 0 18px rgba(0, 230, 118, 0.25);
+}
+.doomsday-essentials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+.dd-card {
+  background: rgba(15, 20, 32, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: all 0.28s ease;
+}
+.dd-card:hover {
+  border-color: #00E676;
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.8);
+}
+.dd-card.watched {
+  border-color: rgba(0, 230, 118, 0.45);
+  background: rgba(0, 230, 118, 0.05);
+}
+.dd-card-top {
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: 1rem;
+}
+.dd-poster {
+  width: 86px;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #000;
+}
+.dd-category-tag {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #00E676;
+  background: rgba(0, 230, 118, 0.12);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+.dd-card-year {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  margin-left: 6px;
+}
+.dd-card-title {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 5px 0;
+}
+.dd-reason-box {
+  font-size: 0.76rem;
+  color: #B4BECE;
+  line-height: 1.45;
+}
+.dd-episodes-box {
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: #FACC15;
+  background: rgba(250, 204, 21, 0.1);
+  border: 1px solid rgba(250, 204, 21, 0.28);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.dd-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.dd-watch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #3C8DFF;
+}
+.dd-check-btn {
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+.dd-card.watched .dd-check-btn {
+  background: #00E676;
+  color: #000;
+  border-color: #00E676;
+}
+
+/* Up Next Banner & Archive Card Enhancements */
+.up-next-banner {
+  background: linear-gradient(90deg, rgba(232, 57, 43, 0.16) 0%, rgba(15, 20, 32, 0.95) 100%);
+  border: 1px solid rgba(255, 42, 42, 0.35);
+  border-radius: 12px;
+  padding: 0.9rem 1.4rem;
+  margin-bottom: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.up-next-pill {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #FF8A00;
+  margin-right: 10px;
+}
+.up-next-title-text {
+  font-size: 0.92rem;
+  color: #fff;
+}
+.up-next-jump-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 42, 42, 0.2);
+  border: 1px solid #FF2A2A;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.up-next-jump-btn:hover {
+  background: #FF2A2A;
+}
+
+.archive-next-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #FF2A2A;
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  padding: 2px 8px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(255, 42, 42, 0.8);
+}
+.archive-dd-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid #00E676;
+  color: #00E676;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+.archive-watch-link {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #3C8DFF;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.archive-watch-link:hover {
+  color: #60A5FA;
+}
+
+.share-card-preview {
+  background: linear-gradient(180deg, #080a12 0%, #0d1222 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 1.6rem;
+}
+
+/* Mjolnir & Spider-Man FX */
+.mjolnir-impact {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #60A5FA;
+  box-shadow: 0 0 20px #3B82F6;
+  transform: translate(-50%, -50%) scale(0.4);
+  pointer-events: none;
+  z-index: 999999;
+  animation: mjolnirRipple 0.45s ease-out forwards;
+}
+@keyframes mjolnirRipple {
+  to {
+    transform: translate(-50%, -50%) scale(3.5);
+    opacity: 0;
+  }
+}
+.thwip-text-normal {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: #fff;
+  text-shadow: 2px 2px 0 #E8392B, -2px -2px 0 #3C8DFF;
+  pointer-events: none;
+  z-index: 999999;
+}
+@keyframes thwipPopNormal {
+  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
+  60% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -65%) scale(1); opacity: 0; }
+}

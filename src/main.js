@@ -1,9 +1,10 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { timelineData, phasesData } from './data/timeline.js';
+import { timelineData, phasesData, DOOMSDAY_BRANCHES } from './data/timeline.js';
 import { charactersData } from './data/characters.js';
 import { networkGraphData } from './data/network.js';
 import { stonesData } from './data/stones.js';
+import { STUDIO_ASSETS, STONE_MEDIA } from './data/mediaRegistry.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,14 +12,21 @@ gsap.registerPlugin(ScrollTrigger);
    GLOBAL STATE & STORAGE
 ═══════════════════════════════════════════════════════════════════ */
 const STORAGE_KEY = 'mcu-multiverse-watched-v2';
+const LEGACY_STORAGE_KEY = 'mcu_watched_v2';
 const DISCOVERED_STONES_KEY = 'mcu-discovered-stones-v1';
 
-let watchedSet = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+// Merge any existing watched items from either storage key
+const initialWatched = [
+  ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]').map(String),
+  ...JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY) || '[]').map(String)
+];
+let watchedSet = new Set(initialWatched);
 let discoveredStones = new Set(JSON.parse(localStorage.getItem(DISCOVERED_STONES_KEY) || '[]'));
 
 let activeArchiveOrder = 'chronological'; // 'release' | 'chronological'
-let activeArchiveFilter = 'all'; // 'all' | 'movie' | 'series' | 'special'
+let activeArchiveFilter = 'all'; // 'all' | 'movie' | 'series' | 'special' | 'doomsday' | 'watched' | 'unwatched'
 let archiveSearchQuery = '';
+let activeDoomsdayTab = 'all';
 
 let activeCharCategory = 'all';
 let charSearchQuery = '';
@@ -27,23 +35,28 @@ let activeMultiversePhase = 'all'; // 'all' | 4 | 5 | 6
 
 let activeNetworkMetric = 'degree'; // 'degree' | 'eigenvector' | 'betweenness'
 let activeNetworkFaction = 'all';
-let selectedNetworkNode = 'Captain America';
+let selectedNetworkNode = 'captain-america';
 
 let activeStoneId = 'space';
 let audioMuted = true;
 let audioContext = null;
 
 /* ═══════════════════════════════════════════════════════════════════
-   FALLBACK / SAFE IMAGE HANDLER
+   FALLBACK / SAFE IMAGE HANDLER (TWO-STAGE VERIFIED FALLBACK)
 ═══════════════════════════════════════════════════════════════════ */
-window.handleImageError = function(img, title, fallbackColor = '#1a233a') {
+window.handleImageError = function(img, title, fallbackColor = '#1a233a', secondaryUrl = '') {
+  if (secondaryUrl && !img.dataset.triedSecondary) {
+    img.dataset.triedSecondary = 'true';
+    img.src = secondaryUrl;
+    return;
+  }
   if (img.dataset.failed) return;
   img.dataset.failed = 'true';
   const cleanTitle = (title || 'Marvel Title').replace(/[^\w\s-]/gi, '').slice(0, 24);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450">
     <defs>
       <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#070a12"/>
+        <stop offset="0%" stop-color="#05070c"/>
         <stop offset="100%" stop-color="${fallbackColor}"/>
       </linearGradient>
     </defs>
@@ -51,7 +64,7 @@ window.handleImageError = function(img, title, fallbackColor = '#1a233a') {
     <circle cx="150" cy="180" r="45" fill="none" stroke="#e23636" stroke-width="2" opacity="0.6"/>
     <text x="150" y="188" font-family="'Bebas Neue', sans-serif" font-size="28" fill="#e23636" text-anchor="middle">MCU</text>
     <text x="150" y="270" font-family="'Outfit', sans-serif" font-size="16" font-weight="600" fill="#f5f5f7" text-anchor="middle">${cleanTitle}</text>
-    <text x="150" y="295" font-family="'Outfit', sans-serif" font-size="11" fill="#718096" text-anchor="middle">MULTIVERSE ARCHIVE</text>
+    <text x="150" y="295" font-family="'Outfit', sans-serif" font-size="11" fill="#718096" text-anchor="middle">CLASSIFIED ARCHIVE</text>
   </svg>`;
   img.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 };
@@ -254,7 +267,7 @@ function initHeroParticleCanvas() {
 ═══════════════════════════════════════════════════════════════════ */
 function initHeroStats() {
   const titlesCount = timelineData.length;
-  const hoursCount = 172; // Verified MCU canonical runtime aggregate
+  const hoursCount = 331; // Verified MCU & Series canonical runtime aggregate
   const charCount = charactersData.length;
   const phasesCount = phasesData.length;
 
@@ -264,7 +277,7 @@ function initHeroStats() {
   const elPhases = document.getElementById('stat-total-phases');
 
   if (elTitles) elTitles.textContent = titlesCount;
-  if (elHours) elHours.textContent = `${hoursCount}h`;
+  if (elHours) elHours.textContent = `${hoursCount}h+`;
   if (elChars) elChars.textContent = charCount;
   if (elPhases) elPhases.textContent = phasesCount;
 }
@@ -301,7 +314,7 @@ function initMultiverseNav() {
     }
 
     // Active link highlighting
-    const sections = ['multiverse-nexus', 'infinity-saga-section', 'multiverse-saga-section', 'characters-section', 'marvel-network-section', 'stones-altar-section', 'archive-section'];
+    const sections = ['multiverse-nexus', 'infinity-saga-section', 'multiverse-saga-section', 'doomsday-fast-track-section', 'characters-section', 'marvel-network-section', 'stones-altar-section', 'archive-section'];
     let current = '';
 
     for (const secId of sections) {
@@ -507,22 +520,24 @@ function renderCharacterGallery() {
 
   grid.innerHTML = list.map(c => {
     const rawAnomalies = c.rawAudit && c.rawAudit.anomaliesFound ? '⚠ Audited' : '✓ Verified';
+    const safeName = c.name.replace(/'/g, "\\'");
+    const fbPoster = (c.fallbackPoster || '').replace(/'/g, "\\'");
     return `
       <div class="character-card" data-id="${c.id}" style="--char-accent: ${c.accentColor || '#3C8DFF'}">
         <div class="char-card-media">
-          <img src="${c.image}" alt="${c.name}" loading="lazy" onerror="handleImageError(this, '${c.name.replace(/'/g, "\\'")}', '${c.accentColor || '#1a233a'}')" />
+          <img src="${c.image}" alt="${c.name}" loading="lazy" onerror="handleImageError(this, '${safeName}', '${c.accentColor || '#1a233a'}', '${fbPoster}')" />
           <div class="char-universe-pill">${c.universe}</div>
           <div class="char-audit-status">${rawAnomalies}</div>
         </div>
         <div class="char-card-info">
           <h3 class="char-name">${c.name}</h3>
           <div class="char-real-name">${c.realName}</div>
-          <div class="char-role-badge">${c.identity}</div>
+          <div class="char-role-badge">${c.identity} • ${c.category}</div>
           
           <div class="char-power-strip">
-            <span class="power-label">Combat Rating</span>
+            <span class="power-label">${typeof c.powerLevel === 'string' ? c.powerLevel : 'Power & Centrality Index'}</span>
             <div class="power-bar-wrap">
-              <div class="power-bar-fill" style="width: ${c.powerLevel?.combat || 80}%;"></div>
+              <div class="power-bar-fill" style="width: ${c.powerLevel?.combat || 85}%;"></div>
             </div>
           </div>
           
@@ -750,7 +765,9 @@ function renderStonesAltars() {
       <div class="stone-pedestal ${isActive ? 'active' : ''}" 
            data-stone="${s.id}" 
            style="--stone-color: ${s.color}; --stone-glow: ${s.glow};">
-        <div class="stone-orb-visual"></div>
+        <div class="stone-orb-visual" style="display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          ${s.imageUrl ? `<img src="${s.imageUrl}" alt="${s.name}" style="width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 0 8px ${s.color});" onerror="this.style.display='none'" />` : ''}
+        </div>
         <h4 class="stone-name-title">${s.name}</h4>
         <div class="stone-aspect-label">${s.aspect}</div>
       </div>
@@ -777,12 +794,17 @@ function updateStoneFeaturePanel(stoneId) {
   const s = stonesData.find(item => item.id === stoneId);
   if (!s) return;
 
-  // Set ambient wash on section
   const section = document.getElementById('stones-altar-section');
   if (section) {
     section.style.setProperty('--active-stone-color', s.color);
     section.style.background = `radial-gradient(circle at center 40%, ${s.glow} 0%, rgba(5, 7, 12, 0.98) 70%)`;
   }
+
+  const journeyHTML = (s.timelineJourney || []).map(step => `
+    <li style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.45; margin-bottom: 6px; padding-left: 10px; border-left: 2px solid ${s.color};">
+      ${step}
+    </li>
+  `).join('');
 
   panel.innerHTML = `
     <div class="stone-feature-left">
@@ -792,7 +814,7 @@ function updateStoneFeaturePanel(stoneId) {
       </div>
       <h3>The ${s.name}</h3>
       <p class="stone-quote">"${s.quote}"</p>
-      <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1.5rem;">${s.lore}</p>
+      <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1.2rem;">${s.lore}</p>
       
       <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 1rem;">
         <span style="font-size: 0.72rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.1em;">First Appearance in Multiverse:</span>
@@ -810,12 +832,8 @@ function updateStoneFeaturePanel(stoneId) {
           <span class="stone-meta-val">${s.wielders.join(', ')}</span>
         </div>
         <div class="stone-meta-row">
-          <span class="stone-meta-key">Dimensional Frequency</span>
-          <span class="stone-meta-val">${s.aspect} Continuum Distortion</span>
-        </div>
-        <div class="stone-meta-row">
-          <span class="stone-meta-key">Destruction / Current Status</span>
-          <span class="stone-meta-val">${s.status || 'Reduced to atoms by Thanos (2018) / Restored via Time Heist'}</span>
+          <span class="stone-meta-key">Infinity Saga Movement Timeline</span>
+          <ul style="list-style: none; padding: 0; margin-top: 6px;">${journeyHTML}</ul>
         </div>
       </div>
     </div>
@@ -826,7 +844,6 @@ function markStoneDiscovered(stoneId) {
   discoveredStones.add(stoneId);
   localStorage.setItem(DISCOVERED_STONES_KEY, JSON.stringify([...discoveredStones]));
   
-  // Update nav dots
   const navDot = document.querySelector(`.nav-stone-dot[data-stone="${stoneId}"]`);
   if (navDot) navDot.classList.add('active');
 
@@ -835,6 +852,302 @@ function markStoneDiscovered(stoneId) {
   } else {
     showToast(`Discovered ${stoneId.toUpperCase()} Stone (${discoveredStones.size}/6)`);
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   3-SECOND MARVEL STUDIOS INTRO & INTERACTIVE 7-BRANCH MULTIVERSE TREE
+═══════════════════════════════════════════════════════════════════ */
+function playStudioIntro() {
+  const intro = document.getElementById('marvel-studio-intro');
+  const redBg = document.getElementById('intro-red-bg');
+  const logoStage = document.getElementById('intro-logo-stage');
+  const blackout = document.getElementById('intro-blackout');
+  if (!intro) return;
+
+  intro.style.display = 'flex';
+  intro.classList.remove('intro-exit');
+  redBg?.classList.remove('active');
+  logoStage?.classList.remove('revealed');
+  blackout?.classList.remove('active');
+  document.body.style.overflow = 'hidden';
+
+  setTimeout(() => redBg?.classList.add('active'), 250);
+  setTimeout(() => logoStage?.classList.add('revealed'), 500);
+  setTimeout(() => blackout?.classList.add('active'), 2300);
+  setTimeout(() => {
+    intro.classList.add('intro-exit');
+    document.body.style.overflow = '';
+  }, 2750);
+  setTimeout(() => {
+    intro.style.display = 'none';
+  }, 3200);
+}
+
+function initStudioIntro() {
+  const replayBtn = document.getElementById('btn-replay-studio-intro');
+  if (replayBtn) {
+    replayBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      playStudioIntro();
+    });
+  }
+
+  if (!sessionStorage.getItem('mcu-intro-played-v2')) {
+    sessionStorage.setItem('mcu-intro-played-v2', '1');
+    playStudioIntro();
+  }
+}
+
+function playCloudTransition(onCovered, onComplete, duration = 650) {
+  let canvas = document.getElementById('cinematic-cloud-canvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'cinematic-cloud-canvas';
+    canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:999995;pointer-events:none;opacity:0;';
+    document.body.appendChild(canvas);
+  }
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width = window.innerWidth;
+  const h = canvas.height = window.innerHeight;
+  canvas.style.opacity = '1';
+
+  const puffs = Array.from({ length: 36 }, () => ({
+    xOffset: (Math.random() - 0.5) * w * 1.1,
+    yRatio: Math.random(),
+    radius: (0.35 + Math.random() * 0.4) * Math.max(w, h),
+    density: 0.85 + Math.random() * 0.15
+  }));
+
+  const start = performance.now();
+  let coveredDone = false;
+
+  function frame(now) {
+    const p = Math.min(1, (now - start) / duration);
+    ctx.clearRect(0, 0, w, h);
+
+    const opacityCurve = p < 0.45 ? p / 0.45 : (p < 0.65 ? 1 : 1 - (p - 0.65) / 0.35);
+    const sweepX = (Math.sin(p * Math.PI * 0.5) * 2.2 - 0.6) * w;
+
+    for (const puff of puffs) {
+      const px = sweepX + puff.xOffset;
+      const py = puff.yRatio * h;
+      const grad = ctx.createRadialGradient(px, py, 0, px, py, puff.radius);
+      const a = Math.min(1, opacityCurve * puff.density);
+      grad.addColorStop(0, `rgba(2, 4, 8, ${a})`);
+      grad.addColorStop(0.5, `rgba(5, 10, 18, ${a * 0.9})`);
+      grad.addColorStop(1, 'rgba(2, 4, 8, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(px, py, puff.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    if (p >= 0.45 && !coveredDone) {
+      coveredDone = true;
+      if (onCovered) onCovered();
+    }
+
+    if (p < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      ctx.clearRect(0, 0, w, h);
+      canvas.style.opacity = '0';
+      if (onComplete) onComplete();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+let activeHeroBranchIdx = null;
+
+function initMultiverseTreeBranches() {
+  const heroSec = document.getElementById('hero');
+  const backBtn = document.getElementById('tree-hero-back-btn');
+  const nextBtn = document.getElementById('tree-hero-next-btn');
+  const badgeEl = document.getElementById('tree-hero-badge');
+  const titleEl = document.getElementById('tree-hero-title');
+  const subEl = document.getElementById('tree-hero-subtitle');
+  const earthPanel = document.getElementById('tree-earth-panel');
+  const statsStrip = document.getElementById('hero-stats-strip');
+
+  function activateBranch(branchIdx) {
+    const branch = DOOMSDAY_BRANCHES[branchIdx];
+    if (!branch || !heroSec) return;
+    activeHeroBranchIdx = branchIdx;
+
+    playCloudTransition(() => {
+      const isMobile = window.innerWidth <= 900;
+      const bgUrl = isMobile && branch.mobAsset ? branch.mobAsset : branch.asset;
+      heroSec.style.background = `#010407 url('${bgUrl}') center center / cover no-repeat`;
+
+      if (badgeEl) badgeEl.textContent = `YGGDRASIL BRANCH 0${branchIdx} • ${branch.label}`;
+      if (titleEl) titleEl.innerHTML = `<span style="color:#fff;">${branch.title}</span>`;
+      if (subEl) subEl.textContent = branch.tagline;
+      if (statsStrip) statsStrip.style.display = 'none';
+      if (backBtn) backBtn.style.display = 'inline-flex';
+      if (nextBtn) {
+        nextBtn.style.display = 'inline-flex';
+        const nextIdx = (branchIdx % 7) + 1;
+        nextBtn.textContent = `NEXT BRANCH (${nextIdx}) →`;
+      }
+
+      document.querySelectorAll('.hero-branch-chip').forEach(chip => {
+        chip.classList.toggle('active', parseInt(chip.dataset.branch, 10) === branchIdx);
+      });
+
+      if (earthPanel) {
+        earthPanel.style.display = 'block';
+        earthPanel.innerHTML = `
+          <div class="earth-panel-header">
+            <span style="color: ${branch.color};">CONNECTED ESSENTIAL TITLES (${branch.movies.length})</span>
+            <span style="color: var(--text-secondary); font-size: 0.65rem;">Click title to open or jump</span>
+          </div>
+          <div class="earth-movies-grid">
+            ${branch.movies.map(m => `
+              <div class="earth-movie-chip" data-movie-id="${m.id}">
+                <div class="earth-movie-title">${m.title}</div>
+                <div class="earth-movie-year">${m.year}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        earthPanel.querySelectorAll('.earth-movie-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            const mId = chip.dataset.movieId;
+            const cardEl = document.querySelector(`.archive-card[data-id="${mId}"]`);
+            if (cardEl) {
+              cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              const item = timelineData.find(t => t.id === String(mId));
+              if (item) setTimeout(() => openMovieModal(item), 550);
+            }
+          });
+        });
+      }
+    });
+  }
+
+  function resetTreeToOverview() {
+    if (!heroSec) return;
+    activeHeroBranchIdx = null;
+    playCloudTransition(() => {
+      const isMobile = window.innerWidth <= 900;
+      const treeBg = isMobile ? STUDIO_ASSETS.heroTreeMobile : STUDIO_ASSETS.heroTreeDesktop;
+      heroSec.style.background = `#010407 url('${treeBg}') center center / cover no-repeat`;
+
+      if (badgeEl) badgeEl.textContent = 'Official Multiverse Continuum • Earth-616 & Divergent Realities';
+      if (titleEl) titleEl.innerHTML = `THE MARVEL<br/><span style="background: linear-gradient(135deg, #FF2A2A, #FF8A00, #3C8DFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">MULTIVERSE</span>`;
+      if (subEl) subEl.textContent = 'An interactive cosmic continuum mapping 79 canonical titles, 44 audited characters, 6 cosmic singularities, and mathematically modeled relationship network science.';
+      if (statsStrip) statsStrip.style.display = 'flex';
+      if (backBtn) backBtn.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'none';
+      if (earthPanel) earthPanel.style.display = 'none';
+      document.querySelectorAll('.hero-branch-chip').forEach(c => c.classList.remove('active'));
+    });
+  }
+
+  document.querySelectorAll('[data-branch]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.branch, 10);
+      if (idx) activateBranch(idx);
+    });
+  });
+
+  backBtn?.addEventListener('click', resetTreeToOverview);
+  nextBtn?.addEventListener('click', () => {
+    const nextIdx = activeHeroBranchIdx ? (activeHeroBranchIdx % 7) + 1 : 1;
+    activateBranch(nextIdx);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SECTION 5B: DOOMSDAY FAST-TRACK WATCHLIST
+═══════════════════════════════════════════════════════════════════ */
+function renderDoomsdaySection() {
+  const grid = document.getElementById('doomsday-grid');
+  if (!grid) return;
+
+  const essentialItems = timelineData.filter(t => t.doomsdayEssential);
+  const watchedEssential = essentialItems.filter(t => watchedSet.has(t.id)).length;
+  const totalEssential = essentialItems.length;
+  const pctEssential = totalEssential > 0 ? Math.round((watchedEssential / totalEssential) * 100) : 0;
+
+  const valEl = document.getElementById('dd-prog-val');
+  const fillEl = document.getElementById('dd-prog-fill');
+  if (valEl) valEl.textContent = `${watchedEssential} / ${totalEssential} Essential Watched (${pctEssential}%)`;
+  if (fillEl) fillEl.style.width = `${pctEssential}%`;
+
+  let filtered = essentialItems;
+  if (activeDoomsdayTab !== 'all') {
+    filtered = essentialItems.filter(t => t.doomsdayCategory === activeDoomsdayTab);
+  }
+
+  grid.innerHTML = filtered.map(item => {
+    const isWatched = watchedSet.has(item.id);
+    const safeTitle = item.title.replace(/'/g, "\\'");
+    return `
+      <div class="dd-card ${isWatched ? 'watched' : ''}" data-id="${item.id}">
+        <div class="dd-card-top">
+          <img src="${item.poster}" alt="${item.title}" class="dd-poster" loading="lazy" onerror="handleImageError(this, '${safeTitle}')" />
+          <div class="dd-card-info">
+            <div>
+              <span class="dd-category-tag">${item.doomsdayCategory || 'Essential'}</span>
+              <span class="dd-card-year">${item.year}</span>
+            </div>
+            <div class="dd-card-title">${item.title}</div>
+            <div class="dd-reason-box">${item.doomsdayReason}</div>
+            ${item.doomsdayEpisodes ? `<div class="dd-episodes-box">💡 ${item.doomsdayEpisodes}</div>` : ''}
+          </div>
+        </div>
+        <div class="dd-card-footer">
+          <a href="${item.watchUrl}" target="_blank" rel="noopener noreferrer" class="dd-watch-btn">
+            <span>▶ Watch on ${item.watch}</span>
+          </a>
+          <button class="dd-check-btn" data-dd-watch="${item.id}">
+            ${isWatched ? '✓ Watched' : '+ Mark Watched'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('[data-dd-watch]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleWatched(btn.dataset.ddWatch);
+    });
+  });
+
+  grid.querySelectorAll('.dd-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('a, button')) return;
+      const item = timelineData.find(t => t.id === card.dataset.id);
+      if (item) openMovieModal(item);
+    });
+  });
+}
+
+function initDoomsdayFastTrack() {
+  document.querySelectorAll('.dd-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.dd-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeDoomsdayTab = btn.dataset.ddTab;
+      renderDoomsdaySection();
+    });
+  });
+
+  // Update countdown labels
+  const swEl = document.getElementById('dd-countdown-secretwars');
+  if (swEl) {
+    const swDiff = Date.parse('May 7, 2027') - Date.now();
+    if (swDiff > 0) {
+      const days = Math.ceil(swDiff / (1000 * 60 * 60 * 24));
+      swEl.textContent = `MAY 7, 2027 (${days}d)`;
+    }
+  }
+
+  renderDoomsdaySection();
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -974,7 +1287,6 @@ function observeIntermissionElements(root = document) {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-revealed');
         } else if (entry.boundingClientRect.top > 0) {
-          // Re-arm when scrolling back above so the trailer reveal replays smoothly
           entry.target.classList.remove('is-revealed');
         }
       });
@@ -987,19 +1299,16 @@ function observeIntermissionElements(root = document) {
 }
 
 function initTrailerIntermissions() {
-  // Populate soundwaves
   document.querySelectorAll('.trailer-soundwave').forEach(sw => {
     sw.innerHTML = buildSoundwaveHTML(14);
   });
 
-  // Convert all .trailer-hype-headline into character-by-character spans
   document.querySelectorAll('.trailer-hype-headline').forEach(h2 => {
     const rawText = h2.dataset.hypeText || h2.textContent.trim();
     const accents = h2.dataset.accents || '';
     h2.innerHTML = buildCharRevealHTML(rawText, accents);
   });
 
-  // Setup interactive rotating slate switcher on the primary trailer intermission
   const firstIntermission = document.querySelector('.trailer-intermission[data-intermission-idx="0"]');
   if (firstIntermission) {
     const switcher = firstIntermission.querySelector('.trailer-slate-switcher');
@@ -1014,7 +1323,7 @@ function initTrailerIntermissions() {
       const pill = firstIntermission.querySelector('.trailer-countdown-pill');
 
       firstIntermission.classList.remove('is-revealed');
-      void firstIntermission.offsetWidth; // Reflow to retrigger character & flare animations
+      void firstIntermission.offsetWidth;
 
       if (h2) h2.innerHTML = buildCharRevealHTML(slate.headline, slate.accents);
       if (tag) tag.innerHTML = slate.tag;
@@ -1043,7 +1352,6 @@ function initTrailerIntermissions() {
         });
       });
 
-      // Gentle auto-rotation every 6.5s when visible in viewport
       setInterval(() => {
         const rect = firstIntermission.getBoundingClientRect();
         const inView = rect.top < window.innerHeight * 0.85 && rect.bottom > 80;
@@ -1060,16 +1368,29 @@ function initTrailerIntermissions() {
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 9: MOVIE ARCHIVE (RELEASE ORDER & CHRONOLOGICAL DUAL MODES)
 ═══════════════════════════════════════════════════════════════════ */
-function renderArchiveCardHTML(t) {
+function getRankBadge(pct) {
+  if (pct >= 100) return '💀 Secret Wars Legend';
+  if (pct >= 80) return '⚡ Timeline Master';
+  if (pct >= 60) return '🧠 Multiverse Walker';
+  if (pct >= 40) return '🔥 Infinity Survivor';
+  if (pct >= 20) return '⚔️ Avenger';
+  if (pct >= 1) return '🛡️ Recruit';
+  return '🧬 Multiverse Newbie';
+}
+
+function renderArchiveCardHTML(t, nextUnwatchedId) {
   const isWatched = watchedSet.has(t.id);
+  const isNext = t.id === nextUnwatchedId;
   const orderNum = activeArchiveOrder === 'chronological' ? t.chronologicalOrder : t.releaseOrder;
   const typeLabel = t.type === 'movie' ? 'Film' : (t.type === 'series' ? 'Series' : 'Special');
   const typeClass = t.type === 'movie' ? 'meta-type-movie' : 'meta-type-series';
 
   return `
-    <div class="archive-card ${isWatched ? 'watched' : ''}" data-id="${t.id}">
+    <div class="archive-card ${isWatched ? 'watched' : ''}" id="archive-card-${t.id}" data-id="${t.id}">
       <div class="archive-card-poster">
         <img src="${t.poster}" alt="${t.title}" loading="lazy" onerror="handleImageError(this, '${t.title.replace(/'/g, "\\'")}')" />
+        ${isNext ? `<div class="archive-next-badge">NEXT UP</div>` : ''}
+        ${t.doomsdayEssential ? `<div class="archive-dd-badge">⚡ DOOMSDAY</div>` : ''}
         <div class="archive-seq-pill">#${orderNum}</div>
         <button class="archive-watched-check" data-id="${t.id}" title="Toggle Watched" aria-label="Mark ${t.title} as watched">
           ✓
@@ -1082,9 +1403,40 @@ function renderArchiveCardHTML(t) {
         </div>
         <h4 class="archive-card-title">${t.title}</h4>
         <p class="archive-card-summary">${t.synopsis || t.hook || ''}</p>
+        <a href="${t.watchUrl}" target="_blank" rel="noopener noreferrer" class="archive-watch-link" onclick="event.stopPropagation();">
+          <span>● Watch on ${t.watch}</span>
+        </a>
       </div>
     </div>
   `;
+}
+
+function updateUpNextBanner(sortedList) {
+  const nextItem = sortedList.find(t => !watchedSet.has(t.id));
+  const banner = document.getElementById('up-next-banner');
+  const titleEl = document.getElementById('up-next-title');
+  const jumpBtn = document.getElementById('up-next-jump-btn');
+
+  if (!banner || !titleEl) return null;
+
+  if (nextItem) {
+    banner.style.display = 'flex';
+    titleEl.textContent = `${nextItem.title} (${nextItem.year}) • ${nextItem.dimension}`;
+    if (jumpBtn) {
+      jumpBtn.onclick = () => {
+        const card = document.getElementById(`archive-card-${nextItem.id}`);
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.boxShadow = '0 0 30px #FF2A2A';
+          setTimeout(() => { card.style.boxShadow = ''; }, 1800);
+        }
+      };
+    }
+    return nextItem.id;
+  } else {
+    banner.style.display = 'none';
+    return null;
+  }
 }
 
 function renderMovieArchive() {
@@ -1093,16 +1445,24 @@ function renderMovieArchive() {
 
   let list = [...timelineData];
 
-  // Sort by active mode
+  // Sort strictly by active mode
   if (activeArchiveOrder === 'chronological') {
     list.sort((a, b) => a.chronologicalOrder - b.chronologicalOrder);
   } else {
     list.sort((a, b) => a.releaseOrder - b.releaseOrder);
   }
 
-  // Filter by media type
-  if (activeArchiveFilter !== 'all') {
+  const nextUnwatchedId = updateUpNextBanner(list);
+
+  // Filter by media type / status
+  if (activeArchiveFilter === 'movie' || activeArchiveFilter === 'series' || activeArchiveFilter === 'special') {
     list = list.filter(t => t.type === activeArchiveFilter);
+  } else if (activeArchiveFilter === 'doomsday') {
+    list = list.filter(t => t.doomsdayEssential);
+  } else if (activeArchiveFilter === 'watched') {
+    list = list.filter(t => watchedSet.has(t.id));
+  } else if (activeArchiveFilter === 'unwatched') {
+    list = list.filter(t => !watchedSet.has(t.id));
   }
 
   // Filter by search
@@ -1111,12 +1471,12 @@ function renderMovieArchive() {
     const q = archiveSearchQuery.toLowerCase();
     list = list.filter(t => 
       t.title.toLowerCase().includes(q) ||
-      (t.year && t.year.toString().includes(q)) ||
+      (t.year && t.year.toLowerCase().includes(q)) ||
+      (t.dimension && t.dimension.toLowerCase().includes(q)) ||
       (t.phase !== undefined && `phase ${t.phase}`.includes(q))
     );
   }
 
-  // Update stats counters
   updateArchiveStats();
 
   if (list.length === 0) {
@@ -1125,8 +1485,9 @@ function renderMovieArchive() {
     return;
   }
 
-  // When browsing without an active text search, group by MCU Phases with cinematic trailer intermission banners
-  if (!hasSearch) {
+  // In Chronological mode without search, group by Phase with trailer intermissions;
+  // In Release Order mode, render in strict theatrical release sequence with Phase badges!
+  if (!hasSearch && activeArchiveOrder === 'chronological' && activeArchiveFilter === 'all') {
     grid.className = 'timeline-phases-stack';
     const phasesOrder = [0, 1, 2, 3, 4, 5, 6];
     const blocksHTML = phasesOrder.map(pNum => {
@@ -1156,7 +1517,7 @@ function renderMovieArchive() {
             </div>
           </div>
           <div class="archive-grid">
-            ${phaseItems.map(renderArchiveCardHTML).join('')}
+            ${phaseItems.map(t => renderArchiveCardHTML(t, nextUnwatchedId)).join('')}
           </div>
         </div>
       `;
@@ -1166,7 +1527,7 @@ function renderMovieArchive() {
     observeIntermissionElements(grid);
   } else {
     grid.className = 'archive-grid';
-    grid.innerHTML = list.map(renderArchiveCardHTML).join('');
+    grid.innerHTML = list.map(t => renderArchiveCardHTML(t, nextUnwatchedId)).join('');
   }
 
   // Bind clicks
@@ -1177,30 +1538,39 @@ function renderMovieArchive() {
         toggleWatched(card.dataset.id);
         return;
       }
+      if (e.target.closest('a')) return;
       const item = timelineData.find(t => t.id === card.dataset.id);
       if (item) openMovieModal(item);
     });
   });
 }
 
+function saveWatchedState() {
+  const arr = [...watchedSet];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(arr.map(Number).filter(n => !Number.isNaN(n))));
+}
+
 function toggleWatched(id) {
-  if (watchedSet.has(id)) {
-    watchedSet.delete(id);
+  const strId = String(id);
+  if (watchedSet.has(strId)) {
+    watchedSet.delete(strId);
     showToast('Removed from Watched Archives');
   } else {
-    watchedSet.add(id);
+    watchedSet.add(strId);
     showToast('Marked as Watched ✓', '🛡');
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...watchedSet]));
+  saveWatchedState();
   renderMovieArchive();
+  renderDoomsdaySection();
   renderInfinitySaga();
   renderMultiverseSaga();
 }
 
 function updateArchiveStats() {
   const total = timelineData.length;
-  const count = watchedSet.size;
-  const pct = Math.round((count / total) * 100);
+  const count = [...watchedSet].filter(id => timelineData.some(t => t.id === String(id))).length;
+  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
 
   const countEl = document.getElementById('archive-watched-count');
   const pctEl = document.getElementById('archive-watched-pct');
@@ -1208,15 +1578,15 @@ function updateArchiveStats() {
 
   if (countEl) countEl.textContent = `${count} / ${total}`;
   if (pctEl) pctEl.textContent = `${pct}%`;
+  if (rankEl) rankEl.textContent = getRankBadge(pct);
 
-  if (rankEl) {
-    let rank = 'Cadet';
-    if (pct >= 100) rank = 'Cosmic Entity (Multiverse Master)';
-    else if (pct >= 80) rank = 'Sorcerer Supreme';
-    else if (pct >= 50) rank = 'Avenger Special Operative';
-    else if (pct >= 25) rank = 'S.H.I.E.L.D. Field Agent';
-    rankEl.textContent = rank;
-  }
+  // Sync Infinity Stone nav dots with sixths of watch progress
+  const placedStones = Math.floor((count / total) * 6 + 1e-9);
+  document.querySelectorAll('.nav-stone-dot').forEach((dot, idx) => {
+    if (idx < placedStones || discoveredStones.has(dot.dataset.stone)) {
+      dot.classList.add('active');
+    }
+  });
 }
 
 function initArchiveControls() {
@@ -1227,6 +1597,7 @@ function initArchiveControls() {
       btn.classList.add('active');
       activeArchiveOrder = btn.dataset.order;
       renderMovieArchive();
+      showToast(activeArchiveOrder === 'release' ? 'Sorted by Theatrical Release Date (2000–2027)' : 'Sorted by In-Universe Story Chronology');
     });
   });
 
@@ -1252,9 +1623,10 @@ function initArchiveControls() {
   if (markAllBtn) {
     markAllBtn.addEventListener('click', () => {
       timelineData.forEach(t => watchedSet.add(t.id));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...watchedSet]));
-      showToast('All 79 Titles Marked as Watched!', '🏆');
+      saveWatchedState();
+      showToast('All 79 Titles Marked as Watched! 💀 Secret Wars Legend Unlocked!', '🏆');
       renderMovieArchive();
+      renderDoomsdaySection();
       renderInfinitySaga();
       renderMultiverseSaga();
     });
@@ -1263,14 +1635,149 @@ function initArchiveControls() {
   const resetAllBtn = document.getElementById('btn-reset-watched');
   if (resetAllBtn) {
     resetAllBtn.addEventListener('click', () => {
-      watchedSet.clear();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-      showToast('Watched progress reset.');
-      renderMovieArchive();
-      renderInfinitySaga();
-      renderMultiverseSaga();
+      document.getElementById('snap-confirm-modal')?.classList.add('open');
     });
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   1080x1920 NATIVE STORY PROGRESS CARD GENERATOR & SHARE MODAL
+═══════════════════════════════════════════════════════════════════ */
+function generateStoryProgressCanvas(count, total, stageText, badgeText) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1920;
+  const ctx = canvas.getContext('2d');
+
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, 1920);
+  bgGrad.addColorStop(0, '#05070c');
+  bgGrad.addColorStop(0.5, '#0c1020');
+  bgGrad.addColorStop(1, '#040508');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, 1080, 1920);
+
+  const glowGrad = ctx.createRadialGradient(540, 320, 30, 540, 320, 520);
+  glowGrad.addColorStop(0, 'rgba(232, 57, 43, 0.18)');
+  glowGrad.addColorStop(1, 'rgba(232, 57, 43, 0)');
+  ctx.fillStyle = glowGrad;
+  ctx.fillRect(0, 0, 1080, 800);
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(48, 48, 984, 1824);
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 54px "Outfit", sans-serif';
+  ctx.fillText('MARVEL MULTIVERSE TIMELINE', 540, 310);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 260px "Outfit", sans-serif';
+  ctx.fillText(String(count), 540, 650);
+
+  ctx.fillStyle = '#9AA6B8';
+  ctx.font = '600 34px "Outfit", sans-serif';
+  ctx.fillText(`OF ${total} CANONICAL TITLES WATCHED`, 540, 810);
+
+  ctx.fillStyle = '#E2E8F0';
+  ctx.font = '400 38px "Outfit", sans-serif';
+  ctx.fillText(stageText, 540, 890);
+
+  ctx.fillStyle = '#FF8A00';
+  ctx.font = 'bold 32px "Outfit", sans-serif';
+  ctx.fillText(badgeText.toUpperCase(), 540, 1005);
+
+  const pct = total > 0 ? Math.min(1, count / total) : 0;
+  const barX = 190, barY = 1150, barW = 700, barH = 18;
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.fillRect(barX, barY, barW, barH);
+  if (pct > 0) {
+    const fillGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+    fillGrad.addColorStop(0, '#E8392B');
+    fillGrad.addColorStop(1, '#FF8A00');
+    ctx.fillStyle = fillGrad;
+    ctx.fillRect(barX, barY, Math.max(18, barW * pct), barH);
+  }
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 28px "Outfit", sans-serif';
+  ctx.fillText('BUILT BY ORIGIN MAX', 540, 1680);
+  ctx.fillStyle = '#E8392B';
+  ctx.font = '500 24px "Outfit", sans-serif';
+  ctx.fillText('mcutime-line.netlify.app', 540, 1730);
+
+  return canvas.toDataURL('image/png', 1.0);
+}
+
+function openShareModal() {
+  const modal = document.getElementById('share-progress-modal');
+  if (!modal) return;
+
+  const total = timelineData.length;
+  const count = [...watchedSet].filter(id => timelineData.some(t => t.id === String(id))).length;
+  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+  const badge = getRankBadge(pct);
+  let stage = 'Beginning the Multiverse Journey';
+  if (pct >= 100) stage = 'Complete MCU & Multiverse Veteran';
+  else if (pct >= 75) stage = 'Deep in the Multiverse Saga';
+  else if (pct >= 50) stage = 'Entering the Multiverse Era';
+  else if (pct >= 25) stage = 'Surviving the Infinity Saga';
+  else if (pct >= 1) stage = 'Assembling the Avengers';
+
+  const numEl = document.getElementById('share-num');
+  const ofEl = document.getElementById('share-of-text');
+  const subEl = document.getElementById('share-sub');
+  const badgeEl = document.getElementById('share-badge');
+  const barEl = document.getElementById('share-bar');
+
+  if (numEl) numEl.textContent = count;
+  if (ofEl) ofEl.textContent = `of ${total} titles watched (${pct}%)`;
+  if (subEl) subEl.textContent = stage;
+  if (badgeEl) badgeEl.textContent = badge;
+  if (barEl) barEl.style.width = `${pct}%`;
+
+  modal.classList.add('open');
+}
+
+function initShareModal() {
+  document.getElementById('nav-share-trigger')?.addEventListener('click', openShareModal);
+  document.getElementById('btn-open-share')?.addEventListener('click', openShareModal);
+
+  document.getElementById('btn-share-download-png')?.addEventListener('click', () => {
+    const total = timelineData.length;
+    const count = [...watchedSet].filter(id => timelineData.some(t => t.id === String(id))).length;
+    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+    const dataUrl = generateStoryProgressCanvas(count, total, document.getElementById('share-sub')?.textContent || '', getRankBadge(pct));
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'mcu-multiverse-progress.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('Downloaded 1080×1920 Story Progress Card!');
+  });
+
+  document.getElementById('btn-share-copy-link')?.addEventListener('click', () => {
+    const url = window.location.href.split('#')[0];
+    navigator.clipboard?.writeText(url);
+    showToast('Timeline link copied to clipboard!');
+  });
+
+  document.querySelectorAll('[data-share-social]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const total = timelineData.length;
+      const count = [...watchedSet].filter(id => timelineData.some(t => t.id === String(id))).length;
+      const url = encodeURIComponent(window.location.href.split('#')[0]);
+      const text = encodeURIComponent(`I've watched ${count}/${total} Marvel Multiverse titles! Track your journey:`);
+      const platform = btn.dataset.shareSocial;
+      const shareUrls = {
+        whatsapp: `https://api.whatsapp.com/send?text=${text}%20${url}`,
+        telegram: `https://t.me/share/url?url=${url}&text=${text}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`
+      };
+      if (shareUrls[platform]) window.open(shareUrls[platform], '_blank', 'noopener');
+    });
+  });
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1285,14 +1792,22 @@ function openCharacterDossier(charObj) {
 
   const auditNote = charObj.rawAudit && charObj.rawAudit.anomaliesFound 
     ? `<div class="dossier-audit-alert">
-        <strong>⚠ Raw Dataset Audit Disclosure:</strong> Original CSV mapped this entry incorrectly (${charObj.rawAudit.note}). Corrected to canonical Marvel continuity.
+        <strong>⚠ Raw Dataset Audit Disclosure:</strong> ${charObj.rawAudit.note}
        </div>`
     : '';
+
+  const powersPills = (charObj.powers || []).map(p => `
+    <span style="font-size: 0.72rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 12px; color: #E2E8F0;">${p}</span>
+  `).join('');
+
+  const appearancesList = (charObj.notableAppearances || []).join(' • ');
+  const safeName = charObj.name.replace(/'/g, "\\'");
+  const fbPoster = (charObj.fallbackPoster || '').replace(/'/g, "\\'");
 
   content.innerHTML = `
     <div class="dossier-layout">
       <div class="dossier-media">
-        <img src="${charObj.image}" alt="${charObj.name}" onerror="handleImageError(this, '${charObj.name.replace(/'/g, "\\'")}', '${charObj.accentColor || '#1a233a'}')" />
+        <img src="${charObj.image}" alt="${charObj.name}" onerror="handleImageError(this, '${safeName}', '${charObj.accentColor || '#1a233a'}', '${fbPoster}')" />
         <div style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.85); padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; border: 1px solid var(--border-bright);">
           ${charObj.universe}
         </div>
@@ -1310,32 +1825,16 @@ function openCharacterDossier(charObj) {
 
         <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-primary);">${charObj.bio || ''}</p>
 
-        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 0.5rem;">
-          <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted);">Power Attribute Matrix</span>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <div style="font-size: 0.75rem; display: flex; justify-content: space-between;">
-              <span style="color: var(--text-secondary);">Combat</span>
-              <strong style="color: #fff;">${charObj.powerLevel?.combat || 85}%</strong>
-            </div>
-            <div style="font-size: 0.75rem; display: flex; justify-content: space-between;">
-              <span style="color: var(--text-secondary);">Energy</span>
-              <strong style="color: #fff;">${charObj.powerLevel?.energy || 70}%</strong>
-            </div>
-            <div style="font-size: 0.75rem; display: flex; justify-content: space-between;">
-              <span style="color: var(--text-secondary);">Intelligence</span>
-              <strong style="color: #fff;">${charObj.powerLevel?.intelligence || 80}%</strong>
-            </div>
-            <div style="font-size: 0.75rem; display: flex; justify-content: space-between;">
-              <span style="color: var(--text-secondary);">Strength</span>
-              <strong style="color: #fff;">${charObj.powerLevel?.strength || 75}%</strong>
-            </div>
+        ${powersPills ? `
+          <div>
+            <span style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); display: block; margin-bottom: 6px;">Canonical Powers &amp; Capabilities</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">${powersPills}</div>
           </div>
-        </div>
+        ` : ''}
 
-        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary);">
-          <span>First Appearance: <strong style="color: #fff;">${charObj.firstAppearance || 'Unknown'}</strong></span>
-          <span>Affiliation: <strong style="color: #fff;">${charObj.affiliations ? charObj.affiliations.join(', ') : 'Independent'}</strong></span>
+        <div style="margin-top: 0.5rem; padding-top: 0.85rem; border-top: 1px solid var(--border-subtle); font-size: 0.76rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px;">
+          <div>Key Appearances: <strong style="color: #fff;">${appearancesList || 'Marvel Continuum'}</strong></div>
+          <div>Network Centrality: <strong style="color: #00E676;">Degree ${(charObj.networkDegree || 0.15).toFixed(2)} • Eigenvector ${(charObj.networkEigen || 0.06).toFixed(4)}</strong></div>
         </div>
       </div>
     </div>
@@ -1360,28 +1859,32 @@ function openMovieModal(item) {
       </div>
       <div class="dossier-content">
         <div class="dossier-header">
-          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px;">
             <span style="font-size: 0.72rem; font-weight: 700; color: var(--stone-space); letter-spacing: 0.12em; text-transform: uppercase;">
               Phase ${item.phase} • ${item.saga}
             </span>
             <span style="font-size: 0.68rem; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 8px;">
               ${item.type.toUpperCase()}
             </span>
+            <span style="font-size: 0.68rem; background: rgba(0,230,118,0.12); color: #00E676; padding: 2px 8px; border-radius: 8px;">
+              ${item.dimension}
+            </span>
           </div>
           <h2>${item.title}</h2>
-          <div class="dossier-realname">${item.year} • ${item.runtime} • Release #${item.releaseOrder} (Chronological #${item.chronologicalOrder})</div>
+          <div class="dossier-realname">${item.year} • Release #${item.releaseOrder} • Chronological #${item.chronologicalOrder}</div>
         </div>
 
         <p style="font-size: 0.92rem; line-height: 1.6; color: var(--text-primary);">${item.synopsis || item.hook || ''}</p>
 
-        ${item.postCreditsScene ? `
-          <div style="background: rgba(130, 87, 255, 0.1); border: 1px solid rgba(130, 87, 255, 0.3); border-radius: 10px; padding: 12px 16px; margin: 0.5rem 0;">
-            <span style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--stone-power);">Post-Credits Sequence:</span>
-            <p style="font-size: 0.8rem; color: #E2E8F0; margin-top: 4px;">${item.postCreditsScene}</p>
+        ${item.doomsdayReason ? `
+          <div style="background: rgba(0, 230, 118, 0.08); border: 1px solid rgba(0, 230, 118, 0.35); border-radius: 10px; padding: 12px 16px;">
+            <span style="font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #00E676;">⚡ Essential for Avengers: Doomsday (${item.doomsdayCategory}):</span>
+            <p style="font-size: 0.8rem; color: #E2E8F0; margin-top: 4px;">${item.doomsdayReason}</p>
+            ${item.doomsdayEpisodes ? `<p style="font-size: 0.74rem; color: #FACC15; margin-top: 4px;">💡 ${item.doomsdayEpisodes}</p>` : ''}
           </div>
         ` : ''}
 
-        <div style="display: flex; gap: 12px; margin-top: 1rem;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1rem;">
           <button class="btn-toggle-watched-modal" style="
             background: ${isWatched ? '#00E676' : 'rgba(255,255,255,0.08)'};
             color: ${isWatched ? '#000' : '#fff'};
@@ -1392,8 +1895,11 @@ function openMovieModal(item) {
             font-weight: 700;
             cursor: pointer;
           ">
-            ${isWatched ? '✓ Watched' : 'Mark as Watched'}
+            ${isWatched ? '✓ Watched' : '+ Mark as Watched'}
           </button>
+          <a href="${item.watchUrl}" target="_blank" rel="noopener noreferrer" class="btn-cosmic-ghost" style="padding: 10px 20px;">
+            ▶ Watch on ${item.watch}
+          </a>
         </div>
       </div>
     </div>
@@ -1427,54 +1933,230 @@ function initModalHandlers() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   EASTER EGGS: THANOS SNAP & REPLAY UNIVERSE
+   EASTER EGGS: THANOS GAUNTLET SNAP, MJOLNIR, SPIDER-WEB & SLING RING
 ═══════════════════════════════════════════════════════════════════ */
-function initEasterEggs() {
-  const replayBtn = document.getElementById('btn-replay-universe');
-  if (replayBtn) {
-    replayBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      showToast('Multiverse Rewound to the Big Bang Singularity', '🌌');
-    });
-  }
+function executeThanosSnap(wipeStorage = false) {
+  document.getElementById('snap-confirm-modal')?.classList.remove('open');
+  const gauntlet = document.getElementById('thanos-gauntlet-container');
+  const flash = document.getElementById('snap-white-flash');
 
-  const snapBtn = document.getElementById('nav-snap-trigger');
-  if (snapBtn) {
-    snapBtn.addEventListener('click', () => {
-      executeThanosSnap();
-    });
-  }
-}
+  try {
+    const audio = new Audio(STUDIO_ASSETS.thanosSnapAudio);
+    audio.volume = 0.65;
+    audio.play().catch(() => {});
+  } catch (e) {}
 
-function executeThanosSnap() {
-  showToast('Snap initiated... Half the universe turns to dust.', '🤌');
-  const cards = document.querySelectorAll('.archive-card, .character-card');
-  
-  cards.forEach((card, index) => {
-    if (index % 2 === 0) {
-      card.style.transition = 'opacity 1.5s ease, transform 1.5s ease, filter 1.5s ease';
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(-20px) scale(0.9)';
-      card.style.filter = 'blur(10px) grayscale(1)';
-    }
-  });
+  if (gauntlet) gauntlet.style.bottom = '40px';
 
   setTimeout(() => {
-    showToast('Time Stone activated! Restoring timeline branches...', '🟢');
-    cards.forEach(card => {
+    if (flash) flash.style.opacity = '1';
+    if (gauntlet) gauntlet.style.bottom = '-320px';
+
+    if (wipeStorage) {
+      watchedSet.clear();
+      saveWatchedState();
+      renderMovieArchive();
+      renderDoomsdaySection();
+      renderInfinitySaga();
+      renderMultiverseSaga();
+    }
+
+    const cards = document.querySelectorAll('.archive-card, .character-card');
+    cards.forEach((card, index) => {
+      if (index % 2 === 0) {
+        card.style.transition = 'opacity 1.2s ease, transform 1.2s ease, filter 1.2s ease';
+        card.style.opacity = '0.15';
+        card.style.transform = 'translateY(-14px) scale(0.94)';
+        card.style.filter = 'blur(6px) grayscale(1)';
+      }
+    });
+
+    showToast('🫰 SNAP! Reality rewritten across the timeline.', '💎');
+  }, 420);
+
+  setTimeout(() => {
+    if (flash) flash.style.opacity = '0';
+  }, 850);
+
+  setTimeout(() => {
+    document.querySelectorAll('.archive-card, .character-card').forEach(card => {
       card.style.opacity = '';
       card.style.transform = '';
       card.style.filter = '';
     });
-  }, 4000);
+  }, 3600);
+}
+
+function shootSpiderWeb(cx, cy) {
+  const canvas = document.getElementById('spidey-web');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = window.innerWidth;
+  const H = canvas.height = window.innerHeight;
+  canvas.style.opacity = '1';
+
+  const tx = cx || W * 0.5;
+  const ty = cy || H * 0.5;
+  const origins = [{ x: 0, y: H }, { x: W, y: H }, { x: W * 0.5, y: H }];
+
+  const pop = document.createElement('div');
+  pop.className = 'thwip-text-normal';
+  pop.textContent = 'THWIP!';
+  pop.style.cssText = `position:fixed;left:${tx}px;top:${ty}px;animation:thwipPopNormal 0.75s ease forwards;`;
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 750);
+
+  let p = 0;
+  function anim() {
+    p += 0.1;
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,0.88)';
+    ctx.lineWidth = 2.5;
+    origins.forEach(o => {
+      ctx.beginPath();
+      ctx.moveTo(o.x, o.y);
+      ctx.lineTo(o.x + (tx - o.x) * Math.min(1, p), o.y + (ty - o.y) * Math.min(1, p));
+      ctx.stroke();
+    });
+    if (p < 1.8) requestAnimationFrame(anim);
+    else {
+      ctx.clearRect(0, 0, W, H);
+      canvas.style.opacity = '0';
+    }
+  }
+  requestAnimationFrame(anim);
+}
+
+function openDoctorStrangePortal() {
+  const canvas = document.getElementById('dr-strange-portal-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = window.innerWidth;
+  const H = canvas.height = window.innerHeight;
+  const cx = W / 2, cy = H / 2;
+  const maxR = Math.min(W, H) * 0.34;
+  const start = performance.now();
+
+  showToast('🌀 Sling Ring Portal Opened — "Be careful what you wish for, Parker."', '✨');
+
+  function draw(now) {
+    const elapsed = now - start;
+    const p = Math.min(1, elapsed / 1200);
+    const fade = elapsed > 3000 ? Math.max(0, 1 - (elapsed - 3000) / 800) : 1;
+    const r = maxR * (1 - Math.pow(1 - p, 3)) * fade;
+
+    ctx.clearRect(0, 0, W, H);
+    if (r > 4) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 8;
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 35;
+      ctx.stroke();
+
+      for (let i = 0; i < 24; i++) {
+        const angle = (Math.PI * 2 / 24) * i + now * 0.004;
+        const sx = cx + Math.cos(angle) * r;
+        const sy = cy + Math.sin(angle) * r;
+        ctx.fillStyle = '#fef3c7';
+        ctx.fillRect(sx - 2, sy - 2, 4, 4);
+      }
+      ctx.restore();
+    }
+
+    if (elapsed < 3800) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, W, H);
+  }
+  requestAnimationFrame(draw);
+}
+
+function initEasterEggs() {
+  document.getElementById('btn-replay-universe')?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast('Multiverse Rewound to the Big Bang Singularity', '🌌');
+  });
+
+  document.getElementById('nav-snap-trigger')?.addEventListener('click', () => {
+    document.getElementById('snap-confirm-modal')?.classList.add('open');
+  });
+
+  document.getElementById('btn-confirm-snap')?.addEventListener('click', () => {
+    executeThanosSnap(true);
+  });
+
+  // 6-Click Logo -> Assemble all 6 Infinity Stones
+  let logoClicks = 0;
+  let logoTimer = null;
+  document.getElementById('mcu-logo')?.addEventListener('click', (e) => {
+    logoClicks++;
+    clearTimeout(logoTimer);
+    logoTimer = setTimeout(() => { logoClicks = 0; }, 3000);
+    if (logoClicks >= 6) {
+      logoClicks = 0;
+      ['reality', 'space', 'time', 'mind', 'power', 'soul'].forEach(s => markStoneDiscovered(s));
+      showToast('💎 ALL 6 INFINITY STONES ASSEMBLED! I AM IRON MAN.', '⚡');
+    }
+  });
+
+  // Double-click background to shoot Spider-Man webs
+  window.addEventListener('dblclick', (e) => {
+    if (e.target.closest('button, a, input, select, .archive-card, .character-card, .dd-card')) return;
+    shootSpiderWeb(e.clientX, e.clientY);
+  });
+
+  // Keyboard secret sequences: worthy, unworthy, thwip, strange, smash, chimichanga
+  let keyBuffer = '';
+  window.addEventListener('keydown', (e) => {
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+    keyBuffer = (keyBuffer + e.key.toLowerCase()).slice(-15);
+
+    if (keyBuffer.endsWith('unworthy')) {
+      document.body.classList.remove('mjolnir-mode');
+      showToast('🔨 Mjolnir returned to Asgard.');
+      keyBuffer = '';
+    } else if (keyBuffer.endsWith('worthy')) {
+      document.body.classList.add('mjolnir-mode');
+      showToast('⚡ Whosoever holds this hammer, if they be worthy, shall possess the power of Thor!');
+      keyBuffer = '';
+    } else if (keyBuffer.endsWith('thwip')) {
+      shootSpiderWeb(window.innerWidth / 2, window.innerHeight / 2);
+      keyBuffer = '';
+    } else if (keyBuffer.endsWith('strange')) {
+      openDoctorStrangePortal();
+      keyBuffer = '';
+    } else if (keyBuffer.endsWith('smash')) {
+      document.body.style.animation = 'screenShake 0.4s ease';
+      setTimeout(() => { document.body.style.animation = ''; }, 450);
+      showToast('💚 HULK SMASH!', '💥');
+      keyBuffer = '';
+    } else if (keyBuffer.endsWith('chimichanga')) {
+      showToast('🌮 Maximum Effort! Deadpool broke the 4th wall.', '⚔️');
+      keyBuffer = '';
+    }
+  });
+
+  // Mjolnir impact ripple when worthy mode is active
+  window.addEventListener('click', (e) => {
+    if (!document.body.classList.contains('mjolnir-mode')) return;
+    const ripple = document.createElement('div');
+    ripple.className = 'mjolnir-impact';
+    ripple.style.left = `${e.clientX}px`;
+    ripple.style.top = `${e.clientY}px`;
+    document.body.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 450);
+  });
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    INITIALIZE EVERYTHING ON DOM READY
 ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
+  initStudioIntro();
   initHeroParticleCanvas();
   initHeroStats();
+  initMultiverseTreeBranches();
   initCosmicAudio();
   initMultiverseNav();
   initTrailerIntermissions();
@@ -1482,6 +2164,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderInfinitySaga();
   renderMultiverseSaga();
   initMultiverseTabs();
+  initDoomsdayFastTrack();
   renderCharacterGallery();
   initCharacterFilters();
   initMarvelNetwork();
@@ -1489,6 +2172,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderStonesAltars();
   renderMovieArchive();
   initArchiveControls();
+  initShareModal();
   initModalHandlers();
   initEasterEggs();
 });

@@ -80,13 +80,55 @@ export const INFINITY_STONES = [
   }
 ];
 
+import { STONE_MEDIA } from './mediaRegistry.js';
+
+const STONE_TIMELINE_JOURNEY = {
+  space: [
+    "965 AD — Hidden in Tønsberg, Norway by Odin inside the Tesseract.",
+    "1942 — Seized by Red Skull (HYDRA); recovered from the Arctic by Howard Stark.",
+    "1995 — Used by Dr. Wendy Lawson (Mar-Vell) for the Light-Speed Engine; imbues Carol Danvers.",
+    "2012 — Stolen by Loki to open the Chitauri portal over New York; returned to Asgard's vault.",
+    "2018 — Taken by Loki before Asgard's destruction; surrendered to Thanos on the Statesman."
+  ],
+  mind: [
+    "2012 — Encased inside Loki's Scepter, gifted by Thanos to lead the Battle of New York.",
+    "2014–2015 — Experimented on by Baron Strucker in Sokovia, unlocking Wanda & Pietro Maximoff's powers.",
+    "2015 — Extracted by Ultron and fused with vibranium and JARVIS to birth Vision.",
+    "2018 — Ripped from Vision's forehead by Thanos in Wakanda after reversing time."
+  ],
+  reality: [
+    "2988 BC — Malekith attempts to plunge the Nine Realms into darkness using the Aether; Bor hides it.",
+    "2013 — Jane Foster accidentally absorbs the Aether during the Convergence; Malekith is defeated in Greenwich.",
+    "2013 — Entrusted by Sif and Volstagg to Taneleer Tivan (The Collector) on Knowhere.",
+    "2018 — Seized by Thanos after devastating Knowhere."
+  ],
+  power: [
+    "Prehistory — Used by Eson the Searcher (Celestial) to judge entire civilizations; sealed on Morag.",
+    "2014 — Retrieved by Star-Lord; wielded by Ronan the Accuser before the Guardians share its energy to destroy him.",
+    "2014 — Locked inside the Nova Corps vault on Xandar.",
+    "2018 — Thanos decimated Xandar to claim the Power Stone first."
+  ],
+  time: [
+    "Ancient Era — Placed inside the Eye of Agamotto by the first Sorcerer Supreme at Kamar-Taj.",
+    "2016 — Mastered by Stephen Strange to trap Dormammu in a time loop and restore Hong Kong.",
+    "2018 — Used by Strange on Titan to view 14,000,605 futures before surrendering it to Thanos to spare Tony Stark's life."
+  ],
+  soul: [
+    "1945–2018 — Red Skull is banished to Vormir by the Tesseract to serve as immortal Stonekeeper.",
+    "2018 — Thanos sacrifices his daughter Gamora at the cliffs of Vormir to claim the Soul Stone.",
+    "2023 (Time Heist / 2014 Branch) — Natasha Romanoff sacrifices herself on Vormir so Clint Barton can bring the stone to Earth-616."
+  ]
+};
+
 export const stonesData = INFINITY_STONES.map(s => ({
   ...s,
+  imageUrl: STONE_MEDIA[s.id] || '',
   glow: s.glowColor,
   lore: s.keyEvents,
   quote: s.cinematicQuote,
   vessels: [s.containment],
   wielders: s.originalKeeper.split(' / ').map(w => w.trim()),
+  timelineJourney: STONE_TIMELINE_JOURNEY[s.id] || [],
   firstAppearance: s.id === 'space' ? 'Captain America: The First Avenger' :
                    s.id === 'mind' ? "Marvel's The Avengers" :
                    s.id === 'reality' ? 'Thor: The Dark World' :

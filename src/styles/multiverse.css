@@ -3227,6 +3227,384 @@ section {
   border-color: #fff;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   ORIGINKIT 3D ROUND CAROUSEL (CYLINDRICAL DOSSIER SLIDESHOW)
+   ═══════════════════════════════════════════════════════════════════ */
+.char-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(4, 16, 11, 0.7);
+  border: 1px solid rgba(0, 230, 118, 0.28);
+  border-radius: 24px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.char-view-btn {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-family: var(--font-captain);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94A3B8;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.char-view-btn.active {
+  background: #00E676;
+  color: #032512;
+  font-weight: 800;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.5);
+}
+
+.char-round-carousel-stage {
+  position: relative;
+  width: 100%;
+  height: clamp(520px, 66vh, 620px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+  touch-action: pan-y;
+  cursor: grab;
+  perspective: 3000px;
+  -webkit-perspective: 3000px;
+  background: radial-gradient(ellipse 70% 55% at 50% 50%, rgba(0, 230, 118, 0.08) 0%, rgba(4, 18, 12, 0.2) 60%, transparent 100%);
+  border-radius: 24px;
+  margin: 0 0 2rem;
+  outline: none;
+}
+
+.char-round-carousel-stage:focus-visible {
+  box-shadow: 0 0 0 2px #00E676, 0 0 25px rgba(0, 230, 118, 0.4);
+}
+
+.char-round-carousel-stage.is-dragging {
+  cursor: grabbing;
+}
+
+.round-carousel-viewport {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+.round-carousel-tilt-rig {
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  transform: rotateX(-7deg);
+}
+
+.round-carousel-cylinder-ring {
+  position: relative;
+  width: 270px;
+  height: 400px;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.round-carousel-card {
+  position: absolute;
+  inset: 0;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: filter 0.3s ease;
+}
+
+.round-card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.round-card-front {
+  background: linear-gradient(180deg, rgba(8, 22, 15, 0.94) 0%, rgba(3, 10, 7, 0.98) 100%);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(0, 230, 118, 0.12);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.round-carousel-card:hover .round-card-front {
+  border-color: #00E676;
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.98), 0 0 35px rgba(0, 230, 118, 0.45);
+  transform: scale(1.02);
+}
+
+.round-card-back {
+  transform: rotateY(180deg);
+  background: #06110a url('/images/doom-smoke-bg.jpg') center/cover;
+  border: 1px solid rgba(0, 230, 118, 0.18);
+  box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.9);
+  filter: brightness(0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.round-card-back::after {
+  content: 'MARVEL';
+  font-family: var(--font-avengero);
+  font-size: 1.6rem;
+  letter-spacing: 0.18em;
+  color: rgba(0, 230, 118, 0.25);
+  transform: rotate(-30deg);
+}
+
+.round-card-media {
+  position: relative;
+  height: 56%;
+  width: 100%;
+  overflow: hidden;
+  background: #020604;
+}
+
+.round-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.5s ease;
+}
+
+.round-carousel-card:hover .round-card-media img {
+  transform: scale(1.08);
+}
+
+.round-card-universe {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  backdrop-filter: blur(6px);
+}
+
+.round-card-audit {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(0, 230, 118, 0.4);
+  color: #00E676;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.round-card-info {
+  padding: 10px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: linear-gradient(180deg, rgba(8, 22, 15, 0.6) 0%, rgba(3, 10, 7, 0.95) 100%);
+}
+
+.round-card-name {
+  font-size: 1.05rem;
+  margin: 0 0 2px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+.round-card-real {
+  font-size: 0.68rem;
+  color: #94A3B8;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.round-card-role {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #00E676;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.round-card-power {
+  margin: 4px 0 8px;
+}
+
+.round-power-label {
+  display: block;
+  font-size: 0.54rem;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
+}
+
+.round-power-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.round-power-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00E676, #FACC15);
+  border-radius: 4px;
+}
+
+.round-card-btn {
+  margin-top: auto;
+  padding: 7px 12px;
+  background: rgba(0, 230, 118, 0.12);
+  border: 1px solid rgba(0, 230, 118, 0.38);
+  border-radius: 6px;
+  color: #86EFAC;
+  font-family: var(--font-captain);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: center;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.round-card-btn:hover {
+  background: #00E676;
+  color: #032512;
+  box-shadow: 0 0 16px rgba(0, 230, 118, 0.6);
+}
+
+/* 3D Round Carousel Floating HUD Controls */
+.round-carousel-hud {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(4, 16, 11, 0.88);
+  border: 1px solid rgba(0, 230, 118, 0.32);
+  border-radius: 30px;
+  padding: 6px 18px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 230, 118, 0.15);
+}
+
+.round-hud-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 230, 118, 0.4);
+  color: #00E676;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.round-hud-btn:hover {
+  background: #00E676;
+  color: #032512;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.6);
+  transform: scale(1.1);
+}
+
+.round-hud-autoplay {
+  width: auto;
+  border-radius: 16px;
+  padding: 0 12px;
+  font-family: var(--font-captain);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.round-hud-telemetry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 170px;
+  text-align: center;
+}
+
+.round-hud-tag {
+  font-family: var(--font-eternal);
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  color: #86EFAC;
+  text-transform: uppercase;
+}
+
+.round-hud-active-title {
+  font-family: var(--font-avengero);
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
+  color: #FFFFFF;
+  margin: 1px 0;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.round-hud-counter {
+  font-family: var(--font-captain);
+  font-size: 0.58rem;
+  color: #FDE047;
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 680px) {
+  .char-round-carousel-stage {
+    height: 480px;
+  }
+  .round-carousel-cylinder-ring {
+    width: 220px;
+    height: 340px;
+  }
+  .round-hud-telemetry {
+    min-width: 120px;
+  }
+  .round-hud-active-title {
+    font-size: 0.74rem;
+    max-width: 140px;
+  }
+}
+
 .characters-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));

@@ -675,11 +675,339 @@ function initMultiverseTabs() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   SECTION 6: CHARACTER UNIVERSE (AUDITED 49 CHARACTERS)
+   SECTION 6: CHARACTER UNIVERSE (AUDITED 49 CHARACTERS + 3D ROUND CAROUSEL)
 ═══════════════════════════════════════════════════════════════════ */
+let roundCarouselList = [];
+let roundCarouselRotY = 0;
+let roundCarouselVel = 0;
+let roundCarouselLastTime = 0;
+let roundCarouselRafId = null;
+let roundCarouselIsDragging = false;
+let roundCarouselDragStartX = 0;
+let roundCarouselTotalDrag = 0;
+let roundCarouselAutoplay = true;
+let roundCarouselIsHovered = false;
+let roundCarouselRadius = 1500;
+let roundCarouselAngle = 7.35;
+let roundCarouselSpeed = 3.5;
+let roundCarouselSensitivity = 4;
+let roundCarouselControlsInitialized = false;
+
+function applyRoundCarouselTransform() {
+  const ring = document.getElementById('round-carousel-ring');
+  if (!ring) return;
+  ring.style.transform = `translateZ(${-roundCarouselRadius}px) rotateY(${roundCarouselRotY}deg)`;
+}
+
+function updateRoundCarouselTelemetry() {
+  if (!roundCarouselList || roundCarouselList.length === 0) return;
+  const count = roundCarouselList.length;
+  if (roundCarouselAngle <= 0) return;
+
+  const normRot = ((-roundCarouselRotY % 360) + 360) % 360;
+  const activeIdx = Math.round(normRot / roundCarouselAngle) % count;
+  const activeChar = roundCarouselList[activeIdx];
+
+  if (activeChar) {
+    const nameEl = document.getElementById('round-active-name');
+    const counterEl = document.getElementById('round-active-counter');
+    if (nameEl && nameEl.textContent !== activeChar.name) {
+      nameEl.textContent = activeChar.name;
+    }
+    const countStr = `BEING ${String(activeIdx + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`;
+    if (counterEl && counterEl.textContent !== countStr) {
+      counterEl.textContent = countStr;
+    }
+  }
+}
+
+function renderRoundCarouselRing(list) {
+  const ring = document.getElementById('round-carousel-ring');
+  const hud = document.querySelector('.round-carousel-hud');
+  if (!ring) return;
+
+  roundCarouselList = list;
+  const count = list.length;
+
+  if (count === 0) {
+    ring.innerHTML = `
+      <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-family: var(--font-captain); font-size: 0.9rem; text-align: center; width: 320px; left: 50%; transform: translateX(-50%);">
+        No character dossiers match this filter.
+      </div>
+    `;
+    if (hud) hud.style.display = 'none';
+    return;
+  }
+
+  if (hud) hud.style.display = 'flex';
+
+  const isMobile = window.innerWidth <= 680;
+  const cardWidth = isMobile ? 220 : 270;
+  const spacing = count > 20 ? 2.2 : (count > 8 ? 2.6 : 3.0);
+  const factor = 1 + spacing * 0.15;
+
+  if (count === 1) {
+    roundCarouselAngle = 0;
+    roundCarouselRadius = 0;
+  } else {
+    roundCarouselAngle = 360 / count;
+    roundCarouselRadius = Math.max(380, Math.round((cardWidth * factor) / (2 * Math.tan(Math.PI / count))));
+  }
+
+  ring.innerHTML = list.map((c, i) => {
+    const itemRot = i * roundCarouselAngle;
+    const rawAnomalies = c.rawAudit && c.rawAudit.anomaliesFound ? '⚠ Audited' : '✓ Verified';
+    const safeName = c.name.replace(/'/g, "\\'");
+    const fbPoster = (c.fallbackPoster || '').replace(/'/g, "\\'");
+    const powerCombat = c.powerLevel && typeof c.powerLevel === 'object' ? (c.powerLevel.combat || 85) : 85;
+
+    return `
+      <div class="round-carousel-card" 
+           data-index="${i}" 
+           data-id="${c.id}" 
+           style="transform: rotateY(${itemRot}deg) translateZ(${roundCarouselRadius}px); --char-accent: ${c.accentColor || '#00E676'};"
+           role="group"
+           aria-label="${c.name} Dossier">
+        <!-- Front Face -->
+        <div class="round-card-face round-card-front">
+          <div class="round-card-media">
+            <img src="${c.image}" alt="${c.name}" loading="lazy" onerror="handleImageError(this, '${safeName}', '${c.accentColor || '#1a233a'}', '${fbPoster}')" />
+            <div class="round-card-universe">${c.universe}</div>
+            <div class="round-card-audit">${rawAnomalies}</div>
+          </div>
+          <div class="round-card-info">
+            <h3 class="round-card-name ${c.franchiseFont || ''}">${c.name}</h3>
+            <div class="round-card-real">${c.realName}</div>
+            <div class="round-card-role">${c.identity} • ${c.category}</div>
+            <div class="round-card-power">
+              <span class="round-power-label">${typeof c.powerLevel === 'string' ? c.powerLevel : 'Power & Centrality'}</span>
+              <div class="round-power-track">
+                <div class="round-power-bar" style="width: ${powerCombat}%;"></div>
+              </div>
+            </div>
+            <button class="round-card-btn" data-id="${c.id}" type="button" aria-label="Open classified dossier for ${c.name}">Classified Dossier →</button>
+          </div>
+        </div>
+        <!-- Back Face with Latverian Obsidian finish -->
+        <div class="round-card-face round-card-back" aria-hidden="true"></div>
+      </div>
+    `;
+  }).join('');
+
+  applyRoundCarouselTransform();
+  updateRoundCarouselTelemetry();
+
+  if (!roundCarouselControlsInitialized) {
+    initRoundCarouselControls();
+  }
+}
+
+function initRoundCarouselControls() {
+  roundCarouselControlsInitialized = true;
+
+  const stage = document.getElementById('char-round-carousel-stage');
+  const viewport = document.getElementById('round-carousel-viewport');
+  const ring = document.getElementById('round-carousel-ring');
+  if (!viewport || !ring) return;
+
+  // Pointer drag & touch swipe
+  viewport.addEventListener('pointerdown', (e) => {
+    roundCarouselIsDragging = true;
+    roundCarouselDragStartX = e.clientX;
+    roundCarouselTotalDrag = 0;
+    roundCarouselVel = 0;
+    try {
+      viewport.setPointerCapture(e.pointerId);
+    } catch (_) {}
+    if (stage) stage.classList.add('is-dragging');
+  });
+
+  viewport.addEventListener('pointermove', (e) => {
+    if (!roundCarouselIsDragging) return;
+    const dx = e.clientX - roundCarouselDragStartX;
+    roundCarouselDragStartX = e.clientX;
+    roundCarouselTotalDrag += Math.abs(dx);
+
+    const k = 0.3 * roundCarouselSensitivity;
+    roundCarouselRotY += dx * k;
+    roundCarouselVel = dx * k * 60;
+    applyRoundCarouselTransform();
+    updateRoundCarouselTelemetry();
+  });
+
+  const onPointerEnd = (e) => {
+    if (!roundCarouselIsDragging) return;
+    try {
+      viewport.releasePointerCapture(e.pointerId);
+    } catch (_) {}
+    roundCarouselIsDragging = false;
+    if (stage) stage.classList.remove('is-dragging');
+  };
+
+  viewport.addEventListener('pointerup', onPointerEnd);
+  viewport.addEventListener('pointercancel', onPointerEnd);
+
+  // Click handler on 3D ring
+  ring.addEventListener('click', (e) => {
+    if (roundCarouselTotalDrag > 8) {
+      // Ignore click if it was part of a drag gesture
+      return;
+    }
+    const btn = e.target.closest('.round-card-btn');
+    const card = e.target.closest('.round-carousel-card');
+    if (!card) return;
+
+    const id = card.dataset.id;
+    const charObj = charactersData.find(c => c.id === id);
+    if (!charObj) return;
+
+    if (btn) {
+      openCharacterDossier(charObj);
+      return;
+    }
+
+    const idx = parseInt(card.dataset.index, 10);
+    const count = roundCarouselList.length;
+    if (count <= 1) {
+      openCharacterDossier(charObj);
+      return;
+    }
+
+    const normRot = ((-roundCarouselRotY % 360) + 360) % 360;
+    const activeIdx = Math.round(normRot / roundCarouselAngle) % count;
+
+    if (idx === activeIdx) {
+      openCharacterDossier(charObj);
+    } else {
+      let diff = idx - activeIdx;
+      if (diff > count / 2) diff -= count;
+      if (diff < -count / 2) diff += count;
+      roundCarouselVel = -diff * roundCarouselAngle * 3.4;
+    }
+  });
+
+  // Prev & Next navigation buttons
+  const prevBtn = document.getElementById('btn-round-prev');
+  const nextBtn = document.getElementById('btn-round-next');
+  if (prevBtn) {
+    prevBtn.onclick = () => {
+      roundCarouselVel += roundCarouselAngle * 3.2;
+    };
+  }
+  if (nextBtn) {
+    nextBtn.onclick = () => {
+      roundCarouselVel -= roundCarouselAngle * 3.2;
+    };
+  }
+
+  // Autoplay toggle button
+  const autoBtn = document.getElementById('btn-round-autoplay');
+  if (autoBtn) {
+    autoBtn.onclick = () => {
+      roundCarouselAutoplay = !roundCarouselAutoplay;
+      autoBtn.textContent = roundCarouselAutoplay ? '⏸ AUTO' : '▶ AUTO';
+      autoBtn.classList.toggle('active', roundCarouselAutoplay);
+    };
+  }
+
+  // Hover pause & keyboard navigation
+  if (stage) {
+    stage.addEventListener('mouseenter', () => {
+      roundCarouselIsHovered = true;
+    });
+    stage.addEventListener('mouseleave', () => {
+      roundCarouselIsHovered = false;
+    });
+    stage.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        roundCarouselVel += roundCarouselAngle * 3.2;
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        roundCarouselVel -= roundCarouselAngle * 3.2;
+      } else if (e.key === 'Enter') {
+        const count = roundCarouselList.length;
+        if (count > 0) {
+          const normRot = ((-roundCarouselRotY % 360) + 360) % 360;
+          const activeIdx = Math.round(normRot / roundCarouselAngle) % count;
+          const activeChar = roundCarouselList[activeIdx];
+          if (activeChar) openCharacterDossier(activeChar);
+        }
+      }
+    });
+  }
+
+  // View toggle buttons (🌀 3D Ring ⇄ ⊞ Grid)
+  const btnRing = document.getElementById('btn-view-3d-ring');
+  const btnGrid = document.getElementById('btn-view-grid');
+  const gridEl = document.getElementById('characters-grid');
+
+  if (btnRing && btnGrid && stage && gridEl) {
+    btnRing.onclick = () => {
+      btnRing.classList.add('active');
+      btnGrid.classList.remove('active');
+      stage.style.display = 'flex';
+      gridEl.style.display = 'none';
+    };
+    btnGrid.onclick = () => {
+      btnGrid.classList.add('active');
+      btnRing.classList.remove('active');
+      stage.style.display = 'none';
+      gridEl.style.display = 'grid';
+    };
+  }
+
+  // Window resize handler
+  window.addEventListener('resize', () => {
+    if (roundCarouselList && roundCarouselList.length > 0) {
+      const isMobile = window.innerWidth <= 680;
+      const cardWidth = isMobile ? 220 : 270;
+      const count = roundCarouselList.length;
+      if (count > 1) {
+        const spacing = count > 20 ? 2.2 : (count > 8 ? 2.6 : 3.0);
+        const factor = 1 + spacing * 0.15;
+        roundCarouselRadius = Math.max(380, Math.round((cardWidth * factor) / (2 * Math.tan(Math.PI / count))));
+        ring.querySelectorAll('.round-carousel-card').forEach((card, i) => {
+          const itemRot = i * roundCarouselAngle;
+          card.style.transform = `rotateY(${itemRot}deg) translateZ(${roundCarouselRadius}px)`;
+        });
+        applyRoundCarouselTransform();
+      }
+    }
+  });
+
+  // Physics & Animation Loop (RAF)
+  roundCarouselLastTime = performance.now();
+  function draw(now) {
+    const dt = roundCarouselLastTime ? (now - roundCarouselLastTime) / 1000 : 0;
+    roundCarouselLastTime = now;
+    const f = Math.min(dt, 0.1);
+
+    if (!roundCarouselIsDragging) {
+      if (Math.abs(roundCarouselVel) > 0.05) {
+        roundCarouselRotY += roundCarouselVel * f;
+        roundCarouselVel *= 0.94;
+        applyRoundCarouselTransform();
+        updateRoundCarouselTelemetry();
+      } else if (roundCarouselAutoplay && !roundCarouselIsHovered) {
+        const degPerSec = roundCarouselSpeed * 2.4;
+        roundCarouselRotY += degPerSec * f;
+        applyRoundCarouselTransform();
+        updateRoundCarouselTelemetry();
+      }
+    }
+
+    roundCarouselRafId = requestAnimationFrame(draw);
+  }
+
+  if (roundCarouselRafId) {
+    cancelAnimationFrame(roundCarouselRafId);
+  }
+  roundCarouselRafId = requestAnimationFrame(draw);
+}
+
 function renderCharacterGallery() {
   const grid = document.getElementById('characters-grid');
-  if (!grid) return;
 
   let list = charactersData;
 
@@ -698,47 +1026,55 @@ function renderCharacterGallery() {
     );
   }
 
-  if (list.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-secondary);">No characters match "${charSearchQuery}" in this category.</div>`;
-    return;
-  }
+  // Reset carousel orientation on new filter so leading match is front & center
+  roundCarouselRotY = 0;
+  roundCarouselVel = 0;
+  renderRoundCarouselRing(list);
 
-  grid.innerHTML = list.map(c => {
-    const rawAnomalies = c.rawAudit && c.rawAudit.anomaliesFound ? '⚠ Audited' : '✓ Verified';
-    const safeName = c.name.replace(/'/g, "\\'");
-    const fbPoster = (c.fallbackPoster || '').replace(/'/g, "\\'");
-    return `
-      <div class="character-card" data-id="${c.id}" style="--char-accent: ${c.accentColor || '#3C8DFF'}">
-        <div class="char-card-media">
-          <img src="${c.image}" alt="${c.name}" loading="lazy" onerror="handleImageError(this, '${safeName}', '${c.accentColor || '#1a233a'}', '${fbPoster}')" />
-          <div class="char-universe-pill">${c.universe}</div>
-          <div class="char-audit-status">${rawAnomalies}</div>
-        </div>
-        <div class="char-card-info">
-          <h3 class="char-name ${c.franchiseFont || ''}">${c.name}</h3>
-          <div class="char-real-name">${c.realName}</div>
-          <div class="char-role-badge">${c.identity} • ${c.category}</div>
-          
-          <div class="char-power-strip">
-            <span class="power-label">${typeof c.powerLevel === 'string' ? c.powerLevel : 'Power & Centrality Index'}</span>
-            <div class="power-bar-wrap">
-              <div class="power-bar-fill" style="width: ${c.powerLevel?.combat || 85}%;"></div>
-            </div>
+  // Render Grid view
+  if (grid) {
+    if (list.length === 0) {
+      grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-secondary);">No characters match "${charSearchQuery}" in this category.</div>`;
+      return;
+    }
+
+    grid.innerHTML = list.map(c => {
+      const rawAnomalies = c.rawAudit && c.rawAudit.anomaliesFound ? '⚠ Audited' : '✓ Verified';
+      const safeName = c.name.replace(/'/g, "\\'");
+      const fbPoster = (c.fallbackPoster || '').replace(/'/g, "\\'");
+      return `
+        <div class="character-card" data-id="${c.id}" style="--char-accent: ${c.accentColor || '#3C8DFF'}">
+          <div class="char-card-media">
+            <img src="${c.image}" alt="${c.name}" loading="lazy" onerror="handleImageError(this, '${safeName}', '${c.accentColor || '#1a233a'}', '${fbPoster}')" />
+            <div class="char-universe-pill">${c.universe}</div>
+            <div class="char-audit-status">${rawAnomalies}</div>
           </div>
-          
-          <button class="char-dossier-btn" data-id="${c.id}">Classified Dossier →</button>
+          <div class="char-card-info">
+            <h3 class="char-name ${c.franchiseFont || ''}">${c.name}</h3>
+            <div class="char-real-name">${c.realName}</div>
+            <div class="char-role-badge">${c.identity} • ${c.category}</div>
+            
+            <div class="char-power-strip">
+              <span class="power-label">${typeof c.powerLevel === 'string' ? c.powerLevel : 'Power & Centrality Index'}</span>
+              <div class="power-bar-wrap">
+                <div class="power-bar-fill" style="width: ${c.powerLevel?.combat || 85}%;"></div>
+              </div>
+            </div>
+            
+            <button class="char-dossier-btn" data-id="${c.id}">Classified Dossier →</button>
+          </div>
         </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
 
-  grid.querySelectorAll('.character-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      const id = card.dataset.id;
-      const charObj = charactersData.find(c => c.id === id);
-      if (charObj) openCharacterDossier(charObj);
+    grid.querySelectorAll('.character-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        const id = card.dataset.id;
+        const charObj = charactersData.find(c => c.id === id);
+        if (charObj) openCharacterDossier(charObj);
+      });
     });
-  });
+  }
 }
 
 function initCharacterFilters() {

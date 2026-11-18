@@ -598,9 +598,37 @@
         <button class="char-pill" data-category="Villains">Villains</button>
         <button class="char-pill" data-category="Street Level">Street Level</button>
       </div>
+
+      <div class="char-view-toggle" role="group" aria-label="Character View Mode">
+        <button class="char-view-btn active" id="btn-view-3d-ring" title="3D Cylindrical Ring Carousel">🌀 3D Ring</button>
+        <button class="char-view-btn" id="btn-view-grid" title="Tactical Dossier Grid">⊞ Grid</button>
+      </div>
     </div>
 
-    <div class="characters-grid" id="characters-grid">
+    <!-- ORIGINKIT 3D ROUND CAROUSEL STAGE -->
+    <div class="char-round-carousel-stage" id="char-round-carousel-stage" tabindex="0" role="region" aria-label="3D Multiverse Character Cylindrical Carousel">
+      <div class="round-carousel-viewport" id="round-carousel-viewport" role="region" aria-label="3D Character Ring Carousel">
+        <div class="round-carousel-tilt-rig">
+          <div class="round-carousel-cylinder-ring" id="round-carousel-ring">
+            <!-- Dynamically populated with 3D character cards -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D CAROUSEL FLOATING HUD CONTROLS -->
+      <div class="round-carousel-hud">
+        <button class="round-hud-btn" id="btn-round-prev" aria-label="Rotate Left">◀</button>
+        <div class="round-hud-telemetry">
+          <span class="round-hud-tag">3D MULTIVERSE CAROUSEL • DRAG TO ROTATE</span>
+          <strong class="round-hud-active-title" id="round-active-name">INVISIBLE WOMAN</strong>
+          <span class="round-hud-counter" id="round-active-counter">BEING 01 / 49</span>
+        </div>
+        <button class="round-hud-btn" id="btn-round-next" aria-label="Rotate Right">▶</button>
+        <button class="round-hud-btn round-hud-autoplay" id="btn-round-autoplay" aria-label="Toggle Auto-Rotation">⏸ AUTO</button>
+      </div>
+    </div>
+
+    <div class="characters-grid" id="characters-grid" style="display: none;">
       <!-- Populated via renderCharacterGallery() -->
     </div>
   </section>
